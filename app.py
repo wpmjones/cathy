@@ -1,14 +1,15 @@
 import creds
 
-from slack_bolt.async_app import AsyncApp
+from slack_bolt import App
+# from slack_bolt.async_app import AsyncApp
 
-app = AsyncApp(token=creds.bot_token,
-               signing_secret=creds.signing_secret)
+app = App(token=creds.bot_token,
+          signing_secret=creds.signing_secret)
 
 
 # Listens to incoming messages that contain "hello"
 @app.message("hello")
-async def message_hello(message, say):
+def message_hello(message, say):
     # say() sends a message to the channel where the event was triggered
     say(
         blocks=[
@@ -27,7 +28,7 @@ async def message_hello(message, say):
 
 
 @app.event("app_mention")
-async def event_test(body, say, logger):
+def event_test(body, say, logger):
     logger.info(body)
     say("What's up?")
 
@@ -39,7 +40,7 @@ async def hello(body, ack):
 
 
 @app.action("button_click")
-async def action_button_click(body, ack, say):
+def action_button_click(body, ack, say):
     # Acknowledge the action
     ack()
     say(f"<@{body['user']['id']}> clicked the button")
