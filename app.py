@@ -9,7 +9,7 @@ app = AsyncApp(token=creds.bot_token,
 
 # Listens to incoming messages that contain "hello"
 @app.message("hello")
-def message_hello(message, say):
+async def message_hello(message, say):
     # say() sends a message to the channel where the event was triggered
     say(
         blocks=[
@@ -34,7 +34,7 @@ async def hello(body, ack):
 
 
 @app.action("button_click")
-def action_button_click(body, ack, say):
+async def action_button_click(body, ack, say):
     # Acknowledge the action
     ack()
     say(f"<@{body['user']['id']}> clicked the button")
