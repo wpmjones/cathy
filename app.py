@@ -1,10 +1,10 @@
 import creds
 import os
 
-from slack_bolt import App
+from slack_bolt.async_app import AsyncApp
 
-app = App(token=creds.bot_token,
-          signing_secret=creds.signing_secret)
+app = AsyncApp(token=creds.bot_token,
+               signing_secret=creds.signing_secret)
 
 
 # Listens to incoming messages that contain "hello"
@@ -25,6 +25,12 @@ def message_hello(message, say):
         ],
         text=f"Hey there <@{message['user']}>!",
     )
+
+
+@app.command("/hello-bolt-python")
+async def hello(body, ack):
+    user_id = body["user_id"]
+    await ack(f"Hi <@{user_id}>!")
 
 
 @app.action("button_click")
