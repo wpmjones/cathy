@@ -1,6 +1,7 @@
 import creds
 import os
 
+# from loguru import logger
 from slack_bolt.async_app import AsyncApp
 
 app = AsyncApp(token=creds.bot_token,
@@ -25,6 +26,12 @@ async def message_hello(message, say):
         ],
         text=f"Hey there <@{message['user']}>!",
     )
+
+
+@app.event("app_mention")
+async def event_test(body, say, logger):
+    logger.info(body)
+    say("What's up?")
 
 
 @app.command("/hello-bolt-python")
