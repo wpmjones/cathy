@@ -1,3 +1,4 @@
+import creds
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
@@ -5,7 +6,8 @@ logging.basicConfig(level=logging.DEBUG)
 from slack_bolt import App
 from slack_bolt.adapter.flask import SlackRequestHandler
 
-app = App()
+app = App(token=creds.bot_token,
+          signing_secret=creds.signing_secret)
 
 
 @app.middleware  # or app.use(log_request)
