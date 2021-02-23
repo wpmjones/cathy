@@ -7,9 +7,43 @@ import string
 # from slack_bolt import App
 from datetime import datetime
 from slack_bolt.async_app import AsyncApp
+from slack_bolt.oauth.async_oauth_settings import AsyncOAuthSettings
+from slack_sdk.oauth.installation_store import FileInstallationStore
+from slack_sdk.oauth.state_store import FileOAuthStateStore
 from slack_sdk.errors import SlackApiError
 
-app = AsyncApp(token=creds.bot_token,
+oauth_settings = AsyncOAuthSettings(
+    client_id=creds.client_id,
+    client_secret=creds.client_secret,
+    scopes=[
+        "app_mentions:read",
+        "channels:history",
+        "channels:join",
+        "channels:read",
+        "chat:write",
+        "commands",
+        "emoji:read",
+        "files:read",
+        "files:write",
+        "groups:history",
+        "groups:read",
+        "groups:write",
+        "im:history",
+        "im:read",
+        "im:write",
+        "links:read",
+        "links:write",
+        "reactions:read",
+        "reactions:write",
+        "users.profile:read",
+        "users:read",
+        "users:write",
+    ],
+    installation_store=FileInstallationStore(base_dir="./data"),
+    state_store=FileOAuthStateStore(expiration_seconds=60, base_dir="./data")
+)
+
+app = AsyncApp(oauth_settings=oauth_settings,
                signing_secret=creds.signing_secret)
 
 gc = gspread.service_account(filename=creds.gspread)
