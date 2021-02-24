@@ -43,7 +43,7 @@ oauth_settings = AsyncOAuthSettings(
     state_store=FileOAuthStateStore(expiration_seconds=60, base_dir="./data")
 )
 
-app = AsyncApp(oauth_settings=oauth_settings,
+app = AsyncApp(token=creds.bot_token,
                signing_secret=creds.signing_secret)
 
 gc = gspread.service_account(filename=creds.gspread)
@@ -221,8 +221,8 @@ async def handle_sick_input(ack, body, client, view, say):
         }
     ]
     await client.chat_postMessage(channel=creds.sick_channel,
-                                      blocks=blocks,
-                                      text=f"New callout for {name}.  Review the sheet <{creds.sick_log_link}|here>.")
+                                  blocks=blocks,
+                                  text=f"New callout for {name}.  Review the sheet <{creds.sick_log_link}|here>.")
 
 
 @app.action("button_click")
