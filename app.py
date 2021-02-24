@@ -7,6 +7,7 @@ import string
 # from slack_bolt import App
 from datetime import datetime
 from slack_bolt.async_app import AsyncApp
+from slack_bolt.error import BoltError
 from slack_bolt.oauth.async_oauth_settings import AsyncOAuthSettings
 from slack_sdk.oauth.installation_store import FileInstallationStore
 from slack_sdk.oauth.state_store import FileOAuthStateStore
@@ -65,14 +66,17 @@ async def clear_messages(ack, body, say, client):
     channel_history = result['messages']
     counter = 0
     for message in channel_history:
-        if counter % 20 == 0:
-            await asyncio.sleep(2)
+        # if counter % 20 == 0:
+        #     await asyncio.sleep(2)
         try:
             await client.chat_delete(channel=body['channel_id'],
                                      ts=message['ts'],
                                      token=creds.user_token)
+        except BoltError as e:
+            print(f"Bolt error: {e}")
         except SlackApiError as e:
             print(f"Error deleting message: {e}")
+            await asyncio.sleep(2)
         counter += 1
 
 
