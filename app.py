@@ -59,13 +59,13 @@ def contains_whitespace(s):
 async def clear_messages(ack, body, say, client):
     """Clear the specified number of messages in the channel that called the command"""
     await ack()
-    if body['user_id'] != creds.pj_user_id:
+    if body['user_id'] not in [creds.pj_user_id, creds.hc_user_id, creds.jc_user_id, creds.pr_user_id]:
         return await say("I'm sorry. Only admins can clear messages.")
     result = await client.conversations_history(channel=body['channel_id'], limit=int(body['text']))
     channel_history = result['messages']
     counter = 0
     for message in channel_history:
-        if counter % 25 == 0:
+        if counter % 20 == 0:
             await asyncio.sleep(2)
         try:
             await client.chat_delete(channel=body['channel_id'],
