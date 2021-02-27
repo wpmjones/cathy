@@ -230,14 +230,17 @@ async def handle_sick_input(ack, body, client, view, say):
 
 
 @app.command("/find")
-async def find_names(ack, body, say, logger):
+async def find_names(ack, body, say):
     """Find matching names from Sick & Discipline Logs"""
     await ack()
     sh = gc.open_by_key(creds.sick_log_id)
     sheet = sh.get_worksheet(0)
     name_list = sheet.col_values(1)
-    logger.info(name_list)
-    await say(f"Found {len(name_list)} names.")
+    count = 0
+    for name in name_list:
+        if name == body['text']:
+            count += 1
+    await say(f"Found {body['text']} {count} times.")
 
 # @app.action("button_click")
 # async def action_button_click(body, ack, say):
