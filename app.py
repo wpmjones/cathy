@@ -235,10 +235,12 @@ async def find_names(ack, body, say):
     await ack()
     sh = gc.open_by_key(creds.sick_log_id)
     sheet = sh.get_worksheet(0)
-    name_list = sheet.col_values(1)
+    data = sheet.get_all_values()
     count = 0
-    for name in name_list:
-        if name == body['text']:
+    print(body['text'])
+    for row in data:
+        print(row[1])
+        if row[1] == body['text']:
             count += 1
     await say(f"Found {body['text']} {count} times.")
 
