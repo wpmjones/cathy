@@ -229,11 +229,19 @@ async def handle_sick_input(ack, body, client, view, say):
                                   text=f"New callout for {name}.  Review the sheet <{creds.sick_log_link}|here>.")
 
 
-@app.action("button_click")
-async def action_button_click(body, ack, say):
-    # Acknowledge the action
-    await ack()
-    await say(f"<@{body['user']['id']}> clicked the button")
+@app.command("/find")
+async def find_names(ack, body, say, logger):
+    """Find matching names from Sick & Discipline Logs"""
+    sh = gc.open_by_key(creds.sick_log_id)
+    sheet = sh.get_worksheet(0)
+    name_list = sheet.col_values(1)
+    logger.info(name_list)
+
+# @app.action("button_click")
+# async def action_button_click(body, ack, say):
+#     # Acknowledge the action
+#     await ack()
+#     await say(f"<@{body['user']['id']}> clicked the button")
 
 
 # Start your app
