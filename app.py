@@ -237,12 +237,22 @@ async def find_names(ack, body, say):
     sheet = sh.get_worksheet(0)
     data = sheet.get_all_values()
     count = 0
-    print(body['text'])
+    block_text = f"**Log records for {body['text']}:**"
     for row in data:
-        print(row[1])
         if row[1] == body['text']:
             count += 1
-    await say(f"Found {body['text']} {count} times.")
+            block_text += f"\n{row[0]} - {row[2]}"
+            if row[3]:
+                block_text += f" ({row[3]})"
+    if count == 0:
+        return await say(f"No records found for {body['text']}.")
+    blocks = [
+        {
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": block_text}
+        }
+    ]
+    await say(blocks=blocks, text=f"Found {count} records for {body['text']}.")
 
 # @app.action("button_click")
 # async def action_button_click(body, ack, say):
