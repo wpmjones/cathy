@@ -235,14 +235,14 @@ async def find_names(ack, body, say):
     """Find matching names from Sick & Discipline Logs"""
     await ack()
     sh = gc.open_by_key(creds.sick_log_id)
-    sheet = sh.get_worksheet(0)
+    sheet = sh.get_worksheet("Form Responses 1")
     data = sheet.get_all_values()
     count = 0
     block_text = f"*Log records for {body['text']}:*"
     input_name = body['text']
     for row in data:
         ratio = fuzz.token_sort_ratio(input_name.lower(), row[1].lower())
-        if ratio > 60:
+        if ratio > 80:
             count += 1
             block_text += f"\n{row[0]} - {row[2]}"
             if row[3]:
