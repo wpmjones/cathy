@@ -235,7 +235,7 @@ async def find_names(ack, body, say):
     """Find matching names from Sick & Discipline Logs"""
     await ack()
     sh = gc.open_by_key(creds.sick_log_id)
-    sheet = sh.get_worksheet("Form Responses 1")
+    sheet = sh.worksheet("Form Responses 1")
     data = sheet.get_all_values()
     count = 0
     block_text = f"*Log records for {body['text']}:*"
