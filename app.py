@@ -242,7 +242,7 @@ async def find_names(ack, body, say):
     input_name = body['text']
     for row in data:
         ratio = fuzz.token_sort_ratio(input_name.lower(), row[1].lower())
-        if ratio > 80:
+        if ratio > 75:
             count += 1
             block_text += f"\n{row[0]} - {row[2]}"
             if row[3]:
