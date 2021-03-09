@@ -22,6 +22,16 @@ def contains_whitespace(s):
     return True in [c in s for c in string.whitespace]
 
 
+@app.command("/help")
+async def cathy_help(ack, say):
+    """Responds with help for Cathy commands"""
+    await ack()
+    await say("`/symptoms` List the symptoms that require a TM to go home\n"
+              "`/illness` List the illnesses that require a TM to stay home\n"
+              "`/sick` Open a form to report an illness or unexcused absence\n"
+              "/find [first last]` Retrieve information on missed shifts for the specified TM")
+
+
 # Remove prior messages
 @app.command("/clear")
 async def clear_messages(ack, body, say, client):
@@ -238,7 +248,7 @@ async def symptoms(ack, say):
 
 
 @app.command("/illness")
-async def symptoms(ack, say):
+async def illness(ack, say):
     """Respond with the illnesses that require a Team Member to stay home"""
     await ack()
     await say("*Team Members must stay home if they have the following illnesses:*\n"
