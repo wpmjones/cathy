@@ -9,41 +9,7 @@ from datetime import datetime
 from fuzzywuzzy import fuzz
 from slack_bolt.async_app import AsyncApp
 from slack_bolt.error import BoltError
-from slack_bolt.oauth.async_oauth_settings import AsyncOAuthSettings
-from slack_sdk.oauth.installation_store import FileInstallationStore
-from slack_sdk.oauth.state_store import FileOAuthStateStore
 from slack_sdk.errors import SlackApiError
-
-oauth_settings = AsyncOAuthSettings(
-    client_id=creds.client_id,
-    client_secret=creds.client_secret,
-    scopes=[
-        "app_mentions:read",
-        "channels:history",
-        "channels:join",
-        "channels:read",
-        "chat:write",
-        "commands",
-        "emoji:read",
-        "files:read",
-        "files:write",
-        "groups:history",
-        "groups:read",
-        "groups:write",
-        "im:history",
-        "im:read",
-        "im:write",
-        "links:read",
-        "links:write",
-        "reactions:read",
-        "reactions:write",
-        "users.profile:read",
-        "users:read",
-        "users:write",
-    ],
-    installation_store=FileInstallationStore(base_dir="./data"),
-    state_store=FileOAuthStateStore(expiration_seconds=60, base_dir="./data")
-)
 
 app = AsyncApp(token=creds.bot_token,
                signing_secret=creds.signing_secret)
@@ -256,6 +222,33 @@ async def find_names(ack, body, say):
         }
     ]
     await say(blocks=blocks, text=f"Found {count} records for {body['text']}.")
+
+
+@app.command("/symptoms")
+async def symptoms(ack, say):
+    """Respond with the symptoms that require a Team Member to go home"""
+    await ack()
+    await say("*Team Members must be sent home if displaying the following symptoms:*\n"
+              "Vomiting\n"
+              "Diarrhea\n"
+              "Jaundice (yellowing of the skin)\n"
+              "Fever\n"
+              "Sore throat with fever or lesions containing pus\n"
+              "Infected wound or burn that is opening or draining")
+
+
+@app.command("/illness")
+async def symptoms(ack, say):
+    """Respond with the illnesses that require a Team Member to stay home"""
+    await ack()
+    await say("*Team Members must stay home if they have the following illnesses:*\n"
+              "Salmonella Typhi\n"
+              "Non-typhoidal Salmonella\n"
+              "Shigella spp.\n"
+              "Shiga toxin-producing Escherichia coli (E coli)\n"
+              "Hepatitis A virus\n"
+              "Norovirus (a type of stomach flu)")
+
 
 # @app.action("button_click")
 # async def action_button_click(body, ack, say):
