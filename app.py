@@ -29,7 +29,8 @@ async def cathy_help(ack, say):
     await say("`/symptoms` List the symptoms that require a TM to go home\n"
               "`/illness` List the illnesses that require a TM to stay home\n"
               "`/sick` Open a form to report an illness or unexcused absence\n"
-              "/find [first last]` Retrieve information on missed shifts for the specified TM")
+              "`/find [first last]` Retrieve information on missed shifts for the specified TM\n"
+              "`/help` List these commands")
 
 
 # Remove prior messages
