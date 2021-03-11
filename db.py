@@ -90,7 +90,7 @@ class Messages:
         with get_db() as conn:
             with conn.cursor() as cursor:
                 sql = ("INSERT INTO cfa_messages "
-                       "(sid, recipient_id, store_id, message) "
+                       "(message_sid, recipient_id, store_id, message) "
                        "VALUES (%s, %s, %s, %s)")
                 cursor.execute(sql, [sid, recipient_id, store_id, message])
         cursor.close()
