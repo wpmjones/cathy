@@ -271,11 +271,13 @@ async def illness(ack, say):
 @app.command("/text")
 async def send_sms(ack, body, say):
     """Send SMS"""
+    await ack()
     message = twilio_client.messages.create(
         to="+16783797611",
         from_="+119529003930",
         body=body['text']
     )
+    await say("Message sent.")
 
 # Start your app
 if __name__ == "__main__":
