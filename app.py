@@ -10,12 +10,19 @@ from fuzzywuzzy import fuzz
 from slack_bolt.async_app import AsyncApp
 from slack_bolt.error import BoltError
 from slack_sdk.errors import SlackApiError
+from twilio.rest import Client
 
+# Create Slack app
 app = AsyncApp(token=creds.bot_token,
                signing_secret=creds.signing_secret)
 
+# Connect to Google Sheets
 gc = gspread.service_account(filename=creds.gspread)
 
+# Connect to Twilio
+account_sid = creds.twilio_account_sid
+auth_token = creds.twilio_auth_token
+twilio_client = Client(account_sid, auth_token)
 
 # look for whitespace in string
 def contains_whitespace(s):
@@ -261,12 +268,14 @@ async def illness(ack, say):
               "Norovirus (a type of stomach flu)")
 
 
-# @app.action("button_click")
-# async def action_button_click(body, ack, say):
-#     # Acknowledge the action
-#     await ack()
-#     await say(f"<@{body['user']['id']}> clicked the button")
-
+@app.command("/text")
+async def send_sms(ack, body, say):
+    """Send SMS"""
+    message = twilio_client.messages.create(
+        to="+16783797611",
+        from_="+119529003930",
+        body=body['text']
+    )
 
 # Start your app
 if __name__ == "__main__":
