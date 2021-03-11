@@ -6,6 +6,7 @@ import string
 
 # from slack_bolt import App
 from datetime import datetime
+from db import Messages
 from fuzzywuzzy import fuzz
 from slack_bolt.async_app import AsyncApp
 from slack_bolt.error import BoltError
@@ -23,6 +24,7 @@ gc = gspread.service_account(filename=creds.gspread)
 account_sid = creds.twilio_account_sid
 auth_token = creds.twilio_auth_token
 twilio_client = Client(account_sid, auth_token)
+
 
 # look for whitespace in string
 def contains_whitespace(s):
@@ -272,11 +274,15 @@ async def illness(ack, say):
 async def send_sms(ack, body, say):
     """Send SMS"""
     await ack()
+    recipient_id = 1
+    store_id = 3930
+    content = body['text']
     message = twilio_client.messages.create(
         to="+16783797611",
         from_="+119529003930",
-        body=body['text']
+        body=content
     )
+    Messages.add_message(message.sid, recipient_id, store_id, content)
     await say("Message sent.")
 
 # Start your app
