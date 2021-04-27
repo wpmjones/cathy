@@ -341,12 +341,12 @@ async def text(ack, body, client):
         }
     )
 
-
+{'type': 'static_select', 'selected_option': {'text': {'type': 'plain_text', 'text': 'Testing', 'emoji': True}, 'value': '6'}}
 @app.view("text_view")
 async def handle_text_input(ack, body, client, view, say):
     """Process input from text form"""
     logger.info(view['state']['values']['input_group']['recipient_group'])
-    position_id = view['state']['values']['input_group']['recipient_group']['value']
+    position_id = view['state']['values']['input_group']['recipient_group']['selected_option']['value']
     msg = view['state']['values']['input_message']['message']['value']
     await ack()
     with get_db() as conn:
