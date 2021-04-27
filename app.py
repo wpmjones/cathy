@@ -345,6 +345,8 @@ async def text(ack, body, client):
 @app.view("text_view")
 async def handle_text_input(ack, body, client, view, say):
     """Process input from text form"""
+    logger.info(body)
+    logger.info(body['channel_id'])
     position_id = view['state']['values']['input_group']['recipient_group']['selected_option']['value']
     msg = view['state']['values']['input_message']['message']['value']
     await ack()
