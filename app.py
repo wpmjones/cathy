@@ -277,7 +277,7 @@ async def text(ack, body, client):
     logger.info(body)
     await ack()
     # Validate user (admins only)
-    if body['user']['id'] not in creds.admin_ids:
+    if body['user_id'] not in creds.admin_ids:
         return
     with get_db() as conn:
         with conn.cursor() as cursor:
@@ -384,13 +384,9 @@ async def handle_text_input(ack, body, client, view, say):
         {
             "type": "section",
             "text": {"type": "mrkdwn", "text": block_text}
-        },
-        {
-            "type": "section",
-            "text": {"type": "mrkdwn", "text": body}
         }
     ]
-    await client.chat_postMessage(channel=creds.pj_user_id,
+    await client.chat_postMessage(channel=body['channel_id'],
                                   blocks=blocks,
                                   text=f"SMS Message sent to {recipient_group}.")
 
