@@ -289,7 +289,7 @@ async def text(ack, body, client):
                 "type": "plain_text",
                 "text": "Everyone"
             },
-            "value": 0
+            "value": "0"
         }
     ]
     for group in groups:
@@ -299,7 +299,7 @@ async def text(ack, body, client):
                     "type": "plain_text",
                     "text": group[1]
                 },
-                "value": group[0]
+                "value": f"{group[0]}"
             }
         )
     await client.views_open(
