@@ -281,7 +281,7 @@ async def text(ack, body, client):
         return
     with get_db() as conn:
         with conn.cursor() as cursor:
-            cursor.execute("SELECT position_id, name FROM cra_positions ORDER BY name")
+            cursor.execute("SELECT position_id, name FROM cfa_positions ORDER BY name")
             groups = cursor.fetchall()
     options = [
         {
