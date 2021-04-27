@@ -390,6 +390,11 @@ async def handle_text_input(ack, body, client, view, say):
                                   text=f"SMS Message sent to {recipient_group}.")
 
 
+@app.action("recipient_group")
+async def update_menu_select(ack):
+    await ack()
+
+
 async def send_sms(recipient, msg):
     """Send SMS"""
     try:
