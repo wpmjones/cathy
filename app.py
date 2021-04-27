@@ -274,7 +274,6 @@ async def illness(ack, say):
 
 @app.command("/text")
 async def text(ack, body, client):
-    logger.info(body)
     await ack()
     # Validate user (admins only)
     if body['user_id'] not in creds.admin_ids:
@@ -346,6 +345,7 @@ async def text(ack, body, client):
 @app.view("text_view")
 async def handle_text_input(ack, body, client, view, say):
     """Process input from text form"""
+    logger.info(view['state']['values']['input_group']['recipient_group'])
     position_id = view['state']['values']['input_group']['recipient_group']['value']
     msg = view['state']['values']['input_message']['message']['value']
     await ack()
