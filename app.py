@@ -341,7 +341,7 @@ async def text(ack, body, client):
         }
     )
 
-{'type': 'static_select', 'selected_option': {'text': {'type': 'plain_text', 'text': 'Testing', 'emoji': True}, 'value': '6'}}
+
 @app.view("text_view")
 async def handle_text_input(ack, body, client, view, say):
     """Process input from text form"""
