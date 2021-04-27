@@ -273,7 +273,7 @@ async def illness(ack, say):
 
 @app.command("/text")
 async def text(ack, body, client):
-    await ack()
+    await ack(body)
     # Validate user (admins only)
     if body['user']['id'] not in creds.admin_ids:
         return
