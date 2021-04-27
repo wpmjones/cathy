@@ -345,7 +345,6 @@ async def text(ack, body, client):
 @app.view("text_view")
 async def handle_text_input(ack, body, client, view, say):
     """Process input from text form"""
-    logger.info(view['state']['values']['input_group']['recipient_group'])
     position_id = view['state']['values']['input_group']['recipient_group']['selected_option']['value']
     msg = view['state']['values']['input_message']['message']['value']
     await ack()
@@ -363,8 +362,9 @@ async def handle_text_input(ack, body, client, view, say):
     for recipient in recipients:
         result = await send_sms(recipient, msg)
         if result != "success":
-            await say(f"There was a problem sending a text to {recipient[2]} ({recipient[0]}). Phone number: "
-                      f"{recipient[2]}. I'll let the administrator know.")
+            await say(channel_id=body['channel_id'],
+                      text=f"There was a problem sending a text to {recipient[2]} ({recipient[0]}). Phone number: "
+                           f"{recipient[2]}. I'll let the administrator know.")
             await client.chat_postMessage(channel=creds.pj_user_id,
                                           text=f"There was an error while sending an SMS via Twilio.\n{result}")
     # All messages have been sent, send notification to Slack
@@ -407,7 +407,7 @@ async def send_sms(recipient, msg):
             body=msg
         )
         Messages.add_message(message.sid, recipient_id, store_id, msg)
-        return True
+        return "success"
     except TwilioRestException as e:
         return e
 
