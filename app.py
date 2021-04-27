@@ -325,8 +325,7 @@ async def text(ack, body, client):
                             "text": "Select a group"
                         },
                         "options": options
-                    },
-                    "optional": False
+                    }
                 },
                 {
                     "type": "input",
