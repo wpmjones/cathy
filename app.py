@@ -6,12 +6,13 @@ import string
 
 # from slack_bolt import App
 from datetime import datetime
-from db import Messages
+from db import Messages, get_db
 from fuzzywuzzy import fuzz
 from slack_bolt.async_app import AsyncApp
 from slack_bolt.error import BoltError
 from slack_sdk.errors import SlackApiError
 from twilio.rest import Client
+from twilio.base.exceptions import TwilioRestException
 
 # Create Slack app
 app = AsyncApp(token=creds.bot_token,
@@ -271,19 +272,142 @@ async def illness(ack, say):
 
 
 @app.command("/text")
-async def send_sms(ack, body, say):
-    """Send SMS"""
+async def text(ack, body, client):
     await ack()
-    recipient_id = 1
-    store_id = 3930
-    content = body['text']
-    message = twilio_client.messages.create(
-        to="+16783797611",
-        from_="+119529003930",
-        body=content
+    # Validate user (admins only)
+    if body['user']['id'] not in creds.admin_ids:
+        return
+    with get_db() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT position_id, name FROM cra_positions ORDER BY name")
+            groups = cursor.fetchall()
+    options = [
+        {
+            "text": {
+                "type": "plain_text",
+                "text": "Everyone"
+            },
+            "value": 0
+        }
+    ]
+    for group in groups:
+        options.append(
+            {
+                "text": {
+                    "type": "plain_text",
+                    "text": group[1]
+                },
+                "value": group[0]
+            }
+        )
+    await client.views_open(
+        trigger_id=body['trigger_id'],
+        view={
+            "type": "modal",
+            "callback_id": "text_view",
+            "title": {"type": "plain_text", "text": "Send Text"},
+            "submit": {"type": "plain_text", "text": "Submit"},
+            "blocks": [
+                {
+                    "type": "section",
+                    "block_id": "input_group",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "Select the recipient group"
+                    },
+                    "accessory": {
+                        "action_id": "recipient_group",
+                        "type": "static_select",
+                        "placeholder": {
+                            "type": "plain_text",
+                            "text": "Select a group"
+                        },
+                        "options": options
+                    },
+                    "optional": False
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_message",
+                    "label": {"type": "plain_text", "text": "Message"},
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "message",
+                        "multiline": True
+                    },
+                    "optional": False
+                }
+            ]
+        }
     )
-    Messages.add_message(message.sid, recipient_id, store_id, content)
-    await say("Message sent.")
+
+
+@app.view("text_view")
+async def handle_text_input(ack, body, client, view, say):
+    """Process input from text form"""
+    position_id = view['state']['values']['input_group']['recipient_group']['value']
+    msg = view['state']['values']['input_message']['message']['value']
+    await ack()
+    with get_db() as conn:
+        with conn.cursor() as cursor:
+            if position_id == 0:
+                sql = "SELECT recipient_id, first_name, phone, store_id FROM cfa_recipients WHERE enabled = True"
+                cursor.execute(sql)
+            else:
+                sql = ("SELECT recipient_id, first_name, phone, store_id FROM cfa_recipients "
+                       "WHERE enabled = True AND position_id = %s")
+                cursor.execute(sql, position_id)
+            recipients = cursor.fetchall()
+            recipient_count = len(recipients)
+    for recipient in recipients:
+        result = await send_sms(recipient, msg)
+        if result != "success":
+            await say(f"There was a problem sending a text to {recipient[2]} ({recipient[0]}). Phone number: "
+                      f"{recipient[2]}. I'll let the administrator know.")
+            await client.chat_postMessage(channel=creds.pj_user_id,
+                                          text=f"There was an error while sending an SMS via Twilio.\n{result}")
+    # All messages have been sent, send notification to Slack
+    # Get name of recipient group
+    if position_id == 0:
+        recipient_group = "Everyone"
+    else:
+        with get_db() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("SELECT name FROM cfa_positions WHERE position_id = %s", position_id)
+                recipient_group = cursor.fetchone()[0]
+    block_text = (f"*Message*: {msg}\n"
+                  f"*Sent to:* {recipient_group} ({recipient_count})\n"
+                  f"*Sent by:* {body['user']['name']}")
+    blocks = [
+        {
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": block_text}
+        },
+        {
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": body}
+        }
+    ]
+    await client.chat_postMessage(channel=creds.pj_user_id,
+                                  blocks=blocks,
+                                  text=f"SMS Message sent to {recipient_group}.")
+
+
+async def send_sms(recipient, msg):
+    """Send SMS"""
+    try:
+        recipient_id = recipient[0]
+        phone = recipient[2]
+        store_id = recipient[3],
+        message = twilio_client.messages.create(
+            to=phone,
+            from_=creds.phone_3930,
+            body=msg
+        )
+        Messages.add_message(message.sid, recipient_id, store_id, msg)
+        return True
+    except TwilioRestException as e:
+        return e
 
 # Start your app
 if __name__ == "__main__":
