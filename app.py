@@ -8,6 +8,7 @@ import string
 from datetime import datetime
 from db import Messages, get_db
 from fuzzywuzzy import fuzz
+from loguru import logger
 from slack_bolt.async_app import AsyncApp
 from slack_bolt.error import BoltError
 from slack_sdk.errors import SlackApiError
@@ -273,7 +274,8 @@ async def illness(ack, say):
 
 @app.command("/text")
 async def text(ack, body, client):
-    await ack(body)
+    logger.info(body)
+    await ack()
     # Validate user (admins only)
     if body['user']['id'] not in creds.admin_ids:
         return
