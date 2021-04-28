@@ -8,7 +8,6 @@ import string
 from datetime import datetime
 from db import Messages, get_db
 from fuzzywuzzy import fuzz
-from loguru import logger
 from slack_bolt.async_app import AsyncApp
 from slack_bolt.error import BoltError
 from slack_sdk.errors import SlackApiError
@@ -272,6 +271,27 @@ async def illness(ack, say):
               "Norovirus (a type of stomach flu)")
 
 
+@app.command("/text_welcome")
+async def text_welcome(ack, body, say, client):
+    await ack()
+    with get_db() as conn:
+        with conn.cursor as cursor:
+            # sql = "SELECT recipient_id, first_name, phone, store_id FROM cfa_recipients WHERE welcome_sent = false"
+            sql = "SELECT recipient_id, first_name, phone, store_id FROM cta_recipients WHERE recipient_id = 1"
+            cursor.execute(sql)
+            recipients = cursor.fetchall()
+    for recipient in recipients:
+        msg = (f"{recipient[1]}, welcome to Chick-fil-A S Las Vegas Blvd & I-215 team! We will occasionally "
+               f"send you texts about the team and special announcements. Reply STOP to unsubscribe.")
+        result = await send_sms(recipient, msg)
+        if result != "success":
+            await say(channel_id=body['channel']['id'],
+                      text=f"There was a problem sending the welcome text to {recipient[2]} ({recipient[0]}). "
+                           f"Phone number: {recipient[2]}. I'll let the administrator know.")
+            await client.chat_postMessage(channel=creds.pj_user_id,
+                                          text=f"There was an error while sending an SMS via Twilio.\n{result}")
+
+
 @app.command("/text")
 async def text(ack, body, client):
     await ack()
@@ -280,7 +300,8 @@ async def text(ack, body, client):
         return
     with get_db() as conn:
         with conn.cursor() as cursor:
-            cursor.execute("SELECT position_id, name FROM cfa_positions ORDER BY name")
+            sql = "SELECT position_id, name FROM cfa_positions WHERE position_id <> 6 ORDER BY name"
+            cursor.execute(sql)
             groups = cursor.fetchall()
     options = [
         {
@@ -345,7 +366,6 @@ async def text(ack, body, client):
 @app.view("text_view")
 async def handle_text_input(ack, body, client, view, say):
     """Process input from text form"""
-    logger.info(view)
     position_id = view['state']['values']['input_group']['recipient_group']['selected_option']['value']
     msg = view['state']['values']['input_message']['message']['value']
     await ack()
@@ -378,7 +398,7 @@ async def handle_text_input(ack, body, client, view, say):
                 cursor.execute("SELECT name FROM cfa_positions WHERE position_id = %s", position_id)
                 recipient_group = cursor.fetchone()[0]
     block_text = (f"*Message*: {msg}\n"
-                  f"*Sent to:* {recipient_group} ({recipient_count})\n"
+                  f"*Sent to:* {recipient_group} (Size: {recipient_count})\n"
                   f"*Sent by:* {body['user']['name']}")
     blocks = [
         {
