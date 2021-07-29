@@ -80,7 +80,7 @@ async def tardy(ack, body, say, client):
         logger.debug(f"{now} - {body['text']} was tardy")
         to_post = [body['text'], now]
         sheet.append_row(to_post, value_input_option='USER_ENTERED')
-        await say(f"Tardy record added for {body['text']}")
+        await say(f"Tardy record added for {body['text']}. No meal credit today ({now}).")
     except gspread.exceptions.GSpreadException as e:
         await client.chat_postMessage(channel=body['user']['id'],
                                       text=e)
