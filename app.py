@@ -41,6 +41,7 @@ async def cathy_help(ack, say):
               "`/illness` List the illnesses that require a TM to stay home\n"
               "`/sick` Open a form to report an illness or unexcused absence\n"
               "`/find [first last]` Retrieve information on missed shifts for the specified TM\n"
+              "`/tardy [first last]` Records a tardy for the specified TM\n"
               "`/help` List these commands")
 
 
