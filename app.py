@@ -72,13 +72,14 @@ async def clear_messages(ack, body, say, client):
 @app.command("/tardy")
 async def tardy(ack, body, say, client):
     await ack()
+    logger.info(f"Sick slash command initiated by {body['user']['name']}")
     try:
         sh = gc.open_by_key(creds.pay_scale_id)
         sheet = sh.worksheet("Tardy")
         now = date.strftime(date.today(), "%m/%d/%Y")
         logger.debug(f"Tardy date: {now}")
         to_post = [body['text'], now]
-        sheet.append_row(to_post)
+        sheet.append_row(to_post, value_input_option='USER_ENTERED')
         await say(f"Tardy record added for {body['text']}")
     except gspread.exceptions.GSpreadException as e:
         await client.chat_postMessage(channel=body['user']['id'],
@@ -95,6 +96,7 @@ async def tardy(ack, body, say, client):
 @app.command("/sick")
 async def sick(ack, body, client):
     await ack()
+    logger.info(f"Sick slash command initiated by {body['user']['name']}")
     await client.views_open(
         trigger_id=body['trigger_id'],
         view={
