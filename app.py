@@ -72,7 +72,7 @@ async def clear_messages(ack, body, say, client):
 @app.command("/tardy")
 async def tardy(ack, body, say, client):
     await ack()
-    logger.info(f"Sick slash command initiated by {body['user']['name']}")
+    logger.info(f"Tardy slash command initiated by {body}")
     try:
         sh = gc.open_by_key(creds.pay_scale_id)
         sheet = sh.worksheet("Tardy")
