@@ -5,7 +5,7 @@ import os
 import string
 
 # from slack_bolt import App
-from datetime import datetime
+from datetime import datetime, date
 from db import Messages, get_db
 from fuzzywuzzy import fuzz
 from slack_bolt.async_app import AsyncApp
@@ -74,7 +74,7 @@ async def tardy(ack, body, say, client):
     try:
         sh = gc.open_by_key(creds.pay_scale_id)
         sheet = sh.worksheet("Tardy")
-        now = str(datetime.date(datetime.today()))
+        now = date.strftime(date.today(), "%m/%d/%Y")
         to_post = [body['text'], now]
         sheet.append_row(to_post)
         await say(f"Tardy record added for {body['text']}")
