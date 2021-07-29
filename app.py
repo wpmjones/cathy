@@ -73,9 +73,9 @@ async def tardy(ack, body, say, client):
     await ack()
     try:
         sh = gc.open_by_key(creds.pay_scale_id)
-        sheet = sh.get_worksheet(2)
+        sheet = sh.worksheet("Tardy")
         now = str(datetime.date(datetime.today()))
-        to_post = [now, body['text']]
+        to_post = [body['text'], now]
         sheet.append_row(to_post)
         await say(f"Tardy record added for {body['text']}")
     except gspread.exceptions.GSpreadException as e:
