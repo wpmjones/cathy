@@ -77,7 +77,7 @@ async def tardy(ack, body, say, client):
         sh = gc.open_by_key(creds.pay_scale_id)
         sheet = sh.worksheet("Tardy")
         now = date.strftime(date.today(), "%m/%d/%Y")
-        logger.debug(f"{now} - {body['text']} was tardy")
+        logger.info(f"{now} - {body['text']} was tardy")
         to_post = [body['text'], now]
         sheet.append_row(to_post, value_input_option='USER_ENTERED')
         await say(f"Tardy record added for {body['text']}. No meal credit today ({now}).")
