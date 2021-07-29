@@ -8,6 +8,7 @@ import string
 from datetime import datetime, date
 from db import Messages, get_db
 from fuzzywuzzy import fuzz
+from loguru import logger
 from slack_bolt.async_app import AsyncApp
 from slack_bolt.error import BoltError
 from slack_sdk.errors import SlackApiError
@@ -75,6 +76,7 @@ async def tardy(ack, body, say, client):
         sh = gc.open_by_key(creds.pay_scale_id)
         sheet = sh.worksheet("Tardy")
         now = date.strftime(date.today(), "%m/%d/%Y")
+        logger.debug(f"Tardy date: {now}")
         to_post = [body['text'], now]
         sheet.append_row(to_post)
         await say(f"Tardy record added for {body['text']}")
