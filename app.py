@@ -80,8 +80,28 @@ async def tardy(ack, body, say, client):
         logger.info(f"{now} - {body['text']} was tardy")
         logger.info(body)
         to_post = [body['text'], now]
-        # sheet.append_row(to_post, value_input_option='USER_ENTERED')
-        # await say(f"Tardy record added for {body['text']}. No meal credit today ({now}).")
+        sheet.append_row(to_post, value_input_option='USER_ENTERED')
+        blocks = [
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"Tardy record added for {body['text']}. No meal credit today ({now})."
+                }
+            },
+            {
+                "type": "context",
+                "elements": [
+                    {
+                        "type": "plain_text",
+                        "text": f"Submitted by: {body['user_name']}"
+                    }
+                ]
+            }
+        ]
+        await client.chat_postMessage(channel=creds.sick_channel,
+                                      blocks=blocks,
+                                      text=f"{body['text']} was tardy on {now}.")
     except gspread.exceptions.GSpreadException as e:
         await client.chat_postMessage(channel=body['user']['id'], text=e)
     except Exception as e:
