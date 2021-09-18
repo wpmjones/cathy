@@ -70,6 +70,56 @@ async def clear_messages(ack, body, say, client):
         counter += 1
 
 
+@app.command("/test")
+async def test(ack, body, client):
+    await ack()
+    await client.views_open(
+        trigger_id=body['trigger_id'],
+        view={
+            "type": "modal",
+            "callback_id": "test_view",
+            "title": {"type": "plain_text", "text": "Test View"},
+            "submit": {"type": "plain_text", "text": "Purple"},
+            "blocks": [
+                {
+                    "type": "input",
+                    "blcok_id": "input_a",
+                    "label": {"type": "plain_text", "text": "Label"},
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "input_a",
+                        "multiline": False
+                    },
+                    "optional": True
+                },
+                {
+                    "type": "section",
+                    "block_id": "section1",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "Pick a name from the list"
+                    },
+                    "accessory": {
+                        "action_id": "select-list",
+                        "type": "external_select",
+                        "placeholder": {
+                            "type": "plain_text",
+                            "text": "Select an item"
+                        },
+                        "min_query_length": 3
+                    }
+                }
+            ]
+        }
+    )
+
+
+@app.view("text_view")
+async def handle_test_input(ack, body, client, view, say):
+    """Process input from test form"""
+    await ack()
+
+
 @app.command("/tardy")
 async def tardy(ack, body, say, client):
     await ack()
