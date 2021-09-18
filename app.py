@@ -83,7 +83,7 @@ async def test(ack, body, client):
             "blocks": [
                 {
                     "type": "input",
-                    "blcok_id": "input_a",
+                    "block_id": "input_a",
                     "label": {"type": "plain_text", "text": "Label"},
                     "element": {
                         "type": "plain_text_input",
