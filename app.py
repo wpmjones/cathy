@@ -85,10 +85,11 @@ async def test(ack, body, client):
                     "type": "plain_text",
                     "text": row[0]
                 },
-                "value": counter
+                "value": str(counter)
             }
         )
         counter += 1
+    logger.info(options)
     await client.views_open(
         trigger_id=body['trigger_id'],
         view={
