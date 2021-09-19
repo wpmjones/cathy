@@ -77,14 +77,14 @@ async def test(ack, body, client):
     # Create options for select menu
     options = []
     df = pd.read_csv('staff.csv')
-    logger.info(df)
     counter = 0
-    for row in df.rows:
+    for index, row in df.iterrows():
+        logger.info(row)
         options.append(
             {
                 "text": {
                     "type": "plain_text",
-                    "text": row[0]
+                    "text": row['0']
                 },
                 "value": str(counter)
             }
