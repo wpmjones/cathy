@@ -85,7 +85,7 @@ async def test(ack, body, client):
             {
                 "text": {
                     "type": "plain_text",
-                    "text": n
+                    "text": n[0]
                 },
                 "value": str(counter)
             }
