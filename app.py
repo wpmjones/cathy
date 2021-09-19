@@ -1,8 +1,8 @@
 import asyncio
 import creds
+import csv
 import gspread
 import os
-import pandas as pd
 import string
 
 # from slack_bolt import App
@@ -76,15 +76,16 @@ async def test(ack, body, client):
     await ack()
     # Create options for select menu
     options = []
-    df = pd.read_csv('staff.csv')
+    with open('staff.csv', newline="") as f:
+        reader = csv.reader(f)
+        data = list(reader)
     counter = 0
-    for index, row in df.iterrows():
-        logger.info(row)
+    for n in data:
         options.append(
             {
                 "text": {
                     "type": "plain_text",
-                    "text": row['0']
+                    "text": n
                 },
                 "value": str(counter)
             }
