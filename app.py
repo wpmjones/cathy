@@ -120,7 +120,6 @@ async def sick(ack, body, client):
     with open('staff.csv', newline="") as f:
         reader = csv.reader(f)
         data = list(reader)
-    counter = 0
     for n in data:
         options.append(
             {
@@ -128,10 +127,9 @@ async def sick(ack, body, client):
                     "type": "plain_text",
                     "text": n[0]
                 },
-                "value": str(counter)
+                "value": n[0]
             }
         )
-        counter += 1
     await client.views_open(
         trigger_id=body['trigger_id'],
         view={
@@ -210,6 +208,7 @@ async def sick(ack, body, client):
 async def handle_sick_input(ack, body, client, view, say):
     """Process input from sick form"""
     logger.info("Processing input...")
+    logger.info(view['state']['values']['input_a']['tm_name'])
     name = view['state']['values']['input_a']['tm_name']['value']
     reason = view['state']['values']['input_b']['reason']['value']
     shift = view['state']['values']['input_c']['shift']['value']
