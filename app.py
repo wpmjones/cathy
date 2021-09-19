@@ -77,8 +77,9 @@ async def test(ack, body, client):
     # Create options for select menu
     options = []
     df = pd.read_csv('staff.csv')
+    logger.info(df)
     counter = 0
-    for row in df:
+    for row in df.rows:
         options.append(
             {
                 "text": {
