@@ -142,9 +142,9 @@ async def sick(ack, body, client):
         trigger_id=body['trigger_id'],
         view={
             "type": "modal",
-            "callback_id": "test_view",
-            "title": {"type": "plain_text", "text": "Test View"},
-            "submit": {"type": "plain_text", "text": "Purple"},
+            "callback_id": "sick_view",
+            "title": {"type": "plain_text", "text": "Missed Shift"},
+            "submit": {"type": "plain_text", "text": "Submit"},
             "blocks": [
                 {
                     "type": "input",
@@ -215,6 +215,7 @@ async def sick(ack, body, client):
 @app.view("sick_view")
 async def handle_sick_input(ack, body, client, view, say):
     """Process input from sick form"""
+    logger.info("Processing input...")
     name = view['state']['values']['input_a']['tm_name']['value']
     reason = view['state']['values']['input_b']['reason']['value']
     shift = view['state']['values']['input_c']['shift']['value']
