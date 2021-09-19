@@ -130,3 +130,5 @@ dmypy.json
 
 # Custom entries
 creds.py
+*.xls
+*.csv
