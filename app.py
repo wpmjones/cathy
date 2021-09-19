@@ -208,8 +208,7 @@ async def sick(ack, body, client):
 async def handle_sick_input(ack, body, client, view, say):
     """Process input from sick form"""
     logger.info("Processing input...")
-    logger.info(view['state']['values']['input_a']['tm_name'])
-    name = view['state']['values']['input_a']['tm_name']['value']
+    name = view['state']['values']['input_a']['tm_name']['selected_option']['value']
     reason = view['state']['values']['input_b']['reason']['value']
     shift = view['state']['values']['input_c']['shift']['value']
     contact = view['state']['values']['input_d']['contact']['value']
