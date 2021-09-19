@@ -71,12 +71,6 @@ async def clear_messages(ack, body, say, client):
         counter += 1
 
 
-@app.view("text_view")
-async def handle_test_input(ack, body, client, view, say):
-    """Process input from test form"""
-    await ack()
-
-
 @app.command("/tardy")
 async def tardy(ack, body, say, client):
     await ack()
