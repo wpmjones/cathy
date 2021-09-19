@@ -76,8 +76,7 @@ async def test(ack, body, client):
     await ack()
     # Create options for select menu
     options = []
-    data = pd.read_excel('staff.xlsx')
-    df = pd.DataFrame(data, columns=["Name", ])
+    df = pd.read_csv('staff.csv')
     counter = 0
     for row in df:
         options.append(
