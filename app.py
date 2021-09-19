@@ -2,6 +2,7 @@ import asyncio
 import creds
 import gspread
 import os
+import pandas as pd
 import string
 
 # from slack_bolt import App
@@ -73,6 +74,22 @@ async def clear_messages(ack, body, say, client):
 @app.command("/test")
 async def test(ack, body, client):
     await ack()
+    # Create options for select menu
+    options = []
+    data = pd.read_excel('staff.xls')
+    df = pd.DataFrame(data, columns=["Name", ])
+    counter = 0
+    for row in df:
+        options.append(
+            {
+                "text": {
+                    "type": "plain_text",
+                    "text": row[0]
+                },
+                "value": counter
+            }
+        )
+        counter += 1
     await client.views_open(
         trigger_id=body['trigger_id'],
         view={
@@ -93,20 +110,14 @@ async def test(ack, body, client):
                     "optional": True
                 },
                 {
-                    "type": "section",
-                    "block_id": "section1",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "Pick a name from the list"
-                    },
-                    "accessory": {
-                        "action_id": "select-list",
-                        "type": "external_select",
-                        "placeholder": {
-                            "type": "plain_text",
-                            "text": "Select an item"
-                        },
-                        "min_query_length": 3
+                    "type": "input",
+                    "block_id": "select_a",
+                    "label": {"type": "plain_text", "text": "Name"},
+                    "element": {
+                        "type": "static_select",
+                        "action_id": "select_a",
+                        "placeholder": {"type": "plain_text", "text": "Select a name"},
+                        "options": options
                     }
                 }
             ]
