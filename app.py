@@ -320,4 +320,4 @@ async def cem_poster():
 if __name__ == "__main__":
     app.start(port=int(os.environ.get("PORT", 3000)))
     while True:
-        await cem_poster()
+        asyncio.run(cem_poster())
