@@ -71,62 +71,6 @@ async def clear_messages(ack, body, say, client):
         counter += 1
 
 
-@app.command("/test")
-async def test(ack, body, client):
-    await ack()
-    # Create options for select menu
-    options = []
-    with open('staff.csv', newline="") as f:
-        reader = csv.reader(f)
-        data = list(reader)
-    counter = 0
-    for n in data:
-        options.append(
-            {
-                "text": {
-                    "type": "plain_text",
-                    "text": n[0]
-                },
-                "value": str(counter)
-            }
-        )
-        counter += 1
-    logger.info(options)
-    await client.views_open(
-        trigger_id=body['trigger_id'],
-        view={
-            "type": "modal",
-            "callback_id": "test_view",
-            "title": {"type": "plain_text", "text": "Test View"},
-            "submit": {"type": "plain_text", "text": "Purple"},
-            "blocks": [
-                {
-                    "type": "input",
-                    "block_id": "input_a",
-                    "label": {"type": "plain_text", "text": "Label"},
-                    "element": {
-                        "type": "plain_text_input",
-                        "action_id": "input_a",
-                        "multiline": False
-                    },
-                    "optional": True
-                },
-                {
-                    "type": "input",
-                    "block_id": "select_a",
-                    "label": {"type": "plain_text", "text": "Name"},
-                    "element": {
-                        "type": "static_select",
-                        "action_id": "select_a",
-                        "placeholder": {"type": "plain_text", "text": "Select a name"},
-                        "options": options
-                    }
-                }
-            ]
-        }
-    )
-
-
 @app.view("text_view")
 async def handle_test_input(ack, body, client, view, say):
     """Process input from test form"""
@@ -177,24 +121,41 @@ async def tardy(ack, body, say, client):
 @app.command("/sick")
 async def sick(ack, body, client):
     await ack()
+    # Create options for select menu
+    options = []
+    with open('staff.csv', newline="") as f:
+        reader = csv.reader(f)
+        data = list(reader)
+    counter = 0
+    for n in data:
+        options.append(
+            {
+                "text": {
+                    "type": "plain_text",
+                    "text": n[0]
+                },
+                "value": str(counter)
+            }
+        )
+        counter += 1
     await client.views_open(
         trigger_id=body['trigger_id'],
         view={
             "type": "modal",
-            "callback_id": "sick_view",
-            "title": {"type": "plain_text", "text": "Missed Shift"},
-            "submit": {"type": "plain_text", "text": "Submit"},
+            "callback_id": "test_view",
+            "title": {"type": "plain_text", "text": "Test View"},
+            "submit": {"type": "plain_text", "text": "Purple"},
             "blocks": [
                 {
                     "type": "input",
                     "block_id": "input_a",
-                    "label": {"type": "plain_text", "text": "Team Member Name"},
+                    "label": {"type": "plain_text", "text": "Name"},
                     "element": {
-                        "type": "plain_text_input",
+                        "type": "static_select",
                         "action_id": "tm_name",
-                        "multiline": False
-                    },
-                    "optional": False
+                        "placeholder": {"type": "plain_text", "text": "Select a name"},
+                        "options": options
+                    }
                 },
                 {
                     "type": "input",
@@ -211,13 +172,14 @@ async def sick(ack, body, client):
                 {
                     "type": "input",
                     "block_id": "input_c",
-                    "label": {"type": "plain_text", "text": "Symptoms"},
+                    "label": {"type": "plain_text", "text": "Missed Shift"},
                     "element": {
                         "type": "plain_text_input",
-                        "action_id": "symptoms",
+                        "action_id": "shift",
                         "multiline": False
                     },
-                    "optional": True
+                    "optional": True,
+                    "hint": {"type": "plain_text", "text": "Position and Time"}
                 },
                 {
                     "type": "input",
@@ -237,21 +199,10 @@ async def sick(ack, body, client):
                 {
                     "type": "input",
                     "block_id": "input_e",
-                    "label": {"type": "plain_text", "text": "Duration"},
+                    "label": {"type": "plain_text", "text": "Other notes"},
                     "element": {
                         "type": "plain_text_input",
-                        "action_id": "duration",
-                        "multiline": False
-                    },
-                    "optional": True
-                },
-                {
-                    "type": "input",
-                    "block_id": "input_f",
-                    "label": {"type": "plain_text", "text": "Restrictions"},
-                    "element": {
-                        "type": "plain_text_input",
-                        "action_id": "restrictions",
+                        "action_id": "other",
                         "multiline": False
                     },
                     "optional": True
@@ -266,22 +217,16 @@ async def handle_sick_input(ack, body, client, view, say):
     """Process input from sick form"""
     name = view['state']['values']['input_a']['tm_name']['value']
     reason = view['state']['values']['input_b']['reason']['value']
-    symptoms = view['state']['values']['input_c']['symptoms']['value']
+    shift = view['state']['values']['input_c']['shift']['value']
     contact = view['state']['values']['input_d']['contact']['value']
-    duration = view['state']['values']['input_e']['duration']['value']
-    restrictions = view['state']['values']['input_f']['restrictions']['value']
+    other = view['state']['values']['input_e']['other']['value']
     block_text = (f"*Name*: {name}\n"
-                  f"*Callout reason:* {reason}")
-    if symptoms:
-        block_text += f"\n*Symptoms:* {symptoms}"
-    block_text += f"\n*Contact:* {contact}"
-    if duration:
-        block_text += f"\n*Duration:* {duration}"
-    if restrictions:
-        block_text += f"\n*Restrictions:* {restrictions}"
+                  f"*Callout reason:* {reason}\n"
+                  f"*Shift:* {shift}\n"
+                  f"*Contact:* {contact}")
+    if other:
+        block_text += f"\n*Other notes:* {other}"
     errors = {}
-    if not contains_whitespace(name):
-        errors['input_a'] = "Please provide both first and last name."
     if len(errors) > 0:
         await ack(response_action="errors", errors=errors)
         return
@@ -291,7 +236,7 @@ async def handle_sick_input(ack, body, client, view, say):
         sh = gc.open_by_key(creds.sick_log_id)
         sheet = sh.get_worksheet(0)
         now = str(datetime.date(datetime.today()))
-        to_post = [now, name, reason, symptoms, contact, duration, restrictions]
+        to_post = [now, name, reason, shift, contact, other]
         sheet.append_row(to_post)
     except gspread.exceptions.GSpreadException as e:
         await client.chat_postMessage(channel=body['user']['id'],
