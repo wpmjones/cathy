@@ -51,13 +51,19 @@ def check_cem():
                     pass
         else:
             body = msg.get_payload(decode=True).decode("utf-8")
+    # find percentages in body
     for j in range(5):
         start = find_nth(body, "%", j + 1) - 3
         end = start + 4
         score_dict[categories[j]] = body[start:end].strip()
-    logger.info(score_dict)
+    # find number of respondents
+    start = body.find("n:") + 3
+    end = start + 3
+    num_responses = body[start:end].strip()
     webhook_url = creds.webhook_test
-    content = "*Month to Date CEM Scores*\n```"
+    content = (f"*Month to Date CEM Scores*\n"
+               f"Out of {num_responses} responses\n```"
+               f"Category              Percent\n")
     for key, value in score_dict.items():
         content += f"{key}{' '*(25-len(key))}{' '*(4-len(value))}{value}\n"
     content += "```"
