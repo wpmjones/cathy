@@ -33,7 +33,7 @@ def check_cem():
     search_date = datetime.date.today()  # - datetime.timedelta(days=1)
     tfmt = search_date.strftime('%d-%b-%Y')
     logger.info(f"Search date: {tfmt}")
-    type, sdata = mail.search(None, f'(FROM "SMGMailMgr@whysmg.com" SINCE {tfmt})')
+    _, sdata = mail.search(None, f'(FROM "SMGMailMgr@whysmg.com" SINCE {tfmt})')
     mail_ids = sdata[0]
     id_list = mail_ids.split()
     logger.info(id_list)
@@ -43,6 +43,7 @@ def check_cem():
         for response_part in data:
             if isinstance(response_part, tuple):
                 msg = email.message_from_bytes(response_part[1])
+                logger.info(type(msg))
                 email_msg = str(msg.get_payload(0), "UTF-8")
                 logger.info(f"Message: {email_msg}")
                 for j in range(5):
