@@ -35,30 +35,29 @@ def check_cem():
     logger.info(f"Search date: {tfmt}")
     type, sdata = mail.search(None, f'(FROM "SMGMailMgr@whysmg.com" SINCE {tfmt})')
     mail_ids = sdata[0]
-    logger.info(f"# of Mail IDs: {mail_ids}")
     id_list = mail_ids.split()
+    logger.info(id_list)
     score_dict = {}
     for i in id_list:
         typ, data = mail.fetch(i, "(RFC822)")
-        email_body = data[0][1]
-        mail_parts = email.message_from_string(str(email_body))
-        logger.info(f"Part: {mail_parts}")
-    #     for response_part in mail_parts:
-    #         if isinstance(response_part, tuple):
-    #             msg = email.message_from_bytes(response_part[1])
-    #             email_msg = str(msg.get_payload(0))
-    #             logger.info(f"Message: {email_msg}")
-    #             for j in range(5):
-    #                 start = find_nth(email_msg, "%", j + 1) - 3
-    #                 end = start + 4
-    #                 score_dict[categories[j]] = email_msg[start:end].strip()
-    # logger.info(score_dict)
-    # webhook_url = creds.webhook_test
-    # content = "*Month to Date CEM Scores*\n```"
-    # for key, value in score_dict.items():
-    #     content += f"{key}{' '*(25-len(key))}{' '*(4-len(value))}{value}\n"
-    # content += "```"
-    # logger.info(content)
+        for response_part in data:
+            if isinstance(response_part, tuple):
+                msg = email.message_from_bytes(response_part[1])
+                msg2 = str(response_part[1], 'utf-8')
+                logger.info(f"unencoded: {msg2}")
+                email_msg = str(msg.get_payload(0))
+                logger.info(f"Message: {email_msg}")
+                for j in range(5):
+                    start = find_nth(email_msg, "%", j + 1) - 3
+                    end = start + 4
+                    score_dict[categories[j]] = email_msg[start:end].strip()
+    logger.info(score_dict)
+    webhook_url = creds.webhook_test
+    content = "*Month to Date CEM Scores*\n```"
+    for key, value in score_dict.items():
+        content += f"{key}{' '*(25-len(key))}{' '*(4-len(value))}{value}\n"
+    content += "```"
+    logger.info(content)
     # payload = {"text": content}
     # r = requests.post(webhook_url, json=payload)
 
