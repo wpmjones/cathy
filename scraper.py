@@ -47,30 +47,21 @@ def check_cem():
                 part_type = part.get_content_type()
                 if part_type == "text/plain" and "attachment" not in part:
                     body = part.get_payload(decode=True).decode("utf-8")
-                    logger.info("Capturing multi-part body")
                 if part.get("Content-Disposition") is None:
                     pass
         else:
             body = msg.get_payload(decode=True).decode("utf-8")
-            logger.info("Capturing plain text")
-        logger.info(body)
-    #     for response_part in data:
-    #         if isinstance(response_part, tuple):
-    #             msg = email.message_from_bytes(response_part[1])
-    #             logger.info(type(msg))
-    #             email_msg = str(msg.get_payload(0), "UTF-8")
-    #             logger.info(f"Message: {email_msg}")
-    #             for j in range(5):
-    #                 start = find_nth(email_msg, "%", j + 1) - 3
-    #                 end = start + 4
-    #                 score_dict[categories[j]] = email_msg[start:end].strip()
-    # logger.info(score_dict)
-    # webhook_url = creds.webhook_test
-    # content = "*Month to Date CEM Scores*\n```"
-    # for key, value in score_dict.items():
-    #     content += f"{key}{' '*(25-len(key))}{' '*(4-len(value))}{value}\n"
-    # content += "```"
-    # logger.info(content)
+    for j in range(5):
+        start = find_nth(body, "%", j + 1) - 3
+        end = start + 4
+        score_dict[categories[j]] = body[start:end].strip()
+    logger.info(score_dict)
+    webhook_url = creds.webhook_test
+    content = "*Month to Date CEM Scores*\n```"
+    for key, value in score_dict.items():
+        content += f"{key}{' '*(25-len(key))}{' '*(4-len(value))}{value}\n"
+    content += "```"
+    logger.info(content)
     # payload = {"text": content}
     # r = requests.post(webhook_url, json=payload)
 
