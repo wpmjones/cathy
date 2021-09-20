@@ -43,9 +43,7 @@ def check_cem():
         for response_part in data:
             if isinstance(response_part, tuple):
                 msg = email.message_from_bytes(response_part[1])
-                msg2 = str(response_part[1], 'utf-8')
-                logger.info(f"unencoded: {msg2}")
-                email_msg = str(msg.get_payload(0))
+                email_msg = str(msg.get_payload(0), "UTF-8")
                 logger.info(f"Message: {email_msg}")
                 for j in range(5):
                     start = find_nth(email_msg, "%", j + 1) - 3
