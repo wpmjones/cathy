@@ -43,9 +43,16 @@ def check_cem():
         raw_str = raw.decode("utf-8")
         msg = email.message_from_string(raw_str)
         logger.info(msg)
-        body = msg.get_payload(decode=True).decode("utf-8")
-        dump = json.dumps(body)
-        logger.info(dump)
+        if msg.is_multipart():
+            for part in msg.walk():
+                part_type = part.get_content_type()
+                if part_type == "text/plain" and "attachment" not in part:
+                    body = part.get_payload()
+                if part.get("Content-Disposition") is None:
+                    pass
+        else:
+            body = msg.get_payload(decode=True).decode("utf-8")
+        logger.info(body)
     #     for response_part in data:
     #         if isinstance(response_part, tuple):
     #             msg = email.message_from_bytes(response_part[1])
