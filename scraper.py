@@ -44,7 +44,8 @@ def check_cem():
         msg = email.message_from_string(raw_str)
         logger.info(msg)
         body = msg.get_payload(decode=True).decode("utf-8")
-        dump = json.dumps(jsonOutput)
+        dump = json.dumps(body)
+        logger.info(dump)
     #     for response_part in data:
     #         if isinstance(response_part, tuple):
     #             msg = email.message_from_bytes(response_part[1])
