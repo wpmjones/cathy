@@ -7,7 +7,7 @@ import requests
 from loguru import logger
 
 mail = imaplib.IMAP4_SSL("imap.gmail.com")
-mail.login(creds.gmail_u, creds.gmail_p)
+mail.login(creds.gmail_u, creds.gmail_app)
 mail.select("INBOX")
 today = datetime.date.today()
 
