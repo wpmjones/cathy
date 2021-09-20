@@ -61,10 +61,9 @@ def check_cem():
     end = start + 3
     num_responses = body[start:end].strip()
     # post content to Slack
-    webhook_url = creds.webhook_test
+    webhook_url = creds.webhook_all
     content = (f"*Month to Date CEM Scores*\n"
-               f"Out of {num_responses} responses\n```"
-               f"Category            Percent\n")
+               f"Out of {num_responses} responses\n```")
     for key, value in score_dict.items():
         content += f"{key}{' '*(25-len(key))}{' '*(4-len(value))}{value}\n"
     content += "```"
