@@ -41,10 +41,10 @@ def check_cem():
     for i in id_list:
         typ, data = mail.fetch(i, "(RFC822)")
         for response_part in data:
-            logger.info(response_part)
             if isinstance(response_part, tuple):
                 msg = email.message_from_bytes(response_part[1])
                 email_msg = str(msg.get_payload(0))
+                logger.info(f"Message: {email_msg}")
                 for j in range(5):
                     start = find_nth(email_msg, "%", j + 1) - 3
                     end = start + 4
@@ -55,8 +55,9 @@ def check_cem():
     for key, value in score_dict.items():
         content += f"{key}{' '*(25-len(key))}{' '*(4-len(value))}{value}\n"
     content += "```"
-    payload = {"text": content}
-    r = requests.post(webhook_url, json=payload)
+    logger.info(content)
+    # payload = {"text": content}
+    # r = requests.post(webhook_url, json=payload)
 
 
 if __name__ == "__main__":
