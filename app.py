@@ -309,13 +309,6 @@ async def illness(ack, say):
               "Norovirus (a type of stomach flu)")
 
 
-# async def cem_poster():
-#     """Repeating task for CEM score posting"""
-#     msg = "This is a test message"
-#     client.chat_postMessage(channel=creds.all_channel, text=msg)
-#     await asyncio.sleep(60 * 60)
-
-
 # Start your app
 if __name__ == "__main__":
     app.start(port=int(os.environ.get("PORT", 3000)))

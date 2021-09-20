@@ -2,6 +2,9 @@ import creds
 import datetime
 import email
 import imaplib
+import requests
+
+from loguru import logger
 
 mail = imaplib.IMAP4_SSL("imap.gmail.com")
 mail.login(creds.gmail_u, creds.gmail_p)
@@ -27,8 +30,8 @@ def find_nth(content, search_string, n):
 
 
 def check_cem():
-    past_date = datetime.date.today() - datetime.timedelta(days=3)
-    tfmt = past_date.strftime('%d-%b-%Y')
+    search_date = datetime.date.today()  # - datetime.timedelta(days=1)
+    tfmt = search_date.strftime('%d-%b-%Y')
     type, sdata = mail.search(None, f'(FROM "SMGMailMgr@whysmg.com" SINCE {tfmt})')
     mail_ids = sdata[0]
     id_list = mail_ids.split()
@@ -43,4 +46,15 @@ def check_cem():
                     start = find_nth(email_msg, "%", j + 1) - 3
                     end = start + 4
                     score_dict[categories[j]] = email_msg[start:end].strip()
+    logger.info(score_dict)
+    webhook_url = creds.webhook_test
+    content = "**Month to Date CEM Scores**\n```"
+    for key, value in score_dict.items():
+        content += f"{key}{25-len(key)}{4-len(value)}{value}\n"
+    content += "```"
+    payload = {"text": content}
+    r = requests.post(webhook_url, json=payload)
 
+
+if __name__ == "__main__":
+    check_cem()
