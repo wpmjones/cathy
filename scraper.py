@@ -46,7 +46,7 @@ def check_cem():
             for part in msg.walk():
                 part_type = part.get_content_type()
                 if part_type == "text/plain" and "attachment" not in part:
-                    body = part.get_payload()
+                    body = part.get_payload(decode=True).decode("utf-8")
                     logger.info("Capturing multi-part body")
                 if part.get("Content-Disposition") is None:
                     pass
