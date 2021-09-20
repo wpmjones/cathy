@@ -32,13 +32,16 @@ def find_nth(content, search_string, n):
 def check_cem():
     search_date = datetime.date.today()  # - datetime.timedelta(days=1)
     tfmt = search_date.strftime('%d-%b-%Y')
+    logger.info(f"Search date: {tfmt}")
     type, sdata = mail.search(None, f'(FROM "SMGMailMgr@whysmg.com" SINCE {tfmt})')
     mail_ids = sdata[0]
+    logger.info(f"# of Mail IDs: {mail_ids}")
     id_list = mail_ids.split()
     score_dict = {}
     for i in id_list:
         typ, data = mail.fetch(i, "(RFC822)")
         for response_part in data:
+            logger.info(response_part)
             if isinstance(response_part, tuple):
                 msg = email.message_from_bytes(response_part[1])
                 email_msg = str(msg.get_payload(0))
@@ -48,9 +51,9 @@ def check_cem():
                     score_dict[categories[j]] = email_msg[start:end].strip()
     logger.info(score_dict)
     webhook_url = creds.webhook_test
-    content = "**Month to Date CEM Scores**\n```"
+    content = "*Month to Date CEM Scores*\n```"
     for key, value in score_dict.items():
-        content += f"{key}{25-len(key)}{4-len(value)}{value}\n"
+        content += f"{key}{' '*(25-len(key))}{' '*(4-len(value))}{value}\n"
     content += "```"
     payload = {"text": content}
     r = requests.post(webhook_url, json=payload)
