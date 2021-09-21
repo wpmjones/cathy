@@ -37,6 +37,7 @@ def check_cem():
     mail_ids = sdata[0]
     id_list = mail_ids.split()
     score_dict = {}
+    body = ""
     for i in id_list:
         typ, data = mail.fetch(i, "(RFC822)")
         raw = data[0][1]
@@ -52,24 +53,25 @@ def check_cem():
         else:
             body = msg.get_payload(decode=True).decode("utf-8")
     # find percentages in body
-    for j in range(5):
-        start = find_nth(body, "%", j + 1) - 3
-        end = start + 4
-        score_dict[categories[j]] = body[start:end].strip()
-    # find number of respondents
-    start = body.find("n:") + 3
-    end = start + 3
-    num_responses = body[start:end].strip()
-    # post content to Slack
-    webhook_url = creds.webhook_all
-    content = (f"*Month to Date CEM Scores*\n"
-               f"Out of {num_responses} responses\n```")
-    for key, value in score_dict.items():
-        content += f"{key}{' '*(25-len(key))}{' '*(4-len(value))}{value}\n"
-    content += "```"
-    logger.info(content)
-    payload = {"text": content}
-    r = requests.post(webhook_url, json=payload)
+    if body:
+        for j in range(6):
+            start = find_nth(body, "%", j + 1) - 3
+            end = start + 4
+            score_dict[categories[j]] = body[start:end].strip()
+        # find number of respondents
+        start = body.find("n:") + 3
+        end = start + 3
+        num_responses = body[start:end].strip()
+        # post content to Slack
+        webhook_url = creds.webhook_all
+        content = (f"*Month to Date CEM Scores*\n"
+                   f"Out of {num_responses} responses\n```")
+        for key, value in score_dict.items():
+            content += f"{key}{' '*(25-len(key))}{' '*(4-len(value))}{value}\n"
+        content += "```"
+        logger.info(content)
+        payload = {"text": content}
+        r = requests.post(webhook_url, json=payload)
 
 
 if __name__ == "__main__":
