@@ -306,10 +306,7 @@ async def waste(ack, body, client):
             "element": {
                 "type": "plain_text_input",
                 "action_id": "regulars",
-                "placeholder": {
-                    "type": "plain_text",
-                    "text": "0"
-                }
+                "initial_value": "0"
             },
             "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
         },
@@ -320,10 +317,7 @@ async def waste(ack, body, client):
             "element": {
                 "type": "plain_text_input",
                 "action_id": "spicy",
-                "placeholder": {
-                    "type": "plain_text",
-                    "text": "0"
-                }
+                "initial_value": "0"
             },
             "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
         },
@@ -334,10 +328,7 @@ async def waste(ack, body, client):
             "element": {
                 "type": "plain_text_input",
                 "action_id": "nuggets",
-                "placeholder": {
-                    "type": "plain_text",
-                    "text": "0"
-                }
+                "initial_value": "0"
             },
             "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
         },
@@ -348,10 +339,7 @@ async def waste(ack, body, client):
             "element": {
                 "type": "plain_text_input",
                 "action_id": "strips",
-                "placeholder": {
-                    "type": "plain_text",
-                    "text": "0"
-                }
+                "initial_value": "0"
             },
             "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
         },
@@ -362,10 +350,7 @@ async def waste(ack, body, client):
             "element": {
                 "type": "plain_text_input",
                 "action_id": "grilled1",
-                "placeholder": {
-                    "type": "plain_text",
-                    "text": "0"
-                }
+                "initial_value": "0"
             },
             "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
         },
@@ -376,10 +361,7 @@ async def waste(ack, body, client):
             "element": {
                 "type": "plain_text_input",
                 "action_id": "grilled2",
-                "placeholder": {
-                    "type": "plain_text",
-                    "text": "0"
-                }
+                "initial_value": "0"
             },
             "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
         }
@@ -393,10 +375,7 @@ async def waste(ack, body, client):
                 "element": {
                     "type": "plain_text_input",
                     "action_id": "breakfast",
-                    "placeholder": {
-                        "type": "plain_text",
-                        "text": "0"
-                    }
+                    "initial_value": "0"
                 },
                 "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
             }
@@ -409,10 +388,7 @@ async def waste(ack, body, client):
                 "element": {
                     "type": "plain_text_input",
                     "action_id": "grilled3",
-                    "placeholder": {
-                        "type": "plain_text",
-                        "text": "0"
-                    }
+                    "initial_value": "0"
                 },
                 "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
             }
