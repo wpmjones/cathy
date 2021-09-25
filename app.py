@@ -402,7 +402,8 @@ async def waste(ack, body, client):
                 "type": "plain_text_input",
                 "action_id": "other",
                 "multiline": True
-            }
+            },
+            "optional": True
         }
     )
     await client.views_open(
@@ -475,9 +476,11 @@ async def handle_waste_view(ack, body, client, view, say):
     blocks = [block1, block2, block3]
     other = view['state']['values']['input_j']['other']['value']
     if other:
+        block4_text = "*Notes:*\n"
+        block4_text += other
         block4 = {
             "type": "section",
-            "text": {"type": "plain_text", "text": f"*Notes:*\n{other}"}
+            "text": {"type": "plain_text", "text": block4_text}
         }
         blocks.append(block4)
     await ack()
