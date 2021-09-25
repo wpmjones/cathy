@@ -442,7 +442,7 @@ async def handle_waste_view(ack, body, client, view, say):
                           f"{new_line.join(leader_list)}\n")
                  }
     }
-    block3_text = ""
+    block3_text = "*Weights:*\n"
     if total_weight > 0:
         if regulars:
             block3_text += f"Regulars: {regulars} lbs.\n"
@@ -472,11 +472,14 @@ async def handle_waste_view(ack, body, client, view, say):
         "type": "section",
         "text": {"type": "mrkdwn", "text": block3_text}
     }
+    blocks = [block1, block2, block3]
     other = view['state']['values']['input_j']['other']['value']
-    block4 = {
-        "type": "section",
-        "text": {"type": "plain_text", "text": other}
-    }
+    if other:
+        block4 = {
+            "type": "section",
+            "text": {"type": "plain_text", "text": f"*Notes:*\n{other}"}
+        }
+        blocks.append(block4)
     await ack()
     # Send data to Google Sheet
     try:
@@ -492,7 +495,6 @@ async def handle_waste_view(ack, body, client, view, say):
         await client.chat_postMessage(channel=creds.pj_user_id,
                                       text=f"There was an error while storing the message to the Google Sheet.\n{e}")
         return
-    blocks = [block1, block2, block3, block4]
     await client.chat_postMessage(channel=creds.boh_channel,
                                   blocks=blocks,
                                   text="New waste report psoted.")
