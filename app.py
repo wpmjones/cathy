@@ -431,6 +431,14 @@ async def handle_waste_view(ack, body, client, view, say):
     g_filets = float(view['state']['values']['input_f']['grilled1']['value'])
     g_nuggets = float(view['state']['values']['input_g']['grilled2']['value'])
     total_weight = sum([regulars, spicy, nuggets, strips, g_filets, g_nuggets])
+    sh = gc.open_by_key(creds.waste_id)
+    goal_sheet = sh.worksheet("Goals")
+    goal_values = goal_sheet.get_all_values()
+    goals = {}
+    for row in goal_values:
+        if row[0] == "Type":
+            continue
+        goals[row[0]] = float(row[1])
     new_line = "\n"
     block1 = {
         "type": "section",
@@ -446,17 +454,35 @@ async def handle_waste_view(ack, body, client, view, say):
     block3_text = "*Weights:*\n"
     if total_weight > 0:
         if regulars:
-            block3_text += f"Regulars: {regulars} lbs.\n"
+            if regulars >= goals['Filets']:
+                block3_text += f"_Regulars: {regulars} lbs._\n"
+            else:
+                block3_text += f"Regulars: {regulars} lbs.\n"
         if spicy:
-            block3_text += f"Spicy: {spicy} lbs.\n"
+            if spicy >= goals['Spicy']:
+                block3_text += f"_Spicy: {spicy} lbs._\n"
+            else:
+                block3_text += f"Spicy: {spicy} lbs.\n"
         if nuggets:
-            block3_text += f"Nuggets: {nuggets} lbs.\n"
+            if nuggets >= goals['Nuggets']:
+                block3_text += f"_Nuggets: {nuggets} lbs._\n"
+            else:
+                block3_text += f"Nuggets: {nuggets} lbs.\n"
         if strips:
-            block3_text += f"Strips: {strips} lbs.\n"
+            if strips >= goals['Strips']:
+                block3_text += f"_Strips: {strips} lbs._\n"
+            else:
+                block3_text += f"Strips: {strips} lbs.\n"
         if g_filets:
-            block3_text += f"Grilled Filets: {g_filets} lbs.\n"
+            if g_filets >= goals['Grilled Filets']:
+                block3_text += f"_Grilled Filets: {g_filets} lbs._\n"
+            else:
+                block3_text += f"Grilled Filets: {g_filets} lbs.\n"
         if g_nuggets:
-            block3_text += f"Grilled Nuggets: {g_nuggets} lbs.\n"
+            if g_nuggets >= goals['Grilled Nuggets']:
+                block3_text += f"_Grilled Nuggets: {g_nuggets} lbs._\n"
+            else:
+                block3_text += f"Grilled Nuggets: {g_nuggets} lbs.\n"
     to_post = [str(datetime.now()), regulars, spicy, nuggets, strips, g_filets, g_nuggets]
     if datetime.now().hour < 13:
         breakfast = float(view['state']['values']['input_h']['breakfast']['value'])
@@ -466,9 +492,15 @@ async def handle_waste_view(ack, body, client, view, say):
         if sum([breakfast, g_breakfast]) > 0:
             total_weight += sum([breakfast, g_breakfast])
             if breakfast:
-                block3_text += f"Breakfast Filets: {breakfast} lbs.\n"
+                if breakfast >= goals['Breakfast Filets']:
+                    block3_text += f"_Breakfast Filets: {breakfast} lbs._\n"
+                else:
+                    block3_text += f"Breakfast Filets: {breakfast} lbs.\n"
             if g_breakfast:
-                block3_text += f"Grilled Breakfast: {g_breakfast} lbs.\n"
+                if g_breakfast >= goals['Grilled Breakfast']:
+                    block3_text += f"_Grilled Breakfast: {g_breakfast} lbs._\n"
+                else:
+                    block3_text += f"Grilled Breakfast: {g_breakfast} lbs.\n"
     block3 = {
         "type": "section",
         "text": {"type": "mrkdwn", "text": block3_text}
@@ -484,8 +516,7 @@ async def handle_waste_view(ack, body, client, view, say):
     await ack()
     # Send data to Google Sheet
     try:
-        sh = gc.open_by_key(creds.waste_id)
-        sheet = sh.get_worksheet(0)
+        sheet = sh.worksheet("Data")
         sheet.append_row(to_post, value_input_option='USER_ENTERED')
     except gspread.exceptions.GSpreadException as e:
         return await client.chat_postMessage(channel=body['user']['id'],
