@@ -486,7 +486,7 @@ async def handle_waste_view(ack, body, client, view, say):
     try:
         sh = gc.open_by_key(creds.waste_id)
         sheet = sh.get_worksheet(0)
-        sheet.append_row(to_post)
+        sheet.append_row(to_post, value_input_option='USER_ENTERED')
     except gspread.exceptions.GSpreadException as e:
         return await client.chat_postMessage(channel=body['user']['id'],
                                              text=e)
