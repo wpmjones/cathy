@@ -424,12 +424,12 @@ async def handle_waste_view(ack, body, client, view, say):
     logger.info("Processing waste input...")
     raw_leaders = view['state']['values']['input_a']['leader_names']['selected_options']
     leader_list = [" - " + n['value'] for n in raw_leaders]
-    regulars = int(view['state']['values']['input_b']['regulars']['value'])
-    spicy = int(view['state']['values']['input_c']['spicy']['value'])
-    nuggets = int(view['state']['values']['input_d']['nuggets']['value'])
-    strips = int(view['state']['values']['input_e']['strips']['value'])
-    g_filets = int(view['state']['values']['input_f']['grilled1']['value'])
-    g_nuggets = int(view['state']['values']['input_g']['grilled2']['value'])
+    regulars = float(view['state']['values']['input_b']['regulars']['value'])
+    spicy = float(view['state']['values']['input_c']['spicy']['value'])
+    nuggets = float(view['state']['values']['input_d']['nuggets']['value'])
+    strips = float(view['state']['values']['input_e']['strips']['value'])
+    g_filets = float(view['state']['values']['input_f']['grilled1']['value'])
+    g_nuggets = float(view['state']['values']['input_g']['grilled2']['value'])
     total_weight = sum([regulars, spicy, nuggets, strips, g_filets, g_nuggets])
     new_line = "\n"
     block1 = {
@@ -459,9 +459,9 @@ async def handle_waste_view(ack, body, client, view, say):
             block3_text += f"Grilled Nuggets: {g_nuggets} lbs.\n"
     to_post = [str(datetime.now()), regulars, spicy, nuggets, strips, g_filets, g_nuggets]
     if datetime.now().hour < 13:
-        breakfast = int(view['state']['values']['input_h']['breakfast']['value'])
+        breakfast = float(view['state']['values']['input_h']['breakfast']['value'])
         to_post.append(breakfast)
-        g_breakfast = int(view['state']['values']['input_i']['grilled3']['value'])
+        g_breakfast = float(view['state']['values']['input_i']['grilled3']['value'])
         to_post.append(g_breakfast)
         if sum([breakfast, g_breakfast]) > 0:
             total_weight += sum([breakfast, g_breakfast])
