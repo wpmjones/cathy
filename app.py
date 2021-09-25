@@ -504,6 +504,7 @@ async def handle_waste_view(ack, body, client, view, say):
 @app.command("/goals")
 async def waste_goals(ack, say):
     """Responds with the current daily waste goals from the Waste Tracking Google Sheet"""
+    await ack()
     sh = gc.open_by_key(creds.waste_id)
     sheet = sh.worksheet("Goals")
     values = sheet.get_all_values()
