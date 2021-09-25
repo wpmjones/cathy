@@ -201,7 +201,7 @@ async def sick(ack, body, client):
 @app.view("sick_view")
 async def handle_sick_input(ack, body, client, view, say):
     """Process input from sick form"""
-    logger.info("Processing input...")
+    logger.info("Processing sick input...")
     name = view['state']['values']['input_a']['tm_name']['selected_option']['value']
     reason = view['state']['values']['input_b']['reason']['value']
     shift = view['state']['values']['input_c']['shift']['value']
@@ -213,10 +213,6 @@ async def handle_sick_input(ack, body, client, view, say):
                   f"*Contact:* {contact}")
     if other:
         block_text += f"\n*Other notes:* {other}"
-    errors = {}
-    if len(errors) > 0:
-        await ack(response_action="errors", errors=errors)
-        return
     await ack()
     # Send data to Google Sheet
     try:
@@ -226,9 +222,8 @@ async def handle_sick_input(ack, body, client, view, say):
         to_post = [now, name, reason, shift, contact, other]
         sheet.append_row(to_post)
     except gspread.exceptions.GSpreadException as e:
-        await client.chat_postMessage(channel=body['user']['id'],
+        return await client.chat_postMessage(channel=body['user']['id'],
                                       text=e)
-        return
     except Exception as e:
         await client.chat_postMessage(channel=body['user']['id'],
                                       text=f"There was an error while storing the message to the Google Sheet.\n{e}")
@@ -253,6 +248,272 @@ async def handle_sick_input(ack, body, client, view, say):
     await client.chat_postMessage(channel=creds.sick_channel,
                                   blocks=blocks,
                                   text=f"New callout for {name}.  Review the sheet <{creds.sick_log_link}|here>.")
+
+
+@app.command("/waste")
+async def waste(ack, body, client):
+    await ack()
+    leaders = [
+        "Phil",
+        "Patrick",
+        "Calvin",
+        "Kayla",
+        "Vanessa",
+        "Kynon",
+        "Jason",
+        "Josh",
+        "Evan",
+        "Brittney",
+        "Jordan",
+        "Karina",
+        "Yvonne",
+    ]
+    options = []
+    for leader in leaders:
+        options.append(
+            {
+                "text": {
+                    "type": "plain_text",
+                    "text": leader
+                },
+                "value": leader
+            }
+        )
+    blocks = [
+        {
+            "type": "input",
+            "block_id": "input_a",
+            "label": {"type": "plain_text", "text": "Leaders on"},
+            "element": {
+                "type": "multi_static_select",
+                "action_id": "leader_names",
+                "placeholder": {"type": "plain_text", "text": "Select leaders"},
+                "options": options
+            }
+        },
+        {
+            "type": "section",
+            "block_id": "section_info",
+            "text": {
+                "type": "plain_text",
+                "text": "Please enter weight as a decimal. For example, 1.25 instead of 1lb 4oz."
+            }
+        },
+        {
+            "type": "input",
+            "block_id": "input_b",
+            "label": {"type": "plain_text", "text": "Regular Filets"},
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "regulars",
+                "placeholder": {
+                    "type": "plain_text",
+                    "text": "0"
+                }
+            },
+            "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
+        },
+        {
+            "type": "input",
+            "block_id": "input_c",
+            "label": {"type": "plain_text", "text": "Spicy Filets"},
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "spicy",
+                "placeholder": {
+                    "type": "plain_text",
+                    "text": "0"
+                }
+            },
+            "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
+        },
+        {
+            "type": "input",
+            "block_id": "input_d",
+            "label": {"type": "plain_text", "text": "Nuggets"},
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "nuggets",
+                "placeholder": {
+                    "type": "plain_text",
+                    "text": "0"
+                }
+            },
+            "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
+        },
+        {
+            "type": "input",
+            "block_id": "input_e",
+            "label": {"type": "plain_text", "text": "Strips"},
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "strips",
+                "placeholder": {
+                    "type": "plain_text",
+                    "text": "0"
+                }
+            },
+            "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
+        },
+        {
+            "type": "input",
+            "block_id": "input_f",
+            "label": {"type": "plain_text", "text": "Grilled Filets"},
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "grilled1",
+                "placeholder": {
+                    "type": "plain_text",
+                    "text": "0"
+                }
+            },
+            "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
+        },
+        {
+            "type": "input",
+            "block_id": "input_g",
+            "label": {"type": "plain_text", "text": "Grilled Nuggets"},
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "grilled2",
+                "placeholder": {
+                    "type": "plain_text",
+                    "text": "0"
+                }
+            },
+            "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
+        }
+    ]
+    if datetime.now().hour < 13:
+        blocks.append(
+            {
+                "type": "input",
+                "block_id": "input_h",
+                "label": {"type": "plain_text", "text": "Breakfast Filets"},
+                "element": {
+                    "type": "plain_text_input",
+                    "action_id": "breakfast",
+                    "placeholder": {
+                        "type": "plain_text",
+                        "text": "0"
+                    }
+                },
+                "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
+            }
+        )
+        blocks.append(
+            {
+                "type": "input",
+                "block_id": "input_i",
+                "label": {"type": "plain_text", "text": "Grilled Breakfast"},
+                "element": {
+                    "type": "plain_text_input",
+                    "action_id": "grilled3",
+                    "placeholder": {
+                        "type": "plain_text",
+                        "text": "0"
+                    }
+                },
+                "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
+            }
+        )
+    blocks.append(
+        {
+            "type": "input",
+            "block_id": "input_j",
+            "label": {"type": "plain_text", "text": "Additional Info"},
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "other",
+                "multiline": True
+            }
+        }
+    )
+    await client.views_open(
+        trigger_id=body['trigger_id'],
+        view={
+            "type": "modal",
+            "callback_id": "waste_view",
+            "title": {"type": "plain_text", "text": "Waste Form"},
+            "submit": {"type": "plain_text", "text": "Submit"},
+            "blocks": blocks
+        }
+    )
+
+
+@app.view("waste_view")
+async def handle_waste_view(ack, body, client, view, say):
+    """Process input from waste form"""
+    logger.info("Processing waste input...")
+    logger.info(view['state']['values']['input_a']['leader_names'])
+    leaders = view['state']['values']['input_a']['leader_names']['selected_options']['value']
+    regulars = int(view['state']['values']['input_b']['regulars']['value'])
+    spicy = int(view['state']['values']['input_c']['spicy']['value'])
+    nuggets = int(view['state']['values']['input_d']['nuggets']['value'])
+    strips = int(view['state']['values']['input_e']['strips']['value'])
+    g_filets = int(view['state']['values']['input_f']['grilled1']['value'])
+    g_nuggets = int(view['state']['values']['input_g']['grilled2']['value'])
+    total_weight = sum([regulars, spicy, nuggets, strips, g_filets, g_nuggets])
+    leader_list = [" - " + leader for leader in leaders]
+    new_line = "\n"
+    block_text = (f"*Submitted by:* {body['user']['name']}\n"
+                  f"*Leaders on:*\n"
+                  f"{new_line.join(leader_list)}\n"
+                  f"---------------\n")
+    if total_weight > 0:
+        if regulars:
+            block_text += f"Regulars: {regulars} lbs.\n"
+        if spicy:
+            block_text += f"Spicy: {spicy} lbs.\n"
+        if nuggets:
+            block_text += f"Nuggets: {nuggets} lbs.\n"
+        if strips:
+            block_text += f"Strips: {strips} lbs.\n"
+        if g_filets:
+            block_text += f"Grilled Filets: {g_filets} lbs.\n"
+        if g_nuggets:
+            block_text += f"Grilled Nuggets: {g_nuggets} lbs.\n"
+    now = str(datetime.date(datetime.today()))
+    to_post = [now, regulars, spicy, nuggets, strips, g_filets, g_nuggets]
+    if datetime.now().hour < 13:
+        breakfast = int(view['state']['values']['input_h']['breakfast']['value'])
+        to_post.append(breakfast)
+        g_breakfast = int(view['state']['values']['input_i']['grilled3']['value'])
+        to_post.append(g_breakfast)
+        if sum([breakfast, g_breakfast]) > 0:
+            total_weight += sum([breakfast, g_breakfast])
+            if breakfast:
+                block_text += f"Breakfast Filets: {breakfast} lbs.\n"
+            if g_breakfast:
+                block_text += f"Grilled Breakfast: {g_breakfast} lbs.\n"
+    other = view['state']['values']['input_j']['other']['value']
+    if other:
+        block_text += (f"---------------\n"
+                       f"{other}")
+    await ack()
+    # Send data to Google Sheet
+    try:
+        sh = gc.open_by_key(creds.waste_id)
+        sheet = sh.get_worksheet(0)
+        sheet.append_row(to_post)
+    except gspread.exceptions.GSpreadException as e:
+        return await client.chat_postMessage(channel=body['user']['id'],
+                                             text=e)
+    except Exception as e:
+        await client.chat_postMessage(channel=body['user']['id'],
+                                      text=f"There was an error while storing the message to the Google Sheet.\n{e}")
+        await client.chat_postMessage(channel=creds.pj_user_id,
+                                      text=f"There was an error while storing the message to the Google Sheet.\n{e}")
+        return
+    blocks = [
+        {
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": block_text}
+        }
+    ]
+    await client.chat_postMessage(channel=creds.boh_channel,
+                                  blocks=blocks,
+                                  text="New waste report psoted.")
 
 
 @app.command("/find")
