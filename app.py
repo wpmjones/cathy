@@ -446,7 +446,9 @@ async def handle_waste_view(ack, body, client, view, say):
     """Process input from waste form"""
     logger.info("Processing waste input...")
     logger.info(view['state']['values']['input_a']['leader_names'])
-    leaders = view['state']['values']['input_a']['leader_names']['selected_options']['value']
+    raw_leaders = view['state']['values']['input_a']['leader_names']['selected_options']
+    leaders = [n['value'] for n in raw_leaders]
+    logger.info(f"Leaders list: {leaders}")
     regulars = int(view['state']['values']['input_b']['regulars']['value'])
     spicy = int(view['state']['values']['input_c']['spicy']['value'])
     nuggets = int(view['state']['values']['input_d']['nuggets']['value'])
