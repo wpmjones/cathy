@@ -476,11 +476,9 @@ async def handle_waste_view(ack, body, client, view, say):
     blocks = [block1, block2, block3]
     other = view['state']['values']['input_j']['other']['value']
     if other:
-        block4_text = "*Notes:*\n"
-        block4_text += other
         block4 = {
             "type": "section",
-            "text": {"type": "plain_text", "text": block4_text}
+            "text": {"type": "mrkdwn", "text": f"*Notes:*\n{other}"}
         }
         blocks.append(block4)
     await ack()
