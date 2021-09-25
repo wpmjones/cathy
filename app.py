@@ -509,7 +509,9 @@ async def waste_goals(ack, say):
     values = sheet.get_all_values()
     content = "*Daily Waste Goals:*\n"
     for row in values:
-        content += f"{row[0]}: {row[1]}\n"
+        if row[0] == "Type":
+            continue
+        content += f"{row[0]}: {row[1]} lbs\n"
     await say(content)
 
 
