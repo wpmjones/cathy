@@ -223,7 +223,7 @@ async def handle_sick_input(ack, body, client, view, say):
         sheet.append_row(to_post)
     except gspread.exceptions.GSpreadException as e:
         return await client.chat_postMessage(channel=body['user']['id'],
-                                      text=e)
+                                             text=e)
     except Exception as e:
         await client.chat_postMessage(channel=body['user']['id'],
                                       text=f"There was an error while storing the message to the Google Sheet.\n{e}")
@@ -445,10 +445,8 @@ async def waste(ack, body, client):
 async def handle_waste_view(ack, body, client, view, say):
     """Process input from waste form"""
     logger.info("Processing waste input...")
-    logger.info(view['state']['values']['input_a']['leader_names'])
     raw_leaders = view['state']['values']['input_a']['leader_names']['selected_options']
-    leaders = [n['value'] for n in raw_leaders]
-    logger.info(f"Leaders list: {leaders}")
+    leader_list = [" - " + n['value'] for n in raw_leaders]
     regulars = int(view['state']['values']['input_b']['regulars']['value'])
     spicy = int(view['state']['values']['input_c']['spicy']['value'])
     nuggets = int(view['state']['values']['input_d']['nuggets']['value'])
@@ -456,27 +454,33 @@ async def handle_waste_view(ack, body, client, view, say):
     g_filets = int(view['state']['values']['input_f']['grilled1']['value'])
     g_nuggets = int(view['state']['values']['input_g']['grilled2']['value'])
     total_weight = sum([regulars, spicy, nuggets, strips, g_filets, g_nuggets])
-    leader_list = [" - " + leader for leader in leaders]
     new_line = "\n"
-    block_text = (f"*Submitted by:* {body['user']['name']}\n"
-                  f"*Leaders on:*\n"
-                  f"{new_line.join(leader_list)}\n"
-                  f"---------------\n")
+    block1 = {
+        "type": "section",
+        "text": {"type": "mrkdwn", "text": f"*Submitted by:* {body['user']['name']}"}
+    }
+    block2 = {
+        "type": "section",
+        "text": {"type": "mrkdwn",
+                 "text": (f"*Leaders on:*\n"
+                          f"{new_line.join(leader_list)}\n")
+                 }
+    }
+    block3_text = ""
     if total_weight > 0:
         if regulars:
-            block_text += f"Regulars: {regulars} lbs.\n"
+            block3_text += f"Regulars: {regulars} lbs.\n"
         if spicy:
-            block_text += f"Spicy: {spicy} lbs.\n"
+            block3_text += f"Spicy: {spicy} lbs.\n"
         if nuggets:
-            block_text += f"Nuggets: {nuggets} lbs.\n"
+            block3_text += f"Nuggets: {nuggets} lbs.\n"
         if strips:
-            block_text += f"Strips: {strips} lbs.\n"
+            block3_text += f"Strips: {strips} lbs.\n"
         if g_filets:
-            block_text += f"Grilled Filets: {g_filets} lbs.\n"
+            block3_text += f"Grilled Filets: {g_filets} lbs.\n"
         if g_nuggets:
-            block_text += f"Grilled Nuggets: {g_nuggets} lbs.\n"
-    now = str(datetime.date(datetime.today()))
-    to_post = [now, regulars, spicy, nuggets, strips, g_filets, g_nuggets]
+            block3_text += f"Grilled Nuggets: {g_nuggets} lbs.\n"
+    to_post = [str(datetime.now()), regulars, spicy, nuggets, strips, g_filets, g_nuggets]
     if datetime.now().hour < 13:
         breakfast = int(view['state']['values']['input_h']['breakfast']['value'])
         to_post.append(breakfast)
@@ -485,13 +489,18 @@ async def handle_waste_view(ack, body, client, view, say):
         if sum([breakfast, g_breakfast]) > 0:
             total_weight += sum([breakfast, g_breakfast])
             if breakfast:
-                block_text += f"Breakfast Filets: {breakfast} lbs.\n"
+                block3_text += f"Breakfast Filets: {breakfast} lbs.\n"
             if g_breakfast:
-                block_text += f"Grilled Breakfast: {g_breakfast} lbs.\n"
+                block3_text += f"Grilled Breakfast: {g_breakfast} lbs.\n"
+    block3 = {
+        "type": "section",
+        "text": {"type": "mrkdwn", "text": block3_text}
+    }
     other = view['state']['values']['input_j']['other']['value']
-    if other:
-        block_text += (f"---------------\n"
-                       f"{other}")
+    block4 = {
+        "type": "section",
+        "text": {"type": "plain_text", "text": other}
+    }
     await ack()
     # Send data to Google Sheet
     try:
@@ -507,12 +516,7 @@ async def handle_waste_view(ack, body, client, view, say):
         await client.chat_postMessage(channel=creds.pj_user_id,
                                       text=f"There was an error while storing the message to the Google Sheet.\n{e}")
         return
-    blocks = [
-        {
-            "type": "section",
-            "text": {"type": "mrkdwn", "text": block_text}
-        }
-    ]
+    blocks = [block1, block2, block3, block4]
     await client.chat_postMessage(channel=creds.boh_channel,
                                   blocks=blocks,
                                   text="New waste report psoted.")
