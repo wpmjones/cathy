@@ -501,6 +501,18 @@ async def handle_waste_view(ack, body, client, view, say):
                                   text="New waste report psoted.")
 
 
+@app.command("/goals")
+async def waste_goals(ack, say):
+    """Responds with the current daily waste goals from the Waste Tracking Google Sheet"""
+    sh = gc.open_by_key(creds.waste_id)
+    sheet = sh.worksheet("Goals")
+    values = sheet.get_all_values()
+    content = "*Daily Waste Goals:*\n"
+    for row in values:
+        content += f"{row[0]}: {row[1]}\n"
+    await say(content)
+
+
 @app.command("/find")
 async def find_names(ack, body, say):
     """Find matching names from Sick & Discipline Logs"""
