@@ -440,6 +440,7 @@ async def handle_waste_view(ack, body, client, view):
         if row[0] == "Type":
             continue
         goals[row[0]] = float(row[1])
+
     new_line = "\n"
     block1 = {
         "type": "section",
@@ -605,6 +606,15 @@ async def illness(ack, say):
               "Shiga toxin-producing Escherichia coli (E coli)\n"
               "Hepatitis A virus\n"
               "Norovirus (a type of stomach flu)")
+
+
+@app.command("/test")
+async def bot_test(ack, body, say):
+    """Testing various features
+    slack event url - http://144.172.83.165:3000/slack/events
+    """
+    await ack()
+    logger.info(body)
 
 
 # Start your app
