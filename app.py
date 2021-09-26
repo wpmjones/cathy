@@ -230,7 +230,7 @@ async def handle_sick_input(ack, body, client, view):
         await client.chat_postMessage(channel=creds.pj_user_id,
                                       text=f"There was an error while storing the message to the Google Sheet.\n{e}")
         return
-    user = client.users_info(user=body['user']['id'])
+    user = await client.users_info(user=body['user']['id'])
     user_name = user['user']['real_name']
     blocks = [
         {
@@ -255,7 +255,7 @@ async def handle_sick_input(ack, body, client, view):
 @app.block_action("waste_tracking_form")
 async def waste(ack, body, client):
     await ack()
-    logger.info(body)
+    logger.info(f"waste button message_ts: {body['container']['message_ts']}")
     leaders = [
         "Phil",
         "Patrick",
@@ -425,6 +425,7 @@ async def waste(ack, body, client):
 async def handle_waste_view(ack, body, client, view):
     """Process input from waste form"""
     logger.info("Processing waste input...")
+    logger.info(f"waste form message_ts: {body['container']['message_ts']}")
     raw_leaders = view['state']['values']['input_a']['leader_names']['selected_options']
     leader_list = [" - " + n['value'] for n in raw_leaders]
     regulars = float(view['state']['values']['input_b']['regulars']['value'])
@@ -443,7 +444,6 @@ async def handle_waste_view(ack, body, client, view):
             continue
         goals[row[0]] = float(row[1])
     user = await client.users_info(user=body['user']['id'])
-    logger.info(user)
     user_name = user['user']['real_name']
     new_line = "\n"
     block1 = {
