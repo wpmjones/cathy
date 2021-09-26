@@ -230,7 +230,7 @@ async def handle_sick_input(ack, body, client, view):
         await client.chat_postMessage(channel=creds.pj_user_id,
                                       text=f"There was an error while storing the message to the Google Sheet.\n{e}")
         return
-    user = client.users_info(user=body['user_id'])
+    user = client.users_info(user=body['user']['id'])
     user_name = user['user']['real_name']
     blocks = [
         {
@@ -442,7 +442,7 @@ async def handle_waste_view(ack, body, client, view):
         if row[0] == "Type":
             continue
         goals[row[0]] = float(row[1])
-    user = client.users_info(user=body['user_id'])
+    user = client.users_info(user=body['user']['id'])
     user_name = user['user']['real_name']
     new_line = "\n"
     block1 = {
