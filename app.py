@@ -199,7 +199,7 @@ async def sick(ack, body, client):
 
 
 @app.view("sick_view")
-async def handle_sick_input(ack, body, client, view, say):
+async def handle_sick_input(ack, body, client, view):
     """Process input from sick form"""
     logger.info("Processing sick input...")
     name = view['state']['values']['input_a']['tm_name']['selected_option']['value']
@@ -250,7 +250,7 @@ async def handle_sick_input(ack, body, client, view, say):
                                   text=f"New callout for {name}.  Review the sheet <{creds.sick_log_link}|here>.")
 
 
-@app.command("/waste")
+@app.block_action("waste_tracking_form")
 async def waste(ack, body, client):
     await ack()
     leaders = [
@@ -419,7 +419,7 @@ async def waste(ack, body, client):
 
 
 @app.view("waste_view")
-async def handle_waste_view(ack, body, client, view, say):
+async def handle_waste_view(ack, body, client, view):
     """Process input from waste form"""
     logger.info("Processing waste input...")
     raw_leaders = view['state']['values']['input_a']['leader_names']['selected_options']
@@ -513,6 +513,11 @@ async def handle_waste_view(ack, body, client, view, say):
             "text": {"type": "mrkdwn", "text": f"*Notes:*\n{other}"}
         }
         blocks.append(block4)
+    block5 = {
+        "type": "section",
+        "text": {"type": "mrkdwn", "text": "Please remember to replace stickers on all waste containers."}
+    }
+    blocks.append(block5)
     await ack()
     # Send data to Google Sheet
     try:
