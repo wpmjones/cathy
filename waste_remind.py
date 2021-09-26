@@ -3,8 +3,9 @@ import requests
 
 from loguru import logger
 
+
 def main():
-    webhook_url = creds.webhook_test
+    webhook_url = creds.webhook_boh
     waste_tracking_sheet = "https://docs.google.com/spreadsheets/d/1HnqmLuAqrPHcd4tsBJRvS1dhUbwqy949-mY_IT40Yp8/edit"
 
     blocks = [
