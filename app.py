@@ -615,6 +615,8 @@ async def bot_test(ack, body, say):
     """
     await ack()
     logger.info(body)
+    user = client.users_info(body['user_id'])
+    await say(user['real_name'])
 
 
 # Start your app
