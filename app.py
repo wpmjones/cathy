@@ -614,10 +614,9 @@ async def bot_test(ack, body, say):
     slack event url - http://144.172.83.165:3000/slack/events
     """
     await ack()
-    logger.info(body)
     user = client.users_info(user=body['user_id'])
-    logger.info(user)
-    await say(user['real_name'])
+    logger.info(user['user'])
+    await say(user['user']['real_name'])
 
 
 # Start your app
