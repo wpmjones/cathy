@@ -422,7 +422,7 @@ async def waste(ack, body, client):
 
 
 @app.view("waste_view")
-async def handle_waste_view(ack, body, client, view):
+async def handle_waste_view(ack, body, view):
     """Process input from waste form"""
     logger.info("Processing waste input...")
     raw_leaders = view['state']['values']['input_a']['leader_names']['selected_options']
@@ -442,7 +442,8 @@ async def handle_waste_view(ack, body, client, view):
         if row[0] == "Type":
             continue
         goals[row[0]] = float(row[1])
-    user = client.users_info(user=body['user']['id'])
+    user = await client.users_info(user=body['user']['id'])
+    logger.info(user)
     user_name = user['user']['real_name']
     new_line = "\n"
     block1 = {
