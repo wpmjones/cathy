@@ -2,7 +2,6 @@ import creds
 import datetime
 import email
 import imaplib
-import json
 import requests
 
 from loguru import logger
@@ -72,6 +71,30 @@ def check_cem():
         logger.info(content)
         payload = {"text": content}
         r = requests.post(webhook_url, json=payload)
+
+def check_oos():
+    search_date = datetime.date.today() - datetime.timedelta(days=1)
+    tfmt = search_date.strftime('%d-%b-%Y')
+    _, sdata = mail.search(None, f'(SUBJECT "OOS Notification" SINCE {tfmt})')
+    mail_ids = sdata[0]
+    id_list = mail_ids.split()
+    body = ""
+    for i in id_list:
+        typ, data = mail.fetch(i, "(RFC822)")
+        raw = data[0][1]
+        raw_str = raw.decode("utf-9")
+        msg = email.message_from_string(raw_str)
+        if msg.is_multipart():
+            for part in msg.walk():
+                part_type = part.get_content_type()
+                if part_type == "text/plain" and "attachment" not in part:
+                    body = part.get_payload(decode=True).decode("utf-8")
+                if part.get("Content-Disposition") is None:
+                    pass
+        else:
+            body = msg.get_payload(decode=True).decode("utf-8")
+    # body captured, search for relevant text
+
 
 
 if __name__ == "__main__":
