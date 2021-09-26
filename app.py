@@ -253,6 +253,7 @@ async def handle_sick_input(ack, body, client, view):
 @app.block_action("waste_tracking_form")
 async def waste(ack, body, client):
     await ack()
+    logger.info(body)
     leaders = [
         "Phil",
         "Patrick",
