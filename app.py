@@ -422,7 +422,7 @@ async def waste(ack, body, client):
 
 
 @app.view("waste_view")
-async def handle_waste_view(ack, body, view):
+async def handle_waste_view(ack, body, client, view):
     """Process input from waste form"""
     logger.info("Processing waste input...")
     raw_leaders = view['state']['values']['input_a']['leader_names']['selected_options']
