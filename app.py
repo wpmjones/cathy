@@ -424,7 +424,6 @@ async def waste(ack, body, client):
 async def handle_waste_view(ack, body, client, view):
     """Process input from waste form"""
     logger.info("Processing waste input...")
-    logger.info(f"waste form message_ts: {body['container']['message_ts']}")
     raw_leaders = view['state']['values']['input_a']['leader_names']['selected_options']
     leader_list = [" - " + n['value'] for n in raw_leaders]
     regulars = float(view['state']['values']['input_b']['regulars']['value'])
