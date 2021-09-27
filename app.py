@@ -231,7 +231,6 @@ async def handle_sick_input(ack, body, client, view):
                                       text=f"There was an error while storing the message to the Google Sheet.\n{e}")
         return
     user = await client.users_info(user=body['user']['id'])
-    logger.info(user)
     user_name = user['user']['real_name']
     blocks = [
         {
