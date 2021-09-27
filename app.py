@@ -230,8 +230,7 @@ async def handle_sick_input(ack, body, client, view):
         await client.chat_postMessage(channel=creds.pj_user_id,
                                       text=f"There was an error while storing the message to the Google Sheet.\n{e}")
         return
-    logger.info(body['user'])
-    user = client.users_info(user=body['user']['id'])
+    user = await client.users_info(user=body['user']['id'])
     logger.info(user)
     user_name = user['user']['real_name']
     blocks = [
