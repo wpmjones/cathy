@@ -255,7 +255,6 @@ async def handle_sick_input(ack, body, client, view):
 @app.block_action("waste_tracking_form")
 async def waste(ack, body, client):
     await ack()
-    logger.info(f"waste button message_ts: {body['container']['message_ts']}")
     leaders = [
         "Phil",
         "Patrick",
