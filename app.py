@@ -543,7 +543,7 @@ async def handle_waste_view(ack, body, client, view):
         return
     await client.chat_postMessage(channel=creds.boh_channel,
                                   blocks=blocks,
-                                  text="New waste report psoted.")
+                                  text="New waste report posted.")
 
 
 @app.command("/goals")
