@@ -3,6 +3,7 @@ import datetime
 import email
 import imaplib
 import requests
+import time
 
 from loguru import logger
 
@@ -132,4 +133,5 @@ def check_oos():
 
 if __name__ == "__main__":
     check_cem()
+    time.sleep(60*60*4)
     check_oos()
