@@ -252,10 +252,14 @@ async def handle_sick_input(ack, body, client, view):
                                   text=f"New callout for {name}.  Review the sheet <{creds.sick_log_link}|here>.")
 
 
+@app.block_action("waste_sheet")
+async def waste_sheet(ack):
+    await ack()
+
+
 @app.block_action("waste_tracking_form")
 async def waste(ack, body, client):
     await ack()
-    logger.info(f"waste button message_ts: {body['container']['message_ts']}")
     leaders = [
         "Phil",
         "Patrick",
@@ -551,7 +555,7 @@ async def handle_waste_view(ack, body, client, view):
         return
     await client.chat_postMessage(channel=creds.boh_channel,
                                   blocks=blocks,
-                                  text="New waste report psoted.")
+                                  text="New waste report posted.")
 
 
 @app.command("/goals")
