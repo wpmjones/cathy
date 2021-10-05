@@ -164,7 +164,7 @@ async def sick(ack, body, client):
                         "action_id": "shift",
                         "multiline": False
                     },
-                    "optional": True,
+                    "optional": False,
                     "hint": {"type": "plain_text", "text": "Position and Time"}
                 },
                 {
