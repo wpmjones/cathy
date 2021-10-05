@@ -425,7 +425,6 @@ async def waste(ack, body, client):
 async def handle_waste_view(ack, body, client, view):
     """Process input from waste form"""
     logger.info("Processing waste input...")
-    logger.info(f"waste form message_ts: {body['container']['message_ts']}")
     raw_leaders = view['state']['values']['input_a']['leader_names']['selected_options']
     leader_list = [" - " + n['value'] for n in raw_leaders]
     regulars = float(view['state']['values']['input_b']['regulars']['value'])
@@ -434,7 +433,18 @@ async def handle_waste_view(ack, body, client, view):
     strips = float(view['state']['values']['input_e']['strips']['value'])
     g_filets = float(view['state']['values']['input_f']['grilled1']['value'])
     g_nuggets = float(view['state']['values']['input_g']['grilled2']['value'])
-    total_weight = sum([regulars, spicy, nuggets, strips, g_filets, g_nuggets])
+    # Check that input is numeric when it needs to be
+    chicken_list = [regulars, spicy, nuggets, strips, g_filets, g_nuggets]
+    # for item in chicken_list:
+    #     if not isinstance(item, float):
+    #         payload = {
+    #             "response_action": "errors",
+    #             "errors": {
+    #                 "block_id": "error_message"
+    #             }
+    #         }
+    # Store data
+    total_weight = sum(chicken_list)
     sh = gc.open_by_key(creds.waste_id)
     goal_sheet = sh.worksheet("Goals")
     goal_values = goal_sheet.get_all_values()
@@ -490,6 +500,7 @@ async def handle_waste_view(ack, body, client, view):
             else:
                 block3_text += f"Grilled Nuggets: {g_nuggets} lbs.\n"
     to_post = [str(datetime.now()), regulars, spicy, nuggets, strips, g_filets, g_nuggets]
+    # Handle breakfast items
     if datetime.now().hour < 13:
         breakfast = float(view['state']['values']['input_h']['breakfast']['value'])
         to_post.append(breakfast)
