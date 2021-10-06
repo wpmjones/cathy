@@ -592,6 +592,8 @@ async def find_names(ack, body, say):
             sick_text += f"\n{row[0]} - {row[2]}"
             if row[3]:
                 sick_text += f" ({row[3]})"
+
+            logger.info(f"Sick - {row[0]} matches {input_name}")
     if count == 0:
         sick_text = f"No absences found for {input_name}."
     # Collect tardies
@@ -604,6 +606,7 @@ async def find_names(ack, body, say):
         if ratio > fuzzy_number:
             count += 1
             tardy_text += f"\nTardy on {row[1]}"
+            logger.info(f"Tardy - {row[0]} matches {input_name}")
     if count == 0:
         tardy_text = f"No tardies found for {input_name}"
     blocks = [
