@@ -593,7 +593,7 @@ async def find_names(ack, body, say):
             if row[3]:
                 sick_text += f" ({row[3]})"
 
-            logger.info(f"Sick - {row[0]} matches {input_name}")
+            logger.info(f"Sick - {row[1]} matches {input_name}")
     if count == 0:
         sick_text = f"No absences found for {input_name}."
     # Collect tardies
