@@ -574,7 +574,7 @@ async def waste_goals(ack, say):
 
 
 @app.command("/find")
-async def find_names(ack, body, say):
+async def find_names(ack, body, client):
     """Find matching names from Sick & Discipline Logs"""
     await ack()
     fuzzy_number = 78
@@ -619,7 +619,7 @@ async def find_names(ack, body, say):
             "text": {"type": "mrkdwn", "text": tardy_text}
         }
     ]
-    await say(blocks=blocks, text=f"Sick & tardy records for {body['text']}.")
+    await client.chat_postEphemeral(blocks=blocks, text=f"Sick & tardy records for {body['text']}.")
 
 
 @app.command("/symptoms")
