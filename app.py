@@ -577,6 +577,7 @@ async def waste_goals(ack, say):
 async def find_names(ack, body, client):
     """Find matching names from Sick & Discipline Logs"""
     await ack()
+    logger.info(body)
     fuzzy_number = 78
     # Collect sick records
     sh = gc.open_by_key(creds.sick_log_id)
