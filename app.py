@@ -577,28 +577,46 @@ async def waste_goals(ack, say):
 async def find_names(ack, body, say):
     """Find matching names from Sick & Discipline Logs"""
     await ack()
+    fuzzy_number = 78
+    # Collect sick records
     sh = gc.open_by_key(creds.sick_log_id)
     sheet = sh.worksheet("Form Responses 1")
     data = sheet.get_all_values()
     count = 0
-    block_text = f"*Log records for {body['text']}:*"
     input_name = body['text']
+    sick_text = f"*Sick records for {input_name}:*"
     for row in data:
         ratio = fuzz.token_sort_ratio(input_name.lower(), row[1].lower())
-        if ratio > 78:
+        if ratio > fuzzy_number:
             count += 1
-            block_text += f"\n{row[0]} - {row[2]}"
+            sick_text += f"\n{row[0]} - {row[2]}"
             if row[3]:
-                block_text += f" ({row[3]})"
+                sick_text += f" ({row[3]})"
     if count == 0:
-        return await say(f"No records found for {body['text']}.")
+        sick_text = f"No absences found for {input_name}."
+    # Collect tardies
+    sheet = sh.worksheet("Tardy Import")
+    data = sheet.get_all_values()
+    count = 0
+    tardy_text = f"*Tardy records for {input_name}"
+    for row in data:
+        ratio = fuzz.token_sort_ratio(input_name.lower(), row[0].lower())
+        if ratio > fuzzy_number:
+            count += 1
+            tardy_text += f"\nTardy on {row[1]}"
+    if count == 0:
+        tardy_text = f"No tardies found for {input_name}"
     blocks = [
         {
             "type": "section",
-            "text": {"type": "mrkdwn", "text": block_text}
+            "text": {"type": "mrkdwn", "text": sick_text}
+        },
+        {
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": tardy_text}
         }
     ]
-    await say(blocks=blocks, text=f"Found {count} records for {body['text']}.")
+    await say(blocks=blocks, text=f"Sick & tardy records for {body['text']}.")
 
 
 @app.command("/symptoms")
