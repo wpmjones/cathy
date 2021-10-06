@@ -598,7 +598,7 @@ async def find_names(ack, body, say):
     sheet = sh.worksheet("Tardy Import")
     data = sheet.get_all_values()
     count = 0
-    tardy_text = f"*Tardy records for {input_name}"
+    tardy_text = f"*Tardy records for {input_name}:*"
     for row in data:
         ratio = fuzz.token_sort_ratio(input_name.lower(), row[0].lower())
         if ratio > fuzzy_number:
