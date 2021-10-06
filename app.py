@@ -620,7 +620,10 @@ async def find_names(ack, body, client):
             "text": {"type": "mrkdwn", "text": tardy_text}
         }
     ]
-    await client.chat_postEphemeral(blocks=blocks, text=f"Sick & tardy records for {body['text']}.")
+    await client.chat_postEphemeral(channel=body['channel_id'],
+                                    user=body['user_id'],
+                                    blocks=blocks,
+                                    text=f"Sick & tardy records for {body['text']}.")
 
 
 @app.command("/symptoms")
