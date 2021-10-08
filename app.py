@@ -267,13 +267,13 @@ async def waste(ack, body, client):
         "Kayla",
         "Vanessa",
         "Kynon",
-        "Jason",
+        "Jason H",
+        "Jason M",
         "Josh",
         "Evan",
         "Brittney",
         "Jordan",
         "Karina",
-        "Yvonne",
     ]
     options = []
     for leader in leaders:
