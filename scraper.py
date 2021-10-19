@@ -186,3 +186,4 @@ def check_oos():
 if __name__ == "__main__":
     check_cem()
     check_oos()
+    check_allocation()
