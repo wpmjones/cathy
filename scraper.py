@@ -60,14 +60,13 @@ def check_cem():
         end = start + 3
         num_responses = body[start:end].strip()
         # post content to Slack
-        webhook_url = creds.webhook_all
         content = (f"*Month to Date CEM Scores*\n"
                    f"Out of {num_responses} responses\n```")
         for key, value in score_dict.items():
             content += f"{key}{' '*(25-len(key))}{' '*(4-len(value))}{value}\n"
         content += "```"
         payload = {"text": content}
-        r = requests.post(webhook_url, json=payload)
+        r = requests.post(creds.webhook_all, json=payload)
         if r.status_code != 200:
             raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
                              f"The response is: {r.text}")
@@ -122,7 +121,7 @@ def check_allocation():
                     }
                 ]
             }
-            r = requests.post(creds.webhook_boh, json=payload)
+            r = requests.post(creds.webhook_truck, json=payload)
             if r.status_code != 200:
                 raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
                                  f"The response is: {r.text}")
@@ -177,7 +176,7 @@ def check_oos():
                     }
                 ]
             }
-            r = requests.post(creds.webhook_boh, json=payload)
+            r = requests.post(creds.webhook_truck, json=payload)
             if r.status_code != 200:
                 raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
                                  f"The response is: {r.text}")
