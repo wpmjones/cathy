@@ -586,6 +586,8 @@ async def symbol(ack, body, say):
     data = sheet.get_all_values()
     for row in data:
         try:
+            if row[4] == "2022-01-07":
+                logger.info(f"Sheet: {row[4]} - Python: {date.today()}")
             row_date = datetime.strptime(row[4], "%Y-%m-%d").date()
             if row_date == date.today():
                 current_sales = float(row[6])
