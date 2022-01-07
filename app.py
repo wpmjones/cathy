@@ -581,6 +581,7 @@ async def symbol(ack, body):
     sheet = sh.worksheet("Daily Goals")
     data = sheet.get_all_values()
     for row in data:
+        logger.info(row[4])
         row_date = datetime.strptime(row[4], "YYYY-MM-DD")
         if row_date == date.today():
             logger.info(row)
