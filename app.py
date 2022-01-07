@@ -582,11 +582,11 @@ async def symbol(ack, body):
     data = sheet.get_all_values()
     for row in data:
         try:
-            logger.info(row[4])
             row_date = datetime.strptime(row[4], "%Y-%m-%d")
+            logger.info(row_date)
+            logger.info(date.today())
             if row_date == date.today():
-                logger.info(row)
-                logger.info(date.today())
+                logger.info("success")
         except ValueError:
             logger.exception("Date check failure")
 
