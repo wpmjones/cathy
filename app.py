@@ -577,7 +577,7 @@ async def symbol(ack, body, say):
     """Record today's sales (if needed) and report current state"""
     await ack()
     logger.info(body)
-    if body['text']:
+    if "text" in body.keys():
         input_sales = float(body['text'])
     else:
         input_sales = 0.0
