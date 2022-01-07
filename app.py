@@ -589,6 +589,7 @@ async def symbol(ack, body, say):
             row_date = datetime.strptime(row[4], "%Y-%m-%d").date()
             if row_date == date.today():
                 current_sales = float(row[6])
+                logger.info(f"Input: {input_sales} - Current: {current_sales}")
                 if input_sales > current_sales:
                     await say("I will update sales.")
                 else:
