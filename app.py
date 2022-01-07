@@ -583,7 +583,7 @@ async def symbol(ack, body):
     for row in data:
         try:
             logger.info(row[4])
-            row_date = datetime.strptime(row[4], "YYYY-MM-DD")
+            row_date = datetime.strptime(row[4], "%Y-%m-%d")
             if row_date == date.today():
                 logger.info(row)
                 logger.info(date.today())
