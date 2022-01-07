@@ -573,10 +573,14 @@ async def waste_goals(ack, say):
 
 
 @app.command("/symbol")
-async def symbol(ack, body):
+async def symbol(ack, body, say):
     """Record today's sales (if needed) and report current state"""
     await ack()
     logger.info(body)
+    if body['text']:
+        input_sales = float(body['text'])
+    else:
+        input_sales = 0.0
     sh = gc.open_by_key(creds.symbol_id)
     sheet = sh.worksheet("Daily Goals")
     data = sheet.get_all_values()
@@ -584,9 +588,14 @@ async def symbol(ack, body):
         try:
             row_date = datetime.strptime(row[4], "%Y-%m-%d").date()
             if row_date == date.today():
-                logger.info("success")
+                current_sales = row[6]
+                if input_sales > current_sales:
+                    await say("I will update sales.")
+                else:
+                    await say("I will only report on current numbers.")
         except ValueError:
-            logger.exception("Date check failure")
+            # This is to bypass the first two rows of the sheet (headers and space)
+            pass
 
 
 @app.command("/find")
