@@ -588,7 +588,7 @@ async def symbol(ack, body, say):
         try:
             row_date = datetime.strptime(row[4], "%Y-%m-%d").date()
             if row_date == date.today():
-                current_sales = row[6]
+                current_sales = float(row[6])
                 if input_sales > current_sales:
                     await say("I will update sales.")
                 else:
