@@ -162,7 +162,7 @@ def check_oos():
             start = end
             end = body.find("pending") + 12
             rescheduled = body[start:end].strip() + " supplier's availability."
-            # post content to Slack
+            # post content to Slack - Truck Channel
             content = f"*{item}*\n{truck_date}\n{rescheduled}"
             payload = {
                 "text": "Out of Stock Notification",
@@ -177,6 +177,23 @@ def check_oos():
                 ]
             }
             r = requests.post(creds.webhook_truck, json=payload)
+            if r.status_code != 200:
+                raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
+                                 f"The response is: {r.text}")
+            # post content to Slack - All Leadership
+            payload = {
+                "text": "Out of Stock Notification",
+                "blocks": [
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": f"The distribution center is out of {item}."
+                        }
+                    }
+                ]
+            }
+            r = requests.post(creds.webhook_all, json=payload)
             if r.status_code != 200:
                 raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
                                  f"The response is: {r.text}")

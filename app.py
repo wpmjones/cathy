@@ -264,14 +264,13 @@ async def waste(ack, body, client):
         "Phil",
         "Patrick",
         "Calvin",
-        "Cayla",
-        "Kayla",
         "Jason H",
         "Kynon",
+        "Evan",
         "Josh",
         "Brittney",
-        "Evan",
-        "Jordan",
+        "Jordan W",
+        "Jordan O",
         "Karina",
     ]
     options = []
@@ -571,6 +570,21 @@ async def waste_goals(ack, say):
             continue
         content += f"{row[0]}: {row[1]} lbs\n"
     await say(content)
+
+
+@app.command("/symbol")
+async def symbol(ack, body):
+    """Record today's sales (if needed) and report current state"""
+    await ack()
+    logger.info(body)
+    sh = gc.open_by_key(creds.symbol_id)
+    sheet = sh.worksheet("Daily Goals")
+    data = sheet.get_all_values()
+    for row in data:
+        row_date = datetime.strptime(row[4], "YYYY-MM-DD")
+        if row_date == date.today():
+            logger.info(row)
+            logger.info(date.today())
 
 
 @app.command("/find")
