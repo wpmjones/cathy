@@ -597,7 +597,8 @@ async def symbol(ack, body, say):
     if input_sales > 0:
         logger.info("here")
         cell = sheet.find(current_date.strftime("%Y-%m-%d"))
-        sheet.update_cell(cell.row, cell.col, input_sales)
+        logger.info(f"{cell.row} - {cell.col}")
+        # sheet.update_cell(cell.row, cell.col, input_sales)
         # for row in data:
         #     try:
         #         row_date = datetime.strptime(row[4], "%Y-%m-%d").date()
