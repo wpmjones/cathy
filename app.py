@@ -586,13 +586,12 @@ async def symbol(ack, body, say):
         # Calculate the reporting date
         if now.hour < 12:
             current_date = date.today() - timedelta(days=1)
-        # elif now.hour < 23:
-        #     return await say("Let's wait until after closing to update sales figures.")
+        elif now.hour < 23:
+            return await say("Let's wait until after closing to update sales figures.")
     else:
         input_sales = 0.0
         if now.hour < 23:
             current_date = date.today() - timedelta(days=1)
-    await ack()
     sh = gc.open_by_key(creds.symbol_id)
     sheet = sh.worksheet("Daily Goals")
     cell = sheet.find(current_date.strftime("%Y-%m-%d"))
@@ -612,53 +611,53 @@ async def symbol(ack, body, say):
     cell = sheet.find("Current Gap:")
     gap = sheet.cell(cell.row, cell.col + 1).value
     gap_cover = sheet.cell(cell.row + 1, cell.col + 1).value
-    # blocks = [
-    #     {
-    #         "type": "section",
-    #         "text": {
-    #             "type": "mrkdwn",
-    #             "text": "*Symbol of Success Status*"
-    #         }
-    #     },
-    #     {
-    #         "type": "section",
-    #         "fields": [
-    #             {
-    #                 "type": "mrkdwn",
-    #                 "text": f"*Most Recent Goal:*\n{daily_goal}"
-    #             },
-    #             {
-    #                 "type": "mrkdwn",
-    #                 "text": f"*Most Recent Sales:*\n{daily_sales}"
-    #             },
-    #             {
-    #                 "type": "mrkdwn",
-    #                 "text": f"*Monthly Goal:*\n{monthly_goal}"
-    #             },
-    #             {
-    #                 "type": "mrkdwn",
-    #                 "text": f"*Month to Date:*\n{monthly_to_date}"
-    #             },
-    #             {
-    #                 "type": "mrkdwn",
-    #                 "text": f"*Year Goal:*\n{year_goal}"
-    #             },
-    #             {
-    #                 "type": "mrkdwn",
-    #                 "text": f"*Year to Date:*\n{year_to_date}"
-    #             },
-    #             {
-    #                 "type": "mrkdwn",
-    #                 "text": f"*Gap to Meet Symbol:*\n{gap}"
-    #             },
-    #             {
-    #                 "type": "mrkdwn",
-    #                 "text": f"*Amount (over 20%) Needed per Day:*\n{gap_cover}"
-    #             }
-    #         ]
-    #     }
-    # ]
-    # await say(blocks=blocks, text="Symbol of Success Status")
+    blocks = [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "*Symbol of Success Status*"
+            }
+        },
+        {
+            "type": "section",
+            "fields": [
+                {
+                    "type": "mrkdwn",
+                    "text": f"*Most Recent Goal:*\n{daily_goal}"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": f"*Most Recent Sales:*\n{daily_sales}"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": f"*Monthly Goal:*\n{monthly_goal}"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": f"*Month to Date:*\n{monthly_to_date}"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": f"*Year Goal:*\n{year_goal}"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": f"*Year to Date:*\n{year_to_date}"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": f"*Gap to Meet Symbol:*\n{gap}"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": f"*Amount (over 20%) Needed per Day:*\n{gap_cover}"
+                }
+            ]
+        }
+    ]
+    await say(blocks=blocks, text="Symbol of Success Status")
 
 
 @app.command("/find")
