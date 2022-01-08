@@ -580,7 +580,7 @@ async def symbol(ack, body, say):
     await ack()
     logger.info(body)
     if "text" in body.keys():
-        input_sales = float(body['text'])
+        input_sales = Decimal(sub(r'[^\d.]', '', body['text']))
     else:
         input_sales = 0.0
     sh = gc.open_by_key(creds.symbol_id)
