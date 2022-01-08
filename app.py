@@ -586,6 +586,9 @@ async def symbol(ack, body, say):
     sh = gc.open_by_key(creds.symbol_id)
     sheet = sh.worksheet("Daily Goals")
     data = sheet.get_all_values()
+    # Calculate the reporting date
+    now = datetime.now()
+    logger.info(now.hour)
     for row in data:
         try:
             if row[4] == "2022-01-07":
@@ -595,7 +598,7 @@ async def symbol(ack, body, say):
                 current_sales = Decimal(sub(r'[^\d.]', '', row[6]))
                 logger.info(f"Input: {input_sales} - Current: {current_sales}")
                 if input_sales > current_sales:
-                    await say("I will update sales.")
+                    # update today's sales total
                 else:
                     await say("I will only report on current numbers.")
         except ValueError:
