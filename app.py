@@ -589,21 +589,22 @@ async def symbol(ack, body, say):
     # Calculate the reporting date
     now = datetime.now()
     logger.info(now.hour)
-    for row in data:
-        try:
-            if row[4] == "2022-01-07":
-                logger.info(f"Sheet: {row[4]} - Python: {date.today()}")
-            row_date = datetime.strptime(row[4], "%Y-%m-%d").date()
-            if row_date == date.today():
-                current_sales = Decimal(sub(r'[^\d.]', '', row[6]))
-                logger.info(f"Input: {input_sales} - Current: {current_sales}")
-                if input_sales > current_sales:
-                    # update today's sales total
-                else:
-                    await say("I will only report on current numbers.")
-        except ValueError:
-            # This is to bypass the first two rows of the sheet (headers and space)
-            pass
+    # for row in data:
+    #     try:
+    #         if row[4] == "2022-01-07":
+    #             logger.info(f"Sheet: {row[4]} - Python: {date.today()}")
+    #         row_date = datetime.strptime(row[4], "%Y-%m-%d").date()
+    #         if row_date == date.today():
+    #             current_sales = Decimal(sub(r'[^\d.]', '', row[6]))
+    #             logger.info(f"Input: {input_sales} - Current: {current_sales}")
+    #             if input_sales > current_sales:
+    #                 # update today's sales total
+    #                 pass
+    #             else:
+    #                 await say("I will only report on current numbers.")
+    #     except ValueError:
+    #         # This is to bypass the first two rows of the sheet (headers and space)
+    #         pass
 
 
 @app.command("/find")
