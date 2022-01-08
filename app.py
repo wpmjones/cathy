@@ -597,6 +597,8 @@ async def symbol(ack, body, say):
         cell = sheet.find(current_date.strftime("%Y-%m-%d"))
         sheet.update_cell(cell.row, cell.col + 2, input_sales)
     # report on status of symbol run
+    daily_sales = sheet.cell(cell.row, cell.col + 2).value
+    daily_goal = sheet.cell(cell.row, cell.col + 6).value
     sheet = sh.worksheet("Monthly Goals")
     current_month = now.strftime("%B")
     cell = sheet.find(current_month)
@@ -621,6 +623,14 @@ async def symbol(ack, body, say):
             "fields": [
                 {
                     "type": "mrkdwn",
+                    "text": f"*Most Recent Goal:*\n{daily_goal}"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": f"*Most Recent Sales:*\n{daily_sales}"
+                },
+                {
+                    "type": "mrkdwn",
                     "text": f"*Monthly Goal:*\n{monthly_goal}"
                 },
                 {
@@ -641,7 +651,7 @@ async def symbol(ack, body, say):
                 },
                 {
                     "type": "mrkdwn",
-                    "text": f"*Amount Needed per Day:*\n{gap_cover}"
+                    "text": f"*Amount (over 20%) Needed per Day:*\n{gap_cover}"
                 }
             ]
         }
