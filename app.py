@@ -592,6 +592,7 @@ async def symbol(ack, body, say):
         input_sales = 0.0
         if now.hour < 23:
             current_date = date.today() - timedelta(days=1)
+    await ack()
     sh = gc.open_by_key(creds.symbol_id)
     sheet = sh.worksheet("Daily Goals")
     cell = sheet.find(current_date.strftime("%Y-%m-%d"))
