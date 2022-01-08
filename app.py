@@ -593,10 +593,10 @@ async def symbol(ack, body, say):
         input_sales = 0.0
     sh = gc.open_by_key(creds.symbol_id)
     sheet = sh.worksheet("Daily Goals")
-    data = sheet.get_all_values()
+    # data = sheet.get_all_values()
     if input_sales > 0:
         cell = sheet.find(current_date.strftime("%Y-%m-%d"))
-        sheet.update(cell, input_sales)
+        sheet.update_cell(cell.row, cell.col, input_sales)
         # for row in data:
         #     try:
         #         row_date = datetime.strptime(row[4], "%Y-%m-%d").date()
