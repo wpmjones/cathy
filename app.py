@@ -590,7 +590,7 @@ async def symbol(ack, body, say):
                 logger.info(f"Sheet: {row[4]} - Python: {date.today()}")
             row_date = datetime.strptime(row[4], "%Y-%m-%d").date()
             if row_date == date.today():
-                logger.info("here")
+                logger.info(f"Cell: {row[6]}")
                 current_sales = float(row[6])
                 logger.info(f"Input: {input_sales} - Current: {current_sales}")
                 if input_sales > current_sales:
