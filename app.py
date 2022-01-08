@@ -586,11 +586,10 @@ async def symbol(ack, body, say):
         # Calculate the reporting date
         if now.hour < 12:
             current_date = date.today() - timedelta(days=1)
-        elif now.hour < 23:
-            return await say("Let's wait until after closing to update sales figures.")
+        # elif now.hour < 23:
+        #     return await say("Let's wait until after closing to update sales figures.")
     else:
         input_sales = 0.0
-    logger.info(input_sales)
     sh = gc.open_by_key(creds.symbol_id)
     sheet = sh.worksheet("Daily Goals")
     if input_sales > 0:
