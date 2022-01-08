@@ -578,7 +578,6 @@ async def waste_goals(ack, say):
 async def symbol(ack, body, say):
     """Record today's sales (if needed) and report current state"""
     await ack()
-    logger.info(body)
     current_date = date.today()
     if "text" in body.keys():
         # Convert text input (string) to decimal
@@ -591,10 +590,12 @@ async def symbol(ack, body, say):
         #     return await say("Let's wait until after closing to update sales figures.")
     else:
         input_sales = 0.0
+    logger.info(input_sales)
     sh = gc.open_by_key(creds.symbol_id)
     sheet = sh.worksheet("Daily Goals")
     # data = sheet.get_all_values()
     if input_sales > 0:
+        logger.info("here")
         cell = sheet.find(current_date.strftime("%Y-%m-%d"))
         sheet.update_cell(cell.row, cell.col, input_sales)
         # for row in data:
