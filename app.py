@@ -593,7 +593,8 @@ async def symbol(ack, body, say):
             row_date = datetime.strptime(row[4], "%Y-%m-%d").date()
             if row_date == date.today():
                 logger.info(f"Cell: {row[6]}")
-                logger.info(f"Convert: {Decimal(sub(r'[^\d.]', '', row[6]))}")
+                converted = Decimal(sub(r'[^\d.]', '', row[6]))
+                logger.info(f"Convert: {converted}")
                 current_sales = float(row[6])
                 logger.info(f"Input: {input_sales} - Current: {current_sales}")
                 if input_sales > current_sales:
