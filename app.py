@@ -595,13 +595,13 @@ async def symbol(ack, body, say):
     sh = gc.open_by_key(creds.symbol_id)
     sheet = sh.worksheet("Daily Goals")
     cell = sheet.find(current_date.strftime("%Y-%m-%d"))
-    # if input_sales > 0:
-    #     sheet.update_cell(cell.row, cell.col + 2, input_sales)
-    # # report on status of symbol run
-    # daily_sales = sheet.cell(cell.row, cell.col + 2).value
-    # daily_goal = sheet.cell(cell.row, cell.col + 6).value
-    # sheet = sh.worksheet("Monthly Goals")
-    # current_month = now.strftime("%B")
+    if input_sales > 0:
+        sheet.update_cell(cell.row, cell.col + 2, input_sales)
+    # report on status of symbol run
+    daily_sales = sheet.cell(cell.row, cell.col + 2).value
+    daily_goal = sheet.cell(cell.row, cell.col + 6).value
+    sheet = sh.worksheet("Monthly Goals")
+    current_month = now.strftime("%B")
     # cell = sheet.find(current_month)
     # monthly_goal = sheet.cell(cell.row, cell.col + 2).value
     # monthly_to_date = sheet.cell(cell.row, cell.col + 6).value
