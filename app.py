@@ -577,7 +577,7 @@ async def waste_goals(ack, say):
 @app.command("/symbol")
 async def symbol(ack, body, say):
     """Record today's sales (if needed) and report current state"""
-    await ack()
+    # await ack()
     now = datetime.now()
     current_date = date.today()
     if "text" in body.keys():
