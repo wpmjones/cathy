@@ -600,20 +600,20 @@ async def symbol(ack, body, say):
     sheet = sh.worksheet("Monthly Goals")
     current_month = now.strftime("%B")
     cell = sheet.find(current_month)
-    monthly_goal = sheet.cell(cell.row, cell.col + 2)
-    monthly_to_date = sheet.cell(cell.row, cell.col + 6)
+    monthly_goal = sheet.cell(cell.row, cell.col + 2).value
+    monthly_to_date = sheet.cell(cell.row, cell.col + 6).value
     cell = sheet.find("TOTAL")
-    year_goal = sheet.cell(cell.row, cell.col + 1)
-    year_to_date = sheet.cell(cell.row, cell.col + 2)
+    year_goal = sheet.cell(cell.row, cell.col + 1).value
+    year_to_date = sheet.cell(cell.row, cell.col + 2).value
     cell = sheet.find("Current Gap:")
-    gap = sheet.cell(cell.row, cell.col + 1)
-    gap_cover = sheet.cell(cell.row + 1, cell.col + 1)
+    gap = sheet.cell(cell.row, cell.col + 1).value
+    gap_cover = sheet.cell(cell.row + 1, cell.col + 1).value
     blocks = [
         {
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": "Symbol of Success Status"
+                "text": "*Symbol of Success Status*"
             }
         },
         {
