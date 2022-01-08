@@ -578,39 +578,75 @@ async def waste_goals(ack, say):
 async def symbol(ack, body, say):
     """Record today's sales (if needed) and report current state"""
     await ack()
+    now = datetime.now()
     current_date = date.today()
     if "text" in body.keys():
         # Convert text input (string) to decimal
         input_sales = Decimal(sub(r'[^\d.]', '', body['text']))
         # Calculate the reporting date
-        now = datetime.now()
         if now.hour < 12:
             current_date = date.today() - timedelta(days=1)
-        # elif now.hour < 23:
-        #     return await say("Let's wait until after closing to update sales figures.")
+        elif now.hour < 23:
+            return await say("Let's wait until after closing to update sales figures.")
     else:
         input_sales = 0.0
     logger.info(input_sales)
     sh = gc.open_by_key(creds.symbol_id)
     sheet = sh.worksheet("Daily Goals")
-    # data = sheet.get_all_values()
     if input_sales > 0:
-        logger.info("here")
         cell = sheet.find(current_date.strftime("%Y-%m-%d"))
         sheet.update_cell(cell.row, cell.col + 2, input_sales)
-        # for row in data:
-        #     try:
-        #         row_date = datetime.strptime(row[4], "%Y-%m-%d").date()
-        #         if row_date == current_date:
-        #             current_sales = Decimal(sub(r'[^\d.]', '', row[6]))
-        #             logger.info(f"Input: {input_sales} - Current: {current_sales}")
-        #             if input_sales > current_sales:
-        #                 # update today's sales total
-        #
-        #
-        #     except ValueError:
-        #         # This is to bypass the first two rows of the sheet (headers and space)
-        #         pass
+    # report on status of symbol run
+    sheet = sh.worksheet("Monthly Goals")
+    current_month = now.strftime("%B")
+    cell = sheet.find(current_month)
+    monthly_goal = sheet.cell(cell.row, cell.col + 2)
+    monthly_to_date = sheet.cell(cell.row, cell.col + 6)
+    cell = sheet.find("TOTAL")
+    year_goal = sheet.cell(cell.row, cell.col + 1)
+    year_to_date = sheet.cell(cell.row, cell.col + 2)
+    cell = sheet.find("Current Gap:")
+    gap = sheet.cell(cell.row, cell.col + 1)
+    gap_cover = sheet.cell(cell.row + 1, cell.col + 1)
+    blocks = [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "Symbol of Success Status"
+            }
+        },
+        {
+            "type": "section",
+            "fields": [
+                {
+                    "type": "mrkdwn",
+                    "text": f"*Monthly Goal:*\n{monthly_goal}"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": f"*Month to Date:*\n{monthly_to_date}"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": f"*Year Goal:*\n{year_goal}"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": f"*Year to Date:*\n{year_to_date}"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": f"*Gap to Meet Symbol:*\n{gap}"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": f"*Amount Needed per Day:*\n{gap_cover}"
+                }
+            ]
+        }
+    ]
+    await say(blocks=blocks, text="Symbol of Success Status")
 
 
 @app.command("/find")
