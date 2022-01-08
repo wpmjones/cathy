@@ -7,8 +7,10 @@ import string
 
 # from slack_bolt import App
 from datetime import datetime, date
+from decimal import Decimal
 from fuzzywuzzy import fuzz
 from loguru import logger
+from re import sub
 from slack_bolt.async_app import AsyncApp
 from slack_sdk.web import WebClient
 from slack_bolt.error import BoltError
@@ -591,6 +593,7 @@ async def symbol(ack, body, say):
             row_date = datetime.strptime(row[4], "%Y-%m-%d").date()
             if row_date == date.today():
                 logger.info(f"Cell: {row[6]}")
+                logger.info(f"Convert: {Decimal(sub(r'[^\d.]', '', row[6]))}")
                 current_sales = float(row[6])
                 logger.info(f"Input: {input_sales} - Current: {current_sales}")
                 if input_sales > current_sales:
