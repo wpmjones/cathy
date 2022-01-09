@@ -577,7 +577,7 @@ async def waste_goals(ack, say):
 @app.command("/symbol")
 async def symbol(ack, body, say):
     """Record today's sales (if needed) and report current state"""
-    # await ack()
+    await ack()
     now = datetime.now()
     current_date = date.today()
     if "text" in body.keys():
@@ -606,8 +606,8 @@ async def symbol(ack, body, say):
     monthly_goal = sheet.cell(cell.row, cell.col + 2).value
     monthly_to_date = sheet.cell(cell.row, cell.col + 6).value
     cell = sheet.find("TOTAL")
-    year_goal = sheet.cell(cell.row, cell.col + 1).value
-    year_to_date = sheet.cell(cell.row, cell.col + 2).value
+    year_goal = sheet.cell(cell.row, cell.col + 2).value
+    year_to_date = sheet.cell(cell.row, cell.col + 6).value
     cell = sheet.find("Current Gap:")
     gap = sheet.cell(cell.row, cell.col + 1).value
     gap_cover = sheet.cell(cell.row + 1, cell.col + 1).value
