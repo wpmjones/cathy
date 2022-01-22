@@ -9,6 +9,7 @@ import string
 from datetime import datetime, date, timedelta
 from decimal import Decimal
 from fuzzywuzzy import fuzz
+from gspread.utils import ValueRenderOption
 from loguru import logger
 from re import sub
 from slack_bolt.async_app import AsyncApp
@@ -75,7 +76,6 @@ async def tardy(ack, body, say, client):
         sheet = sh.worksheet("Tardy")
         now = date.strftime(date.today(), "%m/%d/%Y")
         logger.info(f"{now} - {body['text']} was tardy")
-        logger.info(body)
         to_post = [body['text'], now]
         sheet.append_row(to_post, value_input_option='USER_ENTERED')
         blocks = [
@@ -429,7 +429,6 @@ async def waste(ack, body, client):
 async def handle_waste_view(ack, body, client, view):
     """Process input from waste form"""
     logger.info("Processing waste input...")
-    logger.info(body)
     raw_leaders = view['state']['values']['input_a']['leader_names']['selected_options']
     leader_list = [" - " + n['value'] for n in raw_leaders]
     regulars = float(view['state']['values']['input_b']['regulars']['value'])
@@ -667,7 +666,6 @@ async def symbol(ack, body, say):
 async def find_names(ack, body, client):
     """Find matching names from Sick & Discipline Logs"""
     await ack()
-    logger.info(body)
     fuzzy_number = 78
     # Collect sick records
     sh = gc.open_by_key(creds.sick_log_id)
