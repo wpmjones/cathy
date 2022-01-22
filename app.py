@@ -596,10 +596,10 @@ async def symbol(ack, body, say):
     cell = sheet.find(current_date.strftime("%Y-%m-%d"))
     if input_sales > 0:
         sheet.update_cell(cell.row, cell.col + 2, input_sales)
-    # copy formula for Daily Gap
-    formula = f"=K{cell.row}-G{cell.row}"
-    logger.info(formula)
-    sheet.update_cell(cell.row, cell.col + 7, formula)
+        # copy formula for Daily Gap
+        formula = f"=K{cell.row+1}-G{cell.row+1}"
+        logger.info(formula)
+        sheet.update_cell(cell.row, cell.col + 7, formula)
     # report on status of symbol run
     daily_sales = sheet.cell(cell.row, cell.col + 2).value
     daily_goal = sheet.cell(cell.row, cell.col + 6).value
