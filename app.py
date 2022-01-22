@@ -598,8 +598,7 @@ async def symbol(ack, body, say):
         sheet.update_cell(cell.row, cell.col + 2, input_sales)
     # copy formula for Daily Gap
     formula = f"=K{cell.row+1}-G{cell.row+1}"
-    logger.info(formula)
-    sheet.update_cell(cell.row, cell.col + 7, formula)
+    sheet.update_cell(cell.row+1, cell.col + 7, formula)
     # report on status of symbol run
     daily_sales = sheet.cell(cell.row, cell.col + 2).value
     daily_goal = sheet.cell(cell.row, cell.col + 6).value
