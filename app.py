@@ -597,7 +597,7 @@ async def symbol(ack, body, say):
     if input_sales > 0:
         sheet.update_cell(cell.row, cell.col + 2, input_sales)
     # copy formula for Daily Gap
-    formula = sheet.get_values("L3", value_render_option=ValueRenderOption.formula)
+    formula = f"=K{cell.row}-G{cell.row}"
     logger.info(formula)
     sheet.update_cell(cell.row, cell.col + 7, formula)
     # report on status of symbol run
