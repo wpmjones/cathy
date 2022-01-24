@@ -209,7 +209,7 @@ def post_symbol_goal():
     current_date = datetime.date.today()
     cell = sheet.find(current_date.strftime("%Y-%m-%d"))
     goal = sheet.cell(cell.row, cell.col+6).value
-    content = f"**Today's Symbol Goal:** {goal}"
+    content = f"*Today's Symbol Goal:* {goal}"
     print(content)
     payload = {"text": content}
     r = requests.post(creds.webhook_test, json=payload)
