@@ -210,18 +210,17 @@ def post_symbol_goal():
     cell = sheet.find(current_date.strftime("%Y-%m-%d"))
     goal = sheet.cell(cell.row, cell.col+6).value
     content = f"*Today's Symbol Goal:* {goal}"
-    print(content)
     payload = {"text": content}
-    r = requests.post(creds.webhook_test, json=payload)
+    r = requests.post(creds.webhook_all, json=payload)
     if r.status_code != 200:
         raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
                          f"The response is: {r.text}")
 
 
 if __name__ == "__main__":
-    # check_cem()
-    # check_oos()
-    # check_allocation()
-    # if datetime.date.weekday(today) != 0:
-    #     time.sleep(60*60*3)  # sleep 3 hours
-    post_symbol_goal()
+    check_cem()
+    check_oos()
+    check_allocation()
+    if datetime.date.weekday(today) != 0:
+        time.sleep(60*60*3)  # sleep 3 hours
+        post_symbol_goal()
