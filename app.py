@@ -16,6 +16,8 @@ from slack_sdk.web import WebClient
 from slack_bolt.error import BoltError
 from slack_sdk.errors import SlackApiError
 
+logger.add("app.log", rotation="1 week")
+
 # Create Slack app
 app = AsyncApp(token=creds.bot_token,
                signing_secret=creds.signing_secret)
