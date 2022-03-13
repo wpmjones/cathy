@@ -155,10 +155,11 @@ def check_oos():
             body = msg.get_payload()
         # body captured, search for relevant text
         if body:
-            start = body.find("item #") + 1
-            end = start + 14
-            item_number = "I" + body[start:end].strip()
-            start = end + 2
+            start = body.find("#")
+            logger.info(start)
+            end = start + 10
+            item_number = "Item" + body[start:end].strip()
+            start = end + 1
             end = body.find("This item was") - 1
             item_name = body[start:end].strip()
             item = f"{item_number} - {item_name}"
