@@ -164,11 +164,14 @@ def check_oos():
             item_name = body[start:end].strip()
             item = f"{item_number} - {item_name}"
             start = end
-            end = body.find("The product is")
+            end = body.find("Product is")
             truck_date = body[start:end].strip() + "."
             start = end
             end = body.find("pending") + 12
-            rescheduled = body[start:end].strip() + " supplier's availability."
+            if end > 0:
+                rescheduled = body[start:end].strip() + " supplier's availability."
+            else:
+                rescheduled = ""
             # post content to Slack - Truck Channel
             content = f"*{item}*\n{truck_date}\n{rescheduled}"
             payload = {
