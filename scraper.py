@@ -136,7 +136,7 @@ def check_allocation():
 def check_oos():
     search_date = datetime.date.today() - datetime.timedelta(days=1)
     tfmt = search_date.strftime('%d-%b-%Y')
-    _, sdata = mail.search(None, f'(SUBJECT "OOS Notification" SINCE {tfmt})')
+    _, sdata = mail.search(None, f'(SUBJECT "OOS" SINCE {tfmt})')
     mail_ids = sdata[0]
     id_list = mail_ids.split()
     body = ""
