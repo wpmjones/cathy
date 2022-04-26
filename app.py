@@ -117,23 +117,18 @@ async def sick(ack, body, client):
     # Create options for select menu
     sheet = gc.open_by_key("1FoTA25nVdkEdqC01eBwjtt2Y8sXglOzASho92huzDDM")
     worksheet = sheet.get_worksheet(0)
-    options = worksheet.col_values(1)
-    logger.info(type(options))
-    logger.info(options)
-    # options = []
-    # with open('staff.csv', newline="") as f:
-    #     reader = csv.reader(f)
-    #     data = list(reader)
-    # for n in data:
-    #     options.append(
-    #         {
-    #             "text": {
-    #                 "type": "plain_text",
-    #                 "text": n[0]
-    #             },
-    #             "value": n[0]
-    #         }
-    #     )
+    values = worksheet.col_values(1)
+    options = []
+    for name in values:
+        options.append(
+            {
+                "text": {
+                    "type": "plain_text",
+                    "text": name
+                },
+                "value": name
+            }
+        )
     await client.views_open(
         trigger_id=body['trigger_id'],
         view={
@@ -200,7 +195,8 @@ async def sick(ack, body, client):
                         "type": "plain_text_input",
                         "action_id": "other",
                         "multiline": False
-                    }
+                    },
+                    "optional": True
                 }
             ]
         }
