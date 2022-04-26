@@ -115,20 +115,23 @@ async def tardy(ack, body, say, client):
 async def sick(ack, body, client):
     await ack()
     # Create options for select menu
-    options = []
-    with open('staff.csv', newline="") as f:
-        reader = csv.reader(f)
-        data = list(reader)
-    for n in data:
-        options.append(
-            {
-                "text": {
-                    "type": "plain_text",
-                    "text": n[0]
-                },
-                "value": n[0]
-            }
-        )
+    sheet = gc.open_by_key("1FoTA25nVdkEdqC01eBwjtt2Y8sXglOzASho92huzDDM")
+    worksheet = sheet.get_worksheet(0)
+    options = worksheet.col_values(1)
+    # options = []
+    # with open('staff.csv', newline="") as f:
+    #     reader = csv.reader(f)
+    #     data = list(reader)
+    # for n in data:
+    #     options.append(
+    #         {
+    #             "text": {
+    #                 "type": "plain_text",
+    #                 "text": n[0]
+    #             },
+    #             "value": n[0]
+    #         }
+    #     )
     await client.views_open(
         trigger_id=body['trigger_id'],
         view={
