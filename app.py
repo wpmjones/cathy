@@ -118,6 +118,8 @@ async def sick(ack, body, client):
     sheet = gc.open_by_key("1FoTA25nVdkEdqC01eBwjtt2Y8sXglOzASho92huzDDM")
     worksheet = sheet.get_worksheet(0)
     options = worksheet.col_values(1)
+    logger.info(type(options))
+    logger.info(options)
     # options = []
     # with open('staff.csv', newline="") as f:
     #     reader = csv.reader(f)
