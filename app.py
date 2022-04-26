@@ -200,8 +200,7 @@ async def sick(ack, body, client):
                         "type": "plain_text_input",
                         "action_id": "other",
                         "multiline": False
-                    },
-                    "optional": True
+                    }
                 }
             ]
         }
