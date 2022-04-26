@@ -268,21 +268,7 @@ async def waste_sheet(ack):
 @app.block_action("waste_tracking_form")
 async def waste(ack, body, client):
     await ack()
-    leaders = [
-        "Phil",
-        "Patrick",
-        "Calvin",
-        "Jason H",
-        "Kynon",
-        "Evan",
-        "Jordan W",
-        "Josh",
-        "Brittney",
-        "Jordan O",
-        "Karina",
-        "Angel C",
-        "Joe",
-    ]
+    leaders = creds.leaders
     options = []
     for leader in leaders:
         options.append(
