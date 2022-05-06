@@ -125,7 +125,7 @@ async def add_trello(ack, body, client):
         view={
             "type": "modal",
             "callback_id": "add_view",
-            "title": {"type": "plan_text", "text": "Add New Hire to Trello"},
+            "title": {"type": "plain_text", "text": "Add New Hire"},
             "submit": {"type": "plain_text", "text": "Submit"},
             "blocks": [
                 {
@@ -169,20 +169,20 @@ async def add_trello(ack, body, client):
                     },
                     "optional": False
                 },
-                # {
-                #     "type": "section",
-                #     "block_id": "input_c",
-                #     "text": {"type": "plain_text", "text": "Select start date"},
-                #     "accessory": {
-                #         "type": "datepicker",
-                #         "action_id": "start_date",
-                #         "initial_date": str(next_monday()),
-                #         "placeholder": {
-                #             "type": "plain_text",
-                #             "text": "Start date"
-                #         }
-                #     }
-                # }
+                {
+                    "type": "section",
+                    "block_id": "input_c",
+                    "text": {"type": "plain_text", "text": "Select start date"},
+                    "accessory": {
+                        "type": "datepicker",
+                        "action_id": "start_date",
+                        "initial_date": str(next_monday()),
+                        "placeholder": {
+                            "type": "plain_text",
+                            "text": "Start date"
+                        }
+                    }
+                }
             ]
         }
     )
