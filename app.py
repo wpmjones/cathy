@@ -173,7 +173,7 @@ async def add_trello(ack, body, client):
                 {
                     "type": "input",
                     "block_id": "input_c",
-                    "label": {"type": "plain_text", "text": "Select start date:"},
+                    # "label": {"type": "plain_text", "text": "Select start date:"},
                     "element": {
                         "type": "datepicker",
                         "action_id": "start_date",
