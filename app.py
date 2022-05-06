@@ -120,7 +120,6 @@ async def tardy(ack, body, say, client):
 @app.command("/add")
 async def add_trello(ack, body, client):
     await ack()
-    logger.debug(body)
     await client.views_open(
         trigger_id=body['trigger_id'],
         view={
@@ -182,6 +181,16 @@ async def add_trello(ack, body, client):
                             "text": "Start date"
                         }
                     }
+                },
+                {
+                    "type": "context",
+                    "block_id": "context_a",
+                    "elements": [
+                        {
+                            "type": "plain_text",
+                            "text": body['channel_id']
+                        }
+                    ]
                 }
             ]
         }
@@ -192,9 +201,11 @@ async def add_trello(ack, body, client):
 async def handle_add_view(ack, body, client, view):
     """Process info from add form"""
     logger.info("Processing add input...")
+    logger.info(view['state']['values'])
     location = view['state']['values']['input_a']['select_1']['selected_option']['value']
     name = view['state']['values']['input_b']['full_name']['value']
     start_date = view['state']['values']['input_c']['start_date']['selected_date']
+    channel_id = view['state']['values']['context_a']['value']
     # Get user name from body
     user = await client.users_info(user=body['user']['id'])
     user_name = user['user']['real_name']
