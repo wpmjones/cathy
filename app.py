@@ -175,7 +175,7 @@ async def add_trello(ack, body, client):
                     "element": {
                         "type": "datepicker",
                         "action_id": "start_date",
-                        "initial_date": next_monday(),
+                        "initial_date": str(next_monday()),
                         "placeholder": {
                             "type": "plain_text",
                             "text": "Select start date"
