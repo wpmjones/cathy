@@ -131,6 +131,7 @@ async def add_trello(ack, body, client):
                 {
                     "type": "actions",
                     "block_id": "input_a",
+                    "label": {"type": "plain_text", "text": "FOH or BOH:"},
                     "elements": [
                         {
                             "type": "static_select",
@@ -170,10 +171,10 @@ async def add_trello(ack, body, client):
                     "optional": False
                 },
                 {
-                    "type": "section",
+                    "type": "input",
                     "block_id": "input_c",
-                    "text": {"type": "plain_text", "text": "Select start date"},
-                    "accessory": {
+                    "label": {"type": "plain_text", "text": "Select start date:"},
+                    "element": {
                         "type": "datepicker",
                         "action_id": "start_date",
                         "initial_date": str(next_monday()),
@@ -192,9 +193,10 @@ async def add_trello(ack, body, client):
 async def handle_add_view(ack, body, client, view):
     """Process info from add form"""
     logger.info("Processing add input...")
+    logger.debug(view['state']['values']['input_c'])
     location = view['state']['values']['input_a']['select_1']['selected_option']['value']
     name = view['state']['values']['input_b']['full_name']['value']
-    start_date = view['state']['values']['input_c']['start_date']['value']
+    start_date = view['state']['values']['input_c']['start_date']['selected_date']
     # Get user name from body
     user = await client.users_info(user=body['user']['id'])
     user_name = user['user']['real_name']
