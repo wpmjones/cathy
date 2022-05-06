@@ -170,9 +170,10 @@ async def add_trello(ack, body, client):
                     "optional": False
                 },
                 {
-                    "type": "actions",
+                    "type": "section",
                     "block_id": "input_c",
-                    "element": {
+                    "text": {"type": "plain_text", "text": "Select start date"},
+                    "accessory": {
                         "type": "datepicker",
                         "action_id": "start_date",
                         "initial_date": str(next_monday()),
