@@ -191,7 +191,7 @@ async def add_trello(ack, body, client):
 async def handle_add_view(ack, body, client, view):
     """Process info from add form"""
     logger.info("Processing add input...")
-    logger.debug(view['state']['values']['input_c'])
+    logger.info(body)
     location = view['state']['values']['input_a']['select_1']['selected_option']['value']
     name = view['state']['values']['input_b']['full_name']['value']
     start_date = view['state']['values']['input_c']['start_date']['selected_date']
