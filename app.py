@@ -132,7 +132,7 @@ async def add_trello(ack, body, client):
                     "type": "input",
                     "block_id": "input_a",
                     "label": {"type": "plain_text", "text": "Location:"},
-                    "elements": [
+                    "element": [
                         {
                             "type": "static_select",
                             "placeholder": {
