@@ -129,15 +129,15 @@ async def add_trello(ack, body, client):
             "submit": {"type": "plain_text", "text": "Submit"},
             "blocks": [
                 {
-                    "type": "actions",
+                    "type": "input",
                     "block_id": "input_a",
-                    "label": {"type": "plain_text", "text": "FOH or BOH:"},
+                    "label": {"type": "plain_text", "text": "Location:"},
                     "elements": [
                         {
                             "type": "static_select",
                             "placeholder": {
                                 "type": "plain_text",
-                                "text": "Select front or back"
+                                "text": "Select FOH or BOH"
                             },
                             "action_id": "select_1",
                             "options": [
@@ -173,7 +173,7 @@ async def add_trello(ack, body, client):
                 {
                     "type": "input",
                     "block_id": "input_c",
-                    # "label": {"type": "plain_text", "text": "Select start date:"},
+                    "label": {"type": "plain_text", "text": "Select start date:"},
                     "element": {
                         "type": "datepicker",
                         "action_id": "start_date",
