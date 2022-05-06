@@ -1,8 +1,8 @@
 import asyncio
 import creds
-import csv
 import gspread
 import os
+import requests
 import string
 
 # from slack_bolt import App
@@ -31,6 +31,12 @@ gc = gspread.service_account(filename=creds.gspread)
 def contains_whitespace(s):
     return True in [c in s for c in string.whitespace]
 
+def next_monday():
+    now = date.today()
+    days_ahead = 0 - now.weekday()
+    if days_ahead <= 0:  # target already happened this week
+        days_ahead += 7
+    return now + timedelta(days_ahead)
 
 @app.command("/help")
 async def cathy_help(ack, say):
@@ -109,6 +115,149 @@ async def tardy(ack, body, say, client):
                                       text=f"There was an error while storing the message to the Google Sheet.\n{e}")
         await client.chat_postMessage(channel=creds.pj_user_id,
                                       text=f"There was an error while storing the message to the Google Sheet.\n{e}")
+
+
+@app.command("/add")
+async def add_trello(ack, body, client):
+    await ack()
+    await client.views_open(
+        trigger_id=body['trigger_id'],
+        view={
+            "type": "modal",
+            "callback_id": "add_view",
+            "title": {"type": "plan_text", "text": "Add New Hire to Trello"},
+            "submit": {"type": "plain_text", "text": "Submit"},
+            "blocks": [
+                {
+                    "type": "actions",
+                    "block_id": "input_a",
+                    "elements": [
+                        {
+                            "type": "static_select",
+                            "placeholder": {
+                                "type": "plain_text",
+                                "text": "Select front or back"
+                            },
+                            "action_id": "select_1",
+                            "options": [
+                                {
+                                    "text": {
+                                        "type": "plain_text",
+                                        "text": "Front of House"
+                                    },
+                                    "value": "FOH"
+                                },
+                                {
+                                    "text": {
+                                        "type": "plain_text",
+                                        "text": "Back of House"
+                                    },
+                                    "value": "BOH"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_b",
+                    "label": {"type": "plain_text", "text": "Full Name:"},
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "full_name",
+                        "multiline": False
+                    },
+                    "optional": False
+                },
+                {
+                    "type": "actions",
+                    "block_id": "input_c",
+                    "element": {
+                        "type": "datepicker",
+                        "action_id": "start_date",
+                        "initial_date": next_monday(),
+                        "placeholder": {
+                            "type": "plain_text",
+                            "text": "Select start date"
+                        }
+                    }
+                }
+            ]
+        }
+    )
+
+
+@app.view("add_view")
+async def handle_add_view(ack, body, client, view):
+    """Process info from add form"""
+    logger.info("Processing add input...")
+    location = view['state']['values']['input_a']['select_1']['selected_option']['value']
+    name = view['state']['values']['input_b']['full_name']['value']
+    start_date = view['state']['values']['input_c']['start_date']['value']
+    # Get user name from body
+    user = await client.users_info(user=body['user']['id'])
+    user_name = user['user']['real_name']
+    # Add card to Trello
+    if location == "FOH":
+        list_id = creds.trello_foh_list
+        card_id = creds.trello_foh_card
+    else:
+        list_id = creds.trello_boh_list
+        card_id = creds.trello_boh_card
+    card_name = name + " (" + start_date[:4] + "/" + start_date[5:7] + "/" + start_date[8:10]
+    headers = {
+        "Accept": "application/json"
+    }
+    query = {
+        "name": card_name,
+        "pos": "bottom",
+        "idList": list_id,
+        "idCardSource": card_id,
+        "key": creds.trello_key,
+        "token": creds.trello_token
+    }
+    r = requests.post("https://api.trello.com/1/cards", headers=headers, params=query)
+    if r.status_code == 200:
+        blocks = [
+            {
+                "type": "section",
+                "text": {"type": "plain_text", "text": f"{name} successfully added to the Trello {location} board."}
+            },
+            {
+                "type": "context",
+                "elements": [
+                    {
+                        "type": "plain_text",
+                        "text": f"Submitted by: {user_name}"
+                    }
+                ]
+            }
+        ]
+        await client.chat_postMessage(channel=body['channel']['id'],
+                                      blocks=blocks,
+                                      text=f"{name} added to {location} Trello board.")
+    else:
+        failure_text = f"Failed to add {name} to {location} Trello board. Error code: {r.status_code}"
+        blocks = [
+            {
+                "type": "section",
+                "text": {"type": "plain_text", "text": failure_text}
+            },
+            {
+                "type": "context",
+                "elements": [
+                    {
+                        "type": "plain_text",
+                        "text": f"Submitted by: {user_name}"
+                    }
+                ]
+            }
+        ]
+        await client.chat_postMessage(channel=body['channel']['id'],
+                                      blocks=blocks,
+                                      text=f"{name} failed to add to {location} Trello board.")
+        await client.chat_postMessage(channel=creds.pj_user_id,
+                                      text=f"There was an error while adding {name} to {location} Trello board.")
 
 
 @app.command("/sick")
