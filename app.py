@@ -201,11 +201,10 @@ async def add_trello(ack, body, client):
 async def handle_add_view(ack, body, client, view):
     """Process info from add form"""
     logger.info("Processing add input...")
-    logger.info(view)
     location = view['state']['values']['input_a']['select_1']['selected_option']['value']
     name = view['state']['values']['input_b']['full_name']['value']
     start_date = view['state']['values']['input_c']['start_date']['selected_date']
-    channel_id = view['state']['values']['context_a']['value']
+    channel_id = view['blocks'][3]['elements'][0]['text']
     # Get user name from body
     user = await client.users_info(user=body['user']['id'])
     user_name = user['user']['real_name']
@@ -245,7 +244,7 @@ async def handle_add_view(ack, body, client, view):
                 ]
             }
         ]
-        await client.chat_postMessage(channel=body['channel']['id'],
+        await client.chat_postMessage(channel=channel_id,
                                       blocks=blocks,
                                       text=f"{name} added to {location} Trello board.")
     else:
@@ -265,7 +264,7 @@ async def handle_add_view(ack, body, client, view):
                 ]
             }
         ]
-        await client.chat_postMessage(channel=body['channel']['id'],
+        await client.chat_postMessage(channel=channel_id,
                                       blocks=blocks,
                                       text=f"{name} failed to add to {location} Trello board.")
         await client.chat_postMessage(channel=creds.pj_user_id,
