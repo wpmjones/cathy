@@ -215,7 +215,8 @@ async def handle_add_view(ack, body, client, view):
     else:
         list_id = creds.trello_boh_list
         card_id = creds.trello_boh_card
-    card_name = name + " (" + start_date[:4] + "/" + start_date[5:7] + "/" + start_date[8:10]
+    card_name = name + " (" + start_date[5:7] + "/" + start_date[8:10] + "/" + start_date[:4] + ")"
+    await ack()
     headers = {
         "Accept": "application/json"
     }
