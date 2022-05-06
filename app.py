@@ -169,20 +169,20 @@ async def add_trello(ack, body, client):
                     },
                     "optional": False
                 },
-                {
-                    "type": "section",
-                    "block_id": "input_c",
-                    "text": {"type": "plain_text", "text": "Select start date"},
-                    "accessory": {
-                        "type": "datepicker",
-                        "action_id": "start_date",
-                        "initial_date": str(next_monday()),
-                        "placeholder": {
-                            "type": "plain_text",
-                            "text": "Select start date"
-                        }
-                    }
-                }
+                # {
+                #     "type": "section",
+                #     "block_id": "input_c",
+                #     "text": {"type": "plain_text", "text": "Select start date"},
+                #     "accessory": {
+                #         "type": "datepicker",
+                #         "action_id": "start_date",
+                #         "initial_date": str(next_monday()),
+                #         "placeholder": {
+                #             "type": "plain_text",
+                #             "text": "Start date"
+                #         }
+                #     }
+                # }
             ]
         }
     )
