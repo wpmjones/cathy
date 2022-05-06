@@ -132,32 +132,30 @@ async def add_trello(ack, body, client):
                     "type": "input",
                     "block_id": "input_a",
                     "label": {"type": "plain_text", "text": "Location:"},
-                    "element": [
-                        {
-                            "type": "static_select",
-                            "placeholder": {
-                                "type": "plain_text",
-                                "text": "Select FOH or BOH"
-                            },
-                            "action_id": "select_1",
-                            "options": [
-                                {
-                                    "text": {
-                                        "type": "plain_text",
-                                        "text": "Front of House"
-                                    },
-                                    "value": "FOH"
+                    "element": {
+                        "type": "static_select",
+                        "placeholder": {
+                            "type": "plain_text",
+                            "text": "Select FOH or BOH"
+                        },
+                        "action_id": "select_1",
+                        "options": [
+                            {
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "Front of House"
                                 },
-                                {
-                                    "text": {
-                                        "type": "plain_text",
-                                        "text": "Back of House"
-                                    },
-                                    "value": "BOH"
-                                }
-                            ]
-                        }
-                    ]
+                                "value": "FOH"
+                            },
+                            {
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "Back of House"
+                                },
+                                "value": "BOH"
+                            }
+                        ]
+                    }
                 },
                 {
                     "type": "input",
