@@ -5,7 +5,7 @@ Slack bot for Chick-fil-A
 This is written in Python and is running on a Virtual Private Server (VPS).  I use GalaxyGate because I do other development work as a hobby.  If you have a spare computer at home (or a Raspberry Pi) you could easily run this without needing to pay for a server.
 
 ## Files
-**app.py** is the main bot file.  I run this as a server in Linux, but there are many ways to run bot files.  Use the Google and find the fit that is best for you.
+**app.py** is the main bot file.  I run this as a server in Linux, but there are many ways to run bot files.  Use the Google and find the fit that is best for you.  This is the file that needs to be running at all times for your bot to work.
 
 **cash_remind.py** is a static python file that uses an Incoming Webhook in Slack.  It's sole purpose is to remind front of house to do a pick up at cash cart.  I use crontab (in Linux) to schedule this multiple times per day.
 
