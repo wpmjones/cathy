@@ -34,6 +34,7 @@ def find_nth(content, search_string, n):
 
 
 def check_cem():
+    """Look at gmail to find CEM email and report findings"""
     search_date = datetime.date.today()  # - datetime.timedelta(days=1)
     tfmt = search_date.strftime('%d-%b-%Y')
     _, sdata = mail.search(None, f'(FROM "SMGMailMgr@whysmg.com" SINCE {tfmt})')
@@ -79,6 +80,7 @@ def check_cem():
 
 
 def check_allocation():
+    """Look for allocation notifications from distribution center."""
     search_date = datetime.date.today() - datetime.timedelta(days=1)
     tfmt = search_date.strftime('%d-%b-%Y')
     _, sdata = mail.search(None, f'(SUBJECT "Allocation Notification" SINCE {tfmt})')
@@ -134,6 +136,7 @@ def check_allocation():
 
 
 def check_oos():
+    """Look for out of stock emails from distribution center"""
     search_date = datetime.date.today() - datetime.timedelta(days=1)
     tfmt = search_date.strftime('%d-%b-%Y')
     _, sdata = mail.search(None, f'(SUBJECT "OOS" SINCE {tfmt})')
@@ -193,6 +196,8 @@ def check_oos():
 
 
 def post_symbol_goal():
+    """The command /symbol reports on current stats. This post simply reports the sales target for the coming
+    day (20% of same day last year."""
     logger.info("Starting post_symbol_goal")
     # Connect to Google Sheets
     gc = gspread.service_account(filename=creds.gspread)

@@ -1,10 +1,9 @@
 import creds
 import requests
 
-from loguru import logger
-
 
 def main():
+    """Very simple reminder to do a cash pick up from cash cart.  You can schedule this to run at any time."""
     webhook_url = creds.webhook_foh
 
     blocks = [
