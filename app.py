@@ -1,5 +1,12 @@
-import asyncio
+# creds.py is the file in which you store all of your personal information
+# This includes usernames, passwords, keys, and tokens.
+# Exmaple:
+# bot_token = "my_token"
+# Once you import creds, you will access this like this:
+# creds.bot_token
 import creds
+
+import asyncio
 import gspread
 import os
 import requests
@@ -16,6 +23,7 @@ from slack_sdk.web import WebClient
 from slack_bolt.error import BoltError
 from slack_sdk.errors import SlackApiError
 
+# I'm a big fan of loguru and its simplicity. Obviously, any logging tool could be substituted here.
 logger.add("app.log", rotation="1 week")
 
 # Create Slack app
@@ -28,9 +36,14 @@ gc = gspread.service_account(filename=creds.gspread)
 
 
 # look for whitespace in string
+# I'm not currently using this function. I honestly can't remember what I was using for, but if I
+# remove it, I'll immediately remember why and need it again!
 def contains_whitespace(s):
     return True in [c in s for c in string.whitespace]
 
+
+# All new hires start on Monday, so I use this function to get the next Monday for a start date.
+# This function is only used for adding someone to Trello since we use the start date on their cards.
 def next_monday():
     now = date.today()
     days_ahead = 0 - now.weekday()
@@ -38,6 +51,9 @@ def next_monday():
         days_ahead += 7
     return now + timedelta(days_ahead)
 
+
+# It's poor design to hard code your help command since it won't update itself when you add/change commands,
+# but here it is.  I told you I wasn't a pro!  haha
 @app.command("/help")
 async def cathy_help(ack, say):
     """Responds with help for Cathy commands"""
@@ -49,10 +65,13 @@ async def cathy_help(ack, say):
               "`/tardy [first last]` Records a tardy for the specified TM\n"
               "`/goals` Responds with goals for our waste process\n"
               "`/symbol` Report on the most recent day of sales for our Symbol run\n"
+              "`/add` Opens a form to add new hire to Trello"
               "`/help` List these commands")
 
 
-# Remove prior messages
+# Remove all Slack messages from the channel you are in. I only use this in my test channel.
+# This is a dangerous command and the "if body['user_id'] not in" line below limits the use of this
+# command to top leadership only.
 @app.command("/clear")
 async def clear_messages(ack, body, say, client):
     """Clear the specified number of messages in the channel that called the command"""
@@ -79,6 +98,13 @@ async def clear_messages(ack, body, say, client):
 
 @app.command("/tardy")
 async def tardy(ack, body, say, client):
+    """Record when someone shows up late for their shift. We take away their meal credit when this happens
+    which is why the response message is worded as such.  This updates our pay scale Google Sheet since
+    tardiness also affects one's ability to get a pay raise.
+
+    Example usage:
+    /tardy First Last
+    """
     await ack()
     try:
         sh = gc.open_by_key(creds.pay_scale_id)
@@ -119,6 +145,16 @@ async def tardy(ack, body, say, client):
 
 @app.command("/add")
 async def add_trello(ack, body, client):
+    """This command adds a card to our Trello board (front or back) for a new hire.  We have a template card
+    in the board that is used as a source. Using this command will open a form to select FOH/BOH, employee name,
+    and start date.
+
+    Slack forms (refered to as modals or views) require to functions. The command that initiates the form (this
+    function) and a view handler (the next function).
+
+    Example usage:
+    /add
+    """
     await ack()
     await client.views_open(
         trigger_id=body['trigger_id'],
@@ -199,7 +235,8 @@ async def add_trello(ack, body, client):
 
 @app.view("add_view")
 async def handle_add_view(ack, body, client, view):
-    """Process info from add form"""
+    """Process info from add form.  This is the view handler for the previous function.  It takes the information
+    you provide in the form and processes it."""
     logger.info("Processing add input...")
     location = view['state']['values']['input_a']['select_1']['selected_option']['value']
     name = view['state']['values']['input_b']['full_name']['value']
@@ -274,6 +311,16 @@ async def handle_add_view(ack, body, client, view):
 
 @app.command("/sick")
 async def sick(ack, body, client):
+    """This command opens the form for tracking missed shifts.  I called it 'sick' but it's for any time someone
+    misses a shift, including No Call, No Shows.  It pulls the list of Team Members from a Google Sheet that is
+    literally just a list of TM names (first last).  Slack limits its dropdown (select) lists to 100 items, so I
+    chose to limit my list of names to Team Members and Team Leads only.
+
+    I used a dropdown because I don't trust anyone to spell names properly. :)
+
+    Example usage:
+    /sick
+    """
     await ack()
     # Create options for select menu
     sheet = gc.open_by_key("1FoTA25nVdkEdqC01eBwjtt2Y8sXglOzASho92huzDDM")
@@ -290,6 +337,7 @@ async def sick(ack, body, client):
                 "value": name
             }
         )
+    # open the view
     await client.views_open(
         trigger_id=body['trigger_id'],
         view={
@@ -366,7 +414,8 @@ async def sick(ack, body, client):
 
 @app.view("sick_view")
 async def handle_sick_input(ack, body, client, view):
-    """Process input from sick form"""
+    """Process input from sick form. This is the view handler for the previous function.  It takes the information
+    you provide in the form and processes it."""
     logger.info("Processing sick input...")
     name = view['state']['values']['input_a']['tm_name']['selected_option']['value']
     reason = view['state']['values']['input_b']['reason']['value']
@@ -420,12 +469,20 @@ async def handle_sick_input(ack, body, client, view):
 
 @app.block_action("waste_sheet")
 async def waste_sheet(ack):
+    """This function is necessary for the Waste Sheet button to work. The url is actually in the button from
+    waste_remind.py.  That's where there isn't anything here.  It just opens that url."""
     await ack()
 
 
 @app.block_action("waste_tracking_form")
 async def waste(ack, body, client):
+    """This is not a command!  waste_remind.py is the script that posts a reminder in Slack at determined
+    times. That reminder has a button to Record Waste.  That button initiates this modal."""
     await ack()
+    # I store my BOH leaders in creds.py.  I probably ought to keep them in the same Google Sheet as my Team
+    # Members, but again, I'm not a pro and I don't always do things the best way!  Having leaders names in a
+    # Google Sheet would allow others to update the list, but it changes infrequently enough that I don't mind
+    # being the only that can update it.
     leaders = creds.leaders
     options = []
     for leader in leaders:
@@ -525,6 +582,7 @@ async def waste(ack, body, client):
             "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
         }
     ]
+    # If it's before 1pm, include the breakfast meats as well.
     if datetime.now().hour < 13:
         blocks.append(
             {
@@ -579,7 +637,8 @@ async def waste(ack, body, client):
 
 @app.view("waste_view")
 async def handle_waste_view(ack, body, client, view):
-    """Process input from waste form"""
+    """Process input from waste form. This is the view handler for the previous function.  It takes the information
+    you provide in the form and processes it."""
     logger.info("Processing waste input...")
     raw_leaders = view['state']['values']['input_a']['leader_names']['selected_options']
     leader_list = [" - " + n['value'] for n in raw_leaders]
@@ -712,7 +771,8 @@ async def handle_waste_view(ack, body, client, view):
 
 @app.command("/goals")
 async def waste_goals(ack, say):
-    """Responds with the current daily waste goals from the Waste Tracking Google Sheet"""
+    """Responds with the current daily waste goals from the Waste Tracking Google Sheet. These goals are calculated
+    from averages in the Food Cost Report."""
     await ack()
     sh = gc.open_by_key(creds.waste_id)
     sheet = sh.worksheet("Goals")
@@ -727,11 +787,22 @@ async def waste_goals(ack, say):
 
 @app.command("/symbol")
 async def symbol(ack, body, say):
-    """Record today's sales (if needed) and report current state"""
+    """Record today's sales (if needed) and report current state.  We are going for a Symbol run this year, so
+    this command helps us track where we are and what we need to hit the goals.  The Google Sheet used here has
+    all of last year's daily sales and we add this year's daily sales.... daily.
+
+    Example usage:
+    /symbol
+    /symbol $36,008.12
+
+
+    The first command (without a dollar amount) simply posts our current stats.  The second command records the day's
+    sales and then posts the stats.  If it's before noon, it assumes you are recording yesterday's sales. If it's
+    after noon but before 11pm, it will tell you to wait.  After 11pm, it assumes it is today's sales."""
     await ack()
     now = datetime.now()
     current_date = date.today()
-    if "text" in body.keys():
+    if "text" in body.keys():  # user provided sales info
         # Convert text input (string) to decimal
         input_sales = Decimal(sub(r'[^\d.]', '', body['text']))
         # Calculate the reporting date
@@ -739,10 +810,11 @@ async def symbol(ack, body, say):
             current_date = date.today() - timedelta(days=1)
         elif now.hour < 23:
             return await say("Let's wait until after closing to update sales figures.")
-    else:
+    else:  # user did not provide sales info
         input_sales = 0.0
         if now.hour < 23:
             current_date = date.today() - timedelta(days=1)
+    # find the current date's information in the sheet
     sh = gc.open_by_key(creds.symbol_id)
     sheet = sh.worksheet("Daily Goals")
     cell = sheet.find(current_date.strftime("%Y-%m-%d"))
@@ -816,7 +888,12 @@ async def symbol(ack, body, say):
 
 @app.command("/find")
 async def find_names(ack, body, client):
-    """Find matching names from Sick & Discipline Logs"""
+    """Find matching names from Sick & Discipline Logs. This reports on both absences and tardies for the name
+    provided. Fuzzy is a great tool that allows for misspellings and such as long as it's 'close'.
+
+    Example usage:
+    /find first last
+    """
     await ack()
     fuzzy_number = 78
     # Collect sick records
@@ -894,9 +971,7 @@ async def illness(ack, say):
 
 @app.command("/test")
 async def bot_test(ack, body, say):
-    """Testing various features
-    slack event url - http://144.172.83.165:3000/slack/events
-    """
+    """Testing various features"""
     await ack()
     user = client.users_info(user=body['user_id'])
     logger.info(user['user'])
