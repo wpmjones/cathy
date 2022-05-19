@@ -483,16 +483,26 @@ async def waste(ack, body, client):
     # Members, but again, I'm not a pro and I don't always do things the best way!  Having leaders names in a
     # Google Sheet would allow others to update the list, but it changes infrequently enough that I don't mind
     # being the only that can update it.
-    leaders = creds.leaders
-    options = []
-    for leader in leaders:
-        options.append(
+    leader_options = []
+    time_options = []
+    for leader in creds.leaders:
+        leader_options.append(
             {
                 "text": {
                     "type": "plain_text",
                     "text": leader
                 },
                 "value": leader
+            }
+        )
+    for _time in creds.times:
+        time_options.append(
+            {
+                "text": {
+                    "type": "plain_text",
+                    "text": _time
+                },
+                "value": _time
             }
         )
     blocks = [
@@ -504,7 +514,18 @@ async def waste(ack, body, client):
                 "type": "multi_static_select",
                 "action_id": "leader_names",
                 "placeholder": {"type": "plain_text", "text": "Select leaders"},
-                "options": options
+                "options": leader_options
+            }
+        },
+        {
+            "type": "input",
+            "block_id": "input_a2",
+            "label": {"type": "plain_text", "text": "Report Time(s) Covered"},
+            "element": {
+                "type": "multi_static_select",
+                "action_id": "times",
+                "placeholder": {"type": "plain_text", "text": "Times covered"},
+                "options": time_options
             }
         },
         {
@@ -642,6 +663,8 @@ async def handle_waste_view(ack, body, client, view):
     logger.info("Processing waste input...")
     raw_leaders = view['state']['values']['input_a']['leader_names']['selected_options']
     leader_list = [" - " + n['value'] for n in raw_leaders]
+    raw_times = view['state']['values']['input_a2']['times']['selected_options']
+    time_list = [" - " + n['value'] for n in raw_times]
     regulars = float(view['state']['values']['input_b']['regulars']['value'])
     spicy = float(view['state']['values']['input_c']['spicy']['value'])
     nuggets = float(view['state']['values']['input_d']['nuggets']['value'])
@@ -682,38 +705,46 @@ async def handle_waste_view(ack, body, client, view):
                           f"{new_line.join(leader_list)}\n")
                  }
     }
-    block3_text = "*Weights:*\n"
+    block3 = {
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": (f"*Times covered:*\n"
+                     f"{new_line.join(time_list)}\n")
+        }
+    }
+    block4_text = "*Weights:*\n"
     if total_weight > 0:
         if regulars:
             if regulars >= goals['Filets']:
-                block3_text += f"_Regulars: {regulars} lbs._\n"
+                block4_text += f"_Regulars: {regulars} lbs._\n"
             else:
-                block3_text += f"Regulars: {regulars} lbs.\n"
+                block4_text += f"Regulars: {regulars} lbs.\n"
         if spicy:
             if spicy >= goals['Spicy']:
-                block3_text += f"_Spicy: {spicy} lbs._\n"
+                block4_text += f"_Spicy: {spicy} lbs._\n"
             else:
-                block3_text += f"Spicy: {spicy} lbs.\n"
+                block4_text += f"Spicy: {spicy} lbs.\n"
         if nuggets:
             if nuggets >= goals['Nuggets']:
-                block3_text += f"_Nuggets: {nuggets} lbs._\n"
+                block4_text += f"_Nuggets: {nuggets} lbs._\n"
             else:
-                block3_text += f"Nuggets: {nuggets} lbs.\n"
+                block4_text += f"Nuggets: {nuggets} lbs.\n"
         if strips:
             if strips >= goals['Strips']:
-                block3_text += f"_Strips: {strips} lbs._\n"
+                block4_text += f"_Strips: {strips} lbs._\n"
             else:
-                block3_text += f"Strips: {strips} lbs.\n"
+                block4_text += f"Strips: {strips} lbs.\n"
         if g_filets:
             if g_filets >= goals['Grilled Filets']:
-                block3_text += f"_Grilled Filets: {g_filets} lbs._\n"
+                block4_text += f"_Grilled Filets: {g_filets} lbs._\n"
             else:
-                block3_text += f"Grilled Filets: {g_filets} lbs.\n"
+                block4_text += f"Grilled Filets: {g_filets} lbs.\n"
         if g_nuggets:
             if g_nuggets >= goals['Grilled Nuggets']:
-                block3_text += f"_Grilled Nuggets: {g_nuggets} lbs._\n"
+                block4_text += f"_Grilled Nuggets: {g_nuggets} lbs._\n"
             else:
-                block3_text += f"Grilled Nuggets: {g_nuggets} lbs.\n"
+                block4_text += f"Grilled Nuggets: {g_nuggets} lbs.\n"
     to_post = [str(datetime.now()), regulars, spicy, nuggets, strips, g_filets, g_nuggets]
     # Handle breakfast items
     if datetime.now().hour < 13:
@@ -725,19 +756,19 @@ async def handle_waste_view(ack, body, client, view):
             total_weight += sum([breakfast, g_breakfast])
             if breakfast:
                 if breakfast >= goals['Breakfast Filets']:
-                    block3_text += f"_Breakfast Filets: {breakfast} lbs._\n"
+                    block4_text += f"_Breakfast Filets: {breakfast} lbs._\n"
                 else:
-                    block3_text += f"Breakfast Filets: {breakfast} lbs.\n"
+                    block4_text += f"Breakfast Filets: {breakfast} lbs.\n"
             if g_breakfast:
                 if g_breakfast >= goals['Grilled Breakfast']:
-                    block3_text += f"_Grilled Breakfast: {g_breakfast} lbs._\n"
+                    block4_text += f"_Grilled Breakfast: {g_breakfast} lbs._\n"
                 else:
-                    block3_text += f"Grilled Breakfast: {g_breakfast} lbs.\n"
-    block3 = {
+                    block4_text += f"Grilled Breakfast: {g_breakfast} lbs.\n"
+    block4 = {
         "type": "section",
-        "text": {"type": "mrkdwn", "text": block3_text}
+        "text": {"type": "mrkdwn", "text": block4_text}
     }
-    blocks = [block1, block2, block3]
+    blocks = [block1, block2, block3, block4]
     other = view['state']['values']['input_j']['other']['value']
     if other:
         block4 = {
