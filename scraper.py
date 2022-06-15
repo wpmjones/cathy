@@ -73,7 +73,7 @@ def check_cem():
             content += f"{key}{' '*(25-len(key))}{' '*(4-len(value))}{value}\n"
         content += "```"
         payload = {"text": content}
-        r = requests.post(creds.webhook_annouce, json=payload)
+        r = requests.post(creds.webhook_announce, json=payload)
         if r.status_code != 200:
             raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
                              f"The response is: {r.text}")
@@ -129,7 +129,7 @@ def check_allocation():
                     }
                 ]
             }
-            r = requests.post(creds.webhook_annouce, json=payload)
+            r = requests.post(creds.webhook_announce, json=payload)
             if r.status_code != 200:
                 raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
                                  f"The response is: {r.text}")
@@ -189,7 +189,7 @@ def check_oos():
                     }
                 ]
             }
-            r = requests.post(creds.webhook_annouce, json=payload)
+            r = requests.post(creds.webhook_announce, json=payload)
             if r.status_code != 200:
                 raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
                                  f"The response is: {r.text}")
@@ -210,7 +210,7 @@ def post_symbol_goal():
     logger.info(f"Goal: {goal}")
     content = f"*Today's Symbol Goal:* {goal}"
     payload = {"text": content}
-    r = requests.post(creds.webhook_annouce, json=payload)
+    r = requests.post(creds.webhook_announce, json=payload)
     logger.info(f"Status Code: {r.status_code}")
     if r.status_code != 200:
         raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
