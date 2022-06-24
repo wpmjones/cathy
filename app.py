@@ -1,6 +1,6 @@
 # creds.py is the file in which you store all of your personal information
 # This includes usernames, passwords, keys, and tokens.
-# Exmaple:
+# Example:
 # bot_token = "my_token"
 # Once you import creds, you will access this like this:
 # creds.bot_token
@@ -9,6 +9,7 @@ import creds
 import asyncio
 import gspread
 import os
+import re
 import requests
 import string
 
@@ -17,7 +18,6 @@ from datetime import datetime, date, timedelta
 from decimal import Decimal
 from fuzzywuzzy import fuzz
 from loguru import logger
-from re import sub
 from slack_bolt.async_app import AsyncApp
 from slack_sdk.web import WebClient
 from slack_bolt.error import BoltError
@@ -665,22 +665,46 @@ async def handle_waste_view(ack, body, client, view):
     leader_list = [" - " + n['value'] for n in raw_leaders]
     raw_times = view['state']['values']['input_a2']['times']['selected_options']
     time_list = [" - " + n['value'] for n in raw_times]
-    regulars = float(view['state']['values']['input_b']['regulars']['value'])
-    spicy = float(view['state']['values']['input_c']['spicy']['value'])
-    nuggets = float(view['state']['values']['input_d']['nuggets']['value'])
-    strips = float(view['state']['values']['input_e']['strips']['value'])
-    g_filets = float(view['state']['values']['input_f']['grilled1']['value'])
-    g_nuggets = float(view['state']['values']['input_g']['grilled2']['value'])
-    # Check that input is numeric when it needs to be
+    errors = {}
+    text_error = "Must be a decimal number with no text"
+    try:
+        regulars = float(view['state']['values']['input_b']['regulars']['value'])
+    except ValueError:
+        errors['input_b'] = text_error
+    try:
+        spicy = view['state']['values']['input_c']['spicy']['value']
+    except ValueError:
+        errors['input_c'] = text_error
+    try:
+        nuggets = view['state']['values']['input_d']['nuggets']['value']
+    except ValueError:
+        errors['input_d'] = text_error
+    try:
+        strips = view['state']['values']['input_e']['strips']['value']
+    except ValueError:
+        errors['input_e'] = text_error
+    try:
+        g_filets = view['state']['values']['input_f']['grilled1']['value']
+    except ValueError:
+        errors['input_f'] = text_error
+    try:
+        g_nuggets = view['state']['values']['input_g']['grilled2']['value']
+    except ValueError:
+        errors['input_g'] = text_error
+    # Handle breakfast items
+    if datetime.now().hour < 13:
+        try:
+            breakfast = float(view['state']['values']['input_h']['breakfast']['value'])
+        except ValueError:
+            errors['input_h'] = text_error
+        try:
+            g_breakfast = float(view['state']['values']['input_i']['grilled3']['value'])
+        except ValueError:
+            errors['input_i'] = text_error
+    if len(errors) > 0:
+        return ack(response_action="errors", errors=errors)
+    await ack()
     chicken_list = [regulars, spicy, nuggets, strips, g_filets, g_nuggets]
-    # for item in chicken_list:
-    #     if not isinstance(item, float):
-    #         payload = {
-    #             "response_action": "errors",
-    #             "errors": {
-    #                 "block_id": "error_message"
-    #             }
-    #         }
     # Store data
     total_weight = sum(chicken_list)
     sh = gc.open_by_key(creds.waste_id)
@@ -748,9 +772,7 @@ async def handle_waste_view(ack, body, client, view):
     to_post = [str(datetime.now()), regulars, spicy, nuggets, strips, g_filets, g_nuggets]
     # Handle breakfast items
     if datetime.now().hour < 13:
-        breakfast = float(view['state']['values']['input_h']['breakfast']['value'])
         to_post.append(breakfast)
-        g_breakfast = float(view['state']['values']['input_i']['grilled3']['value'])
         to_post.append(g_breakfast)
         if sum([breakfast, g_breakfast]) > 0:
             total_weight += sum([breakfast, g_breakfast])
@@ -781,7 +803,6 @@ async def handle_waste_view(ack, body, client, view):
         "text": {"type": "mrkdwn", "text": "Please remember to replace stickers on all waste containers."}
     }
     blocks.append(block5)
-    await ack()
     # Send data to Google Sheet
     try:
         sheet = sh.worksheet("Data")
@@ -835,7 +856,7 @@ async def symbol(ack, body, say):
     current_date = date.today()
     if "text" in body.keys():  # user provided sales info
         # Convert text input (string) to decimal
-        input_sales = Decimal(sub(r'[^\d.]', '', body['text']))
+        input_sales = Decimal(re.sub(r'[^\d.]', '', body['text']))
         # Calculate the reporting date
         if now.hour < 12:
             current_date = date.today() - timedelta(days=1)
