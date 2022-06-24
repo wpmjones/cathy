@@ -672,23 +672,23 @@ async def handle_waste_view(ack, body, client, view):
     except ValueError:
         errors['input_b'] = text_error
     try:
-        spicy = view['state']['values']['input_c']['spicy']['value']
+        spicy = float(view['state']['values']['input_c']['spicy']['value'])
     except ValueError:
         errors['input_c'] = text_error
     try:
-        nuggets = view['state']['values']['input_d']['nuggets']['value']
+        nuggets = float(view['state']['values']['input_d']['nuggets']['value'])
     except ValueError:
         errors['input_d'] = text_error
     try:
-        strips = view['state']['values']['input_e']['strips']['value']
+        strips = float(view['state']['values']['input_e']['strips']['value'])
     except ValueError:
         errors['input_e'] = text_error
     try:
-        g_filets = view['state']['values']['input_f']['grilled1']['value']
+        g_filets = float(view['state']['values']['input_f']['grilled1']['value'])
     except ValueError:
         errors['input_f'] = text_error
     try:
-        g_nuggets = view['state']['values']['input_g']['grilled2']['value']
+        g_nuggets = float(view['state']['values']['input_g']['grilled2']['value'])
     except ValueError:
         errors['input_g'] = text_error
     # Handle breakfast items
@@ -702,7 +702,7 @@ async def handle_waste_view(ack, body, client, view):
         except ValueError:
             errors['input_i'] = text_error
     if len(errors) > 0:
-        return ack(response_action="errors", errors=errors)
+        return await ack(response_action="errors", errors=errors)
     await ack()
     chicken_list = [regulars, spicy, nuggets, strips, g_filets, g_nuggets]
     # Store data
