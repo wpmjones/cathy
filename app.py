@@ -483,7 +483,6 @@ async def waste(ack, body, client):
     # Members, but again, I'm not a pro and I don't always do things the best way!  Having leaders names in a
     # Google Sheet would allow others to update the list, but it changes infrequently enough that I don't mind
     # being the only that can update it.
-    logger.info(f"Waste body: Trying to idetify the message to delete.\n{body}")
     leader_options = []
     time_options = []
     for leader in creds.leaders:
@@ -645,6 +644,18 @@ async def waste(ack, body, client):
             "optional": True
         }
     )
+    blocks.append(
+        {
+            "type": "context",
+            "block_id": "context_a",
+            "elements": [
+                {
+                    "type": "plain_text",
+                    "text": body['channel_id']
+                }
+            ]
+        }
+    )
     await client.views_open(
         trigger_id=body['trigger_id'],
         view={
@@ -666,6 +677,7 @@ async def handle_waste_view(ack, body, client, view):
     leader_list = [" - " + n['value'] for n in raw_leaders]
     raw_times = view['state']['values']['input_a2']['times']['selected_options']
     time_list = [" - " + n['value'] for n in raw_times]
+    message_ts = view['blocks'][-1]['elements'][0]['text']
     errors = {}
     text_error = "Must be a decimal number with no text"
     try:
@@ -820,6 +832,8 @@ async def handle_waste_view(ack, body, client, view):
     await client.chat_postMessage(channel=creds.boh_channel,
                                   blocks=blocks,
                                   text="New waste report posted.")
+    await client.chat_delete(channel=creds.boh_channel,
+                             ts=message_ts)
 
 
 @app.command("/goals")
