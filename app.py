@@ -483,6 +483,7 @@ async def waste(ack, body, client):
     # Members, but again, I'm not a pro and I don't always do things the best way!  Having leaders names in a
     # Google Sheet would allow others to update the list, but it changes infrequently enough that I don't mind
     # being the only that can update it.
+    logger.info(f"Waste body: Trying to idetify the message to delete.\n{body}")
     leader_options = []
     time_options = []
     for leader in creds.leaders:
