@@ -832,8 +832,12 @@ async def handle_waste_view(ack, body, client, view):
     await client.chat_postMessage(channel=creds.boh_channel,
                                   blocks=blocks,
                                   text="New waste report posted.")
-    await client.chat_delete(channel=creds.boh_channel,
-                             ts=message_ts)
+    logger.info("Attempting to delete waste_remind message.")
+    try:
+        await client.chat_delete(channel=creds.boh_channel,
+                                 ts=message_ts)
+    except:
+        logger.exception("Message deletion failed:")
 
 
 @app.command("/goals")
