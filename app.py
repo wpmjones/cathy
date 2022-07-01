@@ -651,7 +651,7 @@ async def waste(ack, body, client):
             "elements": [
                 {
                     "type": "plain_text",
-                    "text": body['channel_id']
+                    "text": body['container']['message_ts']
                 }
             ]
         }
