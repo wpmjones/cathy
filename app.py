@@ -835,7 +835,8 @@ async def handle_waste_view(ack, body, client, view):
     logger.info("Attempting to delete waste_remind message.")
     try:
         await client.chat_delete(channel=creds.boh_channel,
-                                 ts=message_ts)
+                                 ts=message_ts,
+                                 token=creds.user_token)
     except:
         logger.exception("Message deletion failed:")
 
