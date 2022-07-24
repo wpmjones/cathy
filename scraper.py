@@ -114,7 +114,7 @@ def check_cem():
                 }
             ]
         }
-        r = requests.post(creds.webhook_test, json=payload)
+        r = requests.post(creds.webhook_announce, json=payload)
         if r.status_code != 200:
             raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
                              f"The response is: {r.text}")
@@ -259,8 +259,8 @@ def post_symbol_goal():
 
 if __name__ == "__main__":
     check_cem()
-    # check_oos()
-    # check_allocation()
-    # if datetime.date.weekday(today) != 6:
-    #     time.sleep(60*60*3)  # sleep 3 hours
-    #     post_symbol_goal()
+    check_oos()
+    check_allocation()
+    if datetime.date.weekday(today) != 6:
+        time.sleep(60*60*3)  # sleep 3 hours
+        post_symbol_goal()
