@@ -87,6 +87,7 @@ def check_cem():
         df = pd.DataFrame(daily.get_all_records(), columns=columns)
         data = df.tail(10)
         data.plot(x="Date", y=categories, title="CEM Scores (Last 10 days)", xlabel="Date")
+        plt.legend(loc="upper left")
         plt.legend = categories
         plt.savefig(fname="plot")
         ftp = ftplib.FTP(creds.ftp_host, creds.ftp_user, creds.ftp_password)
