@@ -3,6 +3,8 @@ import datetime
 import email
 import gspread
 import imaplib
+import matplotlib.pyplot as plt
+import pandas as pd
 import requests
 import time
 
@@ -80,8 +82,10 @@ def check_cem():
         for key, value in score_dict.items():
             val_list.append(value[:-1])
         daily.append_row(val_list, value_input_option="USER_ENTERED")
-        daily_values = daily.get_all_values
-        print([x for x in daily_values])
+        df = pd.DataFrame(daily.get_all_records())
+        print(df)
+        # df.plot(x="Dates", y=categories, title="CEM: Last Ten Days")
+        # plt.legend(categories)
         # post content to Slack
         # content = (f"*Month to Date CEM Scores*\n"
         #            f"Out of {num_responses} responses\n```")
