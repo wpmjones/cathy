@@ -15,6 +15,8 @@ mail.login(creds.gmail_u, creds.gmail_app)
 mail.select("INBOX")
 today = datetime.date.today()
 
+gc = gspread.service_account(filename=creds.gspread)
+
 categories = [
     "Likelihood to Return",
     "Fast Service",
@@ -35,6 +37,7 @@ def find_nth(content, search_string, n):
 
 def check_cem():
     """Look at gmail to find CEM email and report findings"""
+    # Scrap email
     search_date = datetime.date.today()  # - datetime.timedelta(days=1)
     tfmt = search_date.strftime('%d-%b-%Y')
     _, sdata = mail.search(None, f'(FROM "SMGMailMgr@whysmg.com" SINCE {tfmt})')
@@ -66,17 +69,32 @@ def check_cem():
         start = body.find("n:") + 3
         end = start + 3
         num_responses = body[start:end].strip()
-        # post content to Slack
-        content = (f"*Month to Date CEM Scores*\n"
-                   f"Out of {num_responses} responses\n```")
+        # Google Sheet work
+        sh = gc.open_by_key(creds.cem_id)
+        monthly = sh.worksheet("Monthly")
+        daily = sh.worksheet("Daily")
+        current_month = datetime.datetime.now().month
+        current_date = datetime.datetime.now().day
+        current_year = datetime.datetime.now().year
+        val_list = [f"{current_month}/{current_date}/{current_year}", ]
         for key, value in score_dict.items():
-            content += f"{key}{' '*(25-len(key))}{' '*(4-len(value))}{value}\n"
-        content += "```"
-        payload = {"text": content}
-        r = requests.post(creds.webhook_announce, json=payload)
-        if r.status_code != 200:
-            raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
-                             f"The response is: {r.text}")
+            val_list.append(value)
+        daily.append_row(val_list)
+        print(daily)
+        # post content to Slack
+        # content = (f"*Month to Date CEM Scores*\n"
+        #            f"Out of {num_responses} responses\n```")
+        # col_count = 3
+        # for key, value in score_dict.items():
+        #     sheet.update_cell(cell.row, col_count, value)
+        #     col_count += 1
+        #     content += f"{key}{' '*(25-len(key))}{' '*(4-len(value))}{value}\n"
+        # content += "```"
+        # payload = {"text": content}
+        # r = requests.post(creds.webhook_announce, json=payload)
+        # if r.status_code != 200:
+        #     raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
+        #                      f"The response is: {r.text}")
 
 
 def check_allocation():
@@ -200,7 +218,6 @@ def post_symbol_goal():
     day (20% of same day last year."""
     logger.info("Starting post_symbol_goal")
     # Connect to Google Sheets
-    gc = gspread.service_account(filename=creds.gspread)
     sh = gc.open_by_key(creds.symbol_id)
     sheet = sh.worksheet("Daily Goals")
     current_date = datetime.date.today()
