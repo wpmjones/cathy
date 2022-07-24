@@ -73,7 +73,6 @@ def check_cem():
         num_responses = body[start:end].strip()
         # Google Sheet work
         sh = gc.open_by_key(creds.cem_id)
-        monthly = sh.worksheet("Monthly")
         daily = sh.worksheet("Daily")
         current_month = datetime.datetime.now().month
         current_date = datetime.datetime.now().day
@@ -82,7 +81,8 @@ def check_cem():
         for key, value in score_dict.items():
             val_list.append(value[:-1])
         daily.append_row(val_list, value_input_option="USER_ENTERED")
-        df = pd.DataFrame(daily.get_all_records())
+        fred = sh.worksheet("Daily")
+        df = pd.DataFrame(fred.get_all_records())
         print(df)
         # df.plot(x="Dates", y=categories, title="CEM: Last Ten Days")
         # plt.legend(categories)
@@ -241,8 +241,8 @@ def post_symbol_goal():
 
 if __name__ == "__main__":
     check_cem()
-    check_oos()
-    check_allocation()
-    if datetime.date.weekday(today) != 6:
-        time.sleep(60*60*3)  # sleep 3 hours
-        post_symbol_goal()
+    # check_oos()
+    # check_allocation()
+    # if datetime.date.weekday(today) != 6:
+    #     time.sleep(60*60*3)  # sleep 3 hours
+    #     post_symbol_goal()
