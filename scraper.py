@@ -91,20 +91,32 @@ def check_cem():
         plt.savefig(fname="plot")
         ftp = ftplib.FTP(creds.ftp_host, creds.ftp_user, creds.ftp_password)
         ftp.encoding = "utf-8"
-        filename = "plot.png"
-        with open(filename, "rb") as file:
-            ftp.storbinary(f"STOR images/{filename}", file)
+        filename = f"images/plot_{current_month}_{current_date}.png"
+        with open("plot.png", "rb") as file:
+            ftp.storbinary(f"STOR {filename}", file)
         # post content to Slack
-        # content = (f"*Month to Date CEM Scores*\n"
-        #            f"Out of {num_responses} responses\n```")
-        # for key, value in score_dict.items():
-        #     content += f"{key}{' ' * (25 - len(key))}{' ' * (4 - len(value))}{value}\n"
-        # content += "```"
-        # payload = {"text": content}
-        # r = requests.post(creds.webhook_announce, json=payload)
-        # if r.status_code != 200:
-        #     raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
-        #                      f"The response is: {r.text}")
+        content = (f"*Month to Date CEM Scores*\n"
+                   f"Out of {num_responses} responses\n```")
+        for key, value in score_dict.items():
+            content += f"{key}{' ' * (25 - len(key))}{' ' * (4 - len(value))}{value}\n"
+        content += "```"
+        payload = {
+            "blocks": [
+                {
+                    "type": "section",
+                    "text": {"type": "mrkdwn", "text": content},
+                    "accessory": {
+                        "type": "image",
+                        "image_url": f"http://www.mayodev.com/images/plot_{current_month}_{current_date}.png",
+                        "alt_text": "CEM Update Chart"
+                    }
+                }
+            ]
+        }
+        r = requests.post(creds.webhook_test, json=payload)
+        if r.status_code != 200:
+            raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
+                             f"The response is: {r.text}")
 
 
 def check_allocation():
