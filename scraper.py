@@ -84,7 +84,8 @@ def check_cem():
         columns = ["Date", ]
         columns.extend(categories)
         df = pd.DataFrame(daily.get_all_records(), columns=columns)
-        df.plot(x="Date", y=categories, title="CEM Scores (Last 10 days)", xlabel="Date")
+        data = df.tail(10)
+        data.plot(x="Date", y=categories, title="CEM Scores (Last 10 days)", xlabel="Date")
         plt.legend=categories
         plt.savefig(fname="plot")
         # df.plot(x="Dates", y=categories, title="CEM: Last Ten Days")
