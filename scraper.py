@@ -78,9 +78,10 @@ def check_cem():
         current_year = datetime.datetime.now().year
         val_list = [f"{current_month}/{current_date}/{current_year}", ]
         for key, value in score_dict.items():
-            val_list.append(value)
+            val_list.append(value[:-1])
         daily.append_row(val_list, value_input_option="USER_ENTERED")
-        print([x for x in daily])
+        daily_values = daily.get_all_values
+        print([x for x in daily_values])
         # post content to Slack
         # content = (f"*Month to Date CEM Scores*\n"
         #            f"Out of {num_responses} responses\n```")
