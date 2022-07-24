@@ -109,7 +109,8 @@ def check_cem():
                 {
                     "type": "image",
                     "title": {"type": "plain_text", "text": "CEM Update Chart"},
-                    "image_url": f"http://www.mayodev.com/images/plot_{current_month}_{current_date}.png"
+                    "image_url": f"http://www.mayodev.com/images/plot_{current_month}_{current_date}.png",
+                    "alt_text": "CEM Update Chart"
                 }
             ]
         }
