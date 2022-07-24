@@ -1,6 +1,7 @@
 import creds
 import datetime
 import email
+import ftplib
 import gspread
 import imaplib
 import matplotlib.pyplot as plt
@@ -32,7 +33,7 @@ categories = [
 def find_nth(content, search_string, n):
     start = content.find(search_string)
     while start >= 0 and n > 1:
-        start = content.find(search_string, start+len(search_string))
+        start = content.find(search_string, start + len(search_string))
         n -= 1
     return start
 
@@ -86,18 +87,18 @@ def check_cem():
         df = pd.DataFrame(daily.get_all_records(), columns=columns)
         data = df.tail(10)
         data.plot(x="Date", y=categories, title="CEM Scores (Last 10 days)", xlabel="Date")
-        plt.legend=categories
+        plt.legend = categories
         plt.savefig(fname="plot")
-        # df.plot(x="Dates", y=categories, title="CEM: Last Ten Days")
-        # plt.legend(categories)
+        ftp = ftplib.FTP(creds.ftp_host, creds.ftp_user, creds.ftp_password)
+        ftp.encoding = "utf-8"
+        filename = "plot.png"
+        with open(filename, "rb") as file:
+            ftp.storbinary(f"STOR images/{filename}", file)
         # post content to Slack
         # content = (f"*Month to Date CEM Scores*\n"
         #            f"Out of {num_responses} responses\n```")
-        # col_count = 3
         # for key, value in score_dict.items():
-        #     sheet.update_cell(cell.row, col_count, value)
-        #     col_count += 1
-        #     content += f"{key}{' '*(25-len(key))}{' '*(4-len(value))}{value}\n"
+        #     content += f"{key}{' ' * (25 - len(key))}{' ' * (4 - len(value))}{value}\n"
         # content += "```"
         # payload = {"text": content}
         # r = requests.post(creds.webhook_announce, json=payload)
@@ -232,7 +233,7 @@ def post_symbol_goal():
     current_date = datetime.date.today()
     cell = sheet.find(current_date.strftime("%Y-%m-%d"))
     logger.info(f"Date cell: {cell}")
-    goal = sheet.cell(cell.row, cell.col+6).value
+    goal = sheet.cell(cell.row, cell.col + 6).value
     logger.info(f"Goal: {goal}")
     content = f"*Today's Symbol Goal:* {goal}"
     payload = {"text": content}
