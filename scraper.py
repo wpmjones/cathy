@@ -81,8 +81,9 @@ def check_cem():
         for key, value in score_dict.items():
             val_list.append(value[:-1])
         daily.append_row(val_list, value_input_option="USER_ENTERED")
-        fred = sh.worksheet("Daily")
-        df = pd.DataFrame(fred.get_all_records())
+        columns = ["Date", ]
+        columns.extend(categories)
+        df = pd.DataFrame(daily.get_all_records(), columns=columns)
         print(df)
         # df.plot(x="Dates", y=categories, title="CEM: Last Ten Days")
         # plt.legend(categories)
