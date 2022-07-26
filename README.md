@@ -11,6 +11,8 @@ This is written in Python and is running on a Virtual Private Server (VPS).  I u
 
 **cater_remind.py** is a static python file that uses an Incoming Webhook in Slack.  It connects to a Google Sheet that has a list of upcoming catering and the assigned drivers.  I use crontab (in Linux) to schedule this each morning.
 
+**curbside_remind.py** is a static Python file that uses an Incoming Webhook in Slack.  It's sole purpose is to remind leaders to turn curbside on/off at specific times.  I use crontab (in Linux) to schedule this at specific times.
+
 **db.py** is related to sms.py and is something that I'm still playing with.  We only have managers and above in our Slack, so I was kicking around the idea of having a way to quickly text all Team Members (or a subset like all front or all back).  It's basically functional, but there is no way to automate getting Team Members into the database.  It has to be manually updated which, at least for now, is more trouble than it's worth for me.
 
 **scraper.py** is a fun one that takes some work, but comes in handy.  Any emails that come into our store email address that deal with outages at the distribution center are forwarded to my gmail account. This script looks at my gmail every night at 2am and reports any outages to Slack.
