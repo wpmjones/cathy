@@ -29,7 +29,7 @@ def main():
                 }
             ]
         }
-        r = requests.post(creds.webhook_url, json=payload)
+        r = requests.post(webhook_url, json=payload)
         if r.status_code != 200:
             raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
                              f"The response is: {r.text}")
