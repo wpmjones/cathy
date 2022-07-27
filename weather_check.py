@@ -7,7 +7,7 @@ logger.add("weather.log", rotation="1 week")
 
 lat = "36.06302829757474"
 lon = "-115.17006319892765"
-weather_url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={creds.weather_key}"
+weather_url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&units=imperial&appid={creds.weather_key}"
 
 
 def main():
