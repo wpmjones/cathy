@@ -23,5 +23,7 @@ This is written in Python and is running on a Virtual Private Server (VPS).  I u
 
 **waste_remind.py** is the file that many on Facebook asked about.  Like cash_remind.py, it is a stand-alone script that is run multiple times throughout the day to remind the BOH team to record waste.  It includes two buttons.  One brings up a form in Slack to fill out the waste.  The other opens a Google Sheet where all the waste tracking happens.  This is just the reminder.  The form is part of app.py.
 
+**weather_check.py** is a static python file that uses an Incoming Webhook in Slack. It uses a weather API to check for current outside temperature and notifies our FOH leaders if the termperature is over 100.  I use crontab (in Linux) to schedule this at specific times. 
+
 ## Contact Me
 I don't have a lot of spare time, but if you have questions, please email me and I'll help where I can.  I'm wpmjones on gmail.
