@@ -838,7 +838,22 @@ async def handle_waste_view(ack, body, client, view):
                                  ts=message_ts,
                                  token=creds.user_token)
     except:
-        logger.exception("Message deletion failed:")
+        logger.exception("Message deletion failed:\n")
+    if datetime.now().hour < 12:
+        await asyncio.sleep(300)
+        safe_url = "https://www.cfahome.com/go/appurl.go?app=ERQA"
+        content = f"Have we completed our first SAFE Daily Critical yet today?\nIf not, <{safe_url}|click here.>"
+        blocks = [
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": content}
+            }
+        ]
+        await client.chat_postMessage(channel=creds.test_channel,
+                                      blocks=blocks,
+                                      text=f"SAFE yet?")
 
 
 @app.command("/goals")
