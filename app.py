@@ -851,7 +851,7 @@ async def handle_waste_view(ack, body, client, view):
                     "text": content}
             }
         ]
-        await client.chat_postMessage(channel=creds.test_channel,
+        await client.chat_postMessage(channel=creds.boh_channel,
                                       blocks=blocks,
                                       text=f"SAFE yet?")
 
