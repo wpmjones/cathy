@@ -146,21 +146,19 @@ def check_allocation():
             body = msg.get_payload()
         # body captured, search for relevant text
         if body:
-            start = body.find("item #") + 1
+            start = body.lower().find("item #") + 1
             end = start + 14
             item_number = "I" + body[start:end].strip()
             start = end + 2
-            end = body.find("This item was") - 1
+            end = body.lower().find("this item was") - 1
             item_name = body[start:end].strip()
             item = f"{item_number} - {item_name}"
             start = end
-            end = body.find("The product is")
+            end = body.lower().find("product")
             truck_date = body[start:end].strip() + "."
-            start = end
-            end = body.find("pending") + 12
-            rescheduled = body[start:end].strip() + " supplier's availability."
             # post content to Slack
-            content = f"*{item}*\n{truck_date}\n{rescheduled}"
+            content = f"*{item}*\n{truck_date}"
+            logger.info(content)
             payload = {
                 "text": "Allocation Notification",
                 "blocks": [
@@ -202,25 +200,21 @@ def check_oos():
             body = msg.get_payload()
         # body captured, search for relevant text
         if body:
+            new_line = "\n"
             start = body.find("#")
             logger.info(start)
             end = start + 10
             item_number = "Item" + body[start:end].strip()
             start = end + 1
-            end = body.find("This item was") - 1
+            end = body.lower().find("this item was") - 1
             item_name = body[start:end].strip()
-            item = f"{item_number} - {item_name}"
+            item = f"{item_number} - {item_name.replace(new_line, '')}"
             start = end
-            end = body.find("Product is")
+            end = body.lower().find("product")
             truck_date = body[start:end].strip() + "."
-            start = end
-            end = body.find("pending") + 12
-            if end > 0:
-                rescheduled = body[start:end].strip() + " supplier's availability."
-            else:
-                rescheduled = ""
-            # post content to Slack - Truck Channel
-            content = f"*{item}*\n{truck_date}\n{rescheduled}"
+            # post content to Slack
+            content = f"*{item}*\n{truck_date}"
+            logger.info(content)
             payload = {
                 "text": "Out of Stock Notification",
                 "blocks": [
