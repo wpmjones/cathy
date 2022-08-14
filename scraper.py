@@ -258,6 +258,6 @@ if __name__ == "__main__":
     check_cem()
     check_oos()
     check_allocation()
-    if datetime.date.weekday(today) != 6:
-        time.sleep(60*60*3)  # sleep 3 hours
-        post_symbol_goal()
+    # if datetime.date.weekday(today) != 6:
+    #     time.sleep(60*60*3)  # sleep 3 hours
+    #     post_symbol_goal()
