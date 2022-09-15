@@ -64,6 +64,8 @@ def check_cem():
             body = msg.get_payload(decode=True).decode("utf-8")
     # find percentages in body
     if body:
+        logger.info(body)
+        raise KeyError("stop")
         for j in range(6):
             start = find_nth(body, "%", j + 1) - 3
             end = start + 4
@@ -103,24 +105,24 @@ def check_cem():
         for key, value in score_dict.items():
             content += f"{key}{' ' * (25 - len(key))}{' ' * (4 - len(value))}{value}\n"
         content += "```"
-        payload = {
-            "blocks": [
-                {
-                    "type": "section",
-                    "text": {"type": "mrkdwn", "text": content}
-                },
-                {
-                    "type": "image",
-                    "title": {"type": "plain_text", "text": "CEM Update Chart"},
-                    "image_url": f"http://www.mayodev.com/images/plot_{current_month}_{current_date}.png",
-                    "alt_text": "CEM Update Chart"
-                }
-            ]
-        }
-        r = requests.post(creds.webhook_announce, json=payload)
-        if r.status_code != 200:
-            raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
-                             f"The response is: {r.text}")
+        # payload = {
+        #     "blocks": [
+        #         {
+        #             "type": "section",
+        #             "text": {"type": "mrkdwn", "text": content}
+        #         },
+        #         {
+        #             "type": "image",
+        #             "title": {"type": "plain_text", "text": "CEM Update Chart"},
+        #             "image_url": f"http://www.mayodev.com/images/plot_{current_month}_{current_date}.png",
+        #             "alt_text": "CEM Update Chart"
+        #         }
+        #     ]
+        # }
+        # r = requests.post(creds.webhook_announce, json=payload)
+        # if r.status_code != 200:
+        #     raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
+        #                      f"The response is: {r.text}")
 
 
 def check_allocation():
@@ -256,8 +258,8 @@ def post_symbol_goal():
 
 if __name__ == "__main__":
     check_cem()
-    check_oos()
-    check_allocation()
+    # check_oos()
+    # check_allocation()
     # if datetime.date.weekday(today) != 6:
     #     time.sleep(60*60*3)  # sleep 3 hours
     #     post_symbol_goal()
