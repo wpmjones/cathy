@@ -23,8 +23,9 @@ gc = gspread.service_account(filename=creds.gspread)
 categories = [
     "Likelihood to Return",
     "Fast Service",
-    "Attentive/Courteous",
     "Order Accuracy",
+    "Attentive/Courteous",
+    "Cleanliness",
     "Taste",
     "Overall Satisfaction",
 ]
@@ -65,14 +66,14 @@ def check_cem():
     # find percentages in body
     if body:
         logger.info(body)
-        raise KeyError("stop")
-        for j in range(6):
+        for j in range(7):
             start = find_nth(body, "%", j + 1) - 3
             end = start + 4
             score_dict[categories[j]] = body[start:end].strip()
             # catch the colon in case where response is 0% (e.g. ": 0%")
             if ":" in score_dict[categories[j]]:
                 score_dict[categories[j]] = score_dict[categories[j]].replace(": ", "")
+        logger.info(score_dict)
         # find number of respondents
         start = body.find("n:") + 3
         end = start + 3
