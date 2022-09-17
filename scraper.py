@@ -209,7 +209,6 @@ def check_oos():
             start = body.find("#")
             end = start + 10
             item_number = "Item" + body[start:end].strip()
-
             start = end + 1
             end = body.lower().find("this item was") - 1
             item_name = body[start:end].strip().replace("=", "")
@@ -219,8 +218,6 @@ def check_oos():
             truck_date = body[start:end].strip().replace("=", "") + "."
             # post content to Slack
             content = f"*{item}*\n{truck_date}"
-            logger.info(content)
-            content = "".join(char for char in content if char.isascii())
             logger.info(content)
             payload = {
                 "text": "Out of Stock Notification",
@@ -234,7 +231,7 @@ def check_oos():
                     }
                 ]
             }
-            r = requests.post(creds.webhook_test, json=payload)
+            r = requests.post(creds.webhook_announce, json=payload)
             if r.status_code != 200:
                 raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
                                  f"The response is: {r.text}")
@@ -262,9 +259,9 @@ def post_symbol_goal():
 
 
 if __name__ == "__main__":
-    # check_cem()
+    check_cem()
     check_oos()
-    # check_allocation()
+    check_allocation()
     # if datetime.date.weekday(today) != 6:
     #     time.sleep(60*60*3)  # sleep 3 hours
     #     post_symbol_goal()
