@@ -207,9 +207,10 @@ def check_oos():
             logger.info(start)
             end = start + 10
             item_number = "Item" + body[start:end].strip()
+
             start = end + 1
             end = body.lower().find("this item was") - 1
-            item_name = body[start:end].strip()
+            item_name = body[start:end].strip().replace("=", "")
             item = f"{item_number} - {item_name.replace(new_line, '')}"
             start = end
             end = body.lower().find("product")
