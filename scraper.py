@@ -218,22 +218,24 @@ def check_oos():
             # post content to Slack
             content = f"*{item}*\n{truck_date}"
             logger.info(content)
-            payload = {
-                "text": "Out of Stock Notification",
-                "blocks": [
-                    {
-                        "type": "section",
-                        "text": {
-                            "type": "mrkdwn",
-                            "text": content
-                        }
-                    }
-                ]
-            }
-            r = requests.post(creds.webhook_test, json=payload)
-            if r.status_code != 200:
-                raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
-                                 f"The response is: {r.text}")
+            content = "".join(char for char in content if char.isascii())
+            logger.info(content)
+            # payload = {
+            #     "text": "Out of Stock Notification",
+            #     "blocks": [
+            #         {
+            #             "type": "section",
+            #             "text": {
+            #                 "type": "mrkdwn",
+            #                 "text": content
+            #             }
+            #         }
+            #     ]
+            # }
+            # r = requests.post(creds.webhook_test, json=payload)
+            # if r.status_code != 200:
+            #     raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
+            #                      f"The response is: {r.text}")
 
 
 def post_symbol_goal():
