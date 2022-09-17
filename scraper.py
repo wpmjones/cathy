@@ -192,7 +192,6 @@ def check_oos():
         typ, data = mail.fetch(i, "(RFC822)")
         raw = data[0][1]
         msg = email.message_from_bytes(raw)
-        msg = quopri.decodestring(msg)
         logger.info(msg)
         if msg.is_multipart():
             for part in msg.walk():
@@ -205,6 +204,7 @@ def check_oos():
             body = msg.get_payload()
         # body captured, search for relevant text
         if body:
+            body = quopri.decodestring(body)
             logger.info(body)
             new_line = "\n"
             start = body.find("#")
