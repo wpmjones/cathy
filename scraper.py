@@ -214,7 +214,7 @@ def check_oos():
             item = f"{item_number} - {item_name.replace(new_line, '')}"
             start = end
             end = body.lower().find("product")
-            truck_date = body[start:end].strip() + "."
+            truck_date = body[start:end].strip().replace("=", "") + "."
             # post content to Slack
             content = f"*{item}*\n{truck_date}"
             logger.info(content)
