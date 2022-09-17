@@ -141,13 +141,14 @@ def check_allocation():
             for part in msg.walk():
                 part_type = part.get_content_type()
                 if part_type == "text/plain" and "attachment" not in part:
-                    body = part.get_payload()
+                    body = quopri.decodestring(part.get_payload())
                 if part.get("Content-Disposition") is None:
                     pass
         else:
-            body = msg.get_payload()
+            body = quopri.decodestring(msg.get_payload())
         # body captured, search for relevant text
         if body:
+            body = body.decode()
             start = body.lower().find("item #") + 1
             end = start + 14
             item_number = "I" + body[start:end].strip()
@@ -156,7 +157,7 @@ def check_allocation():
             item_name = body[start:end].strip()
             item = f"{item_number} - {item_name}"
             start = end
-            end = body.lower().find("product")
+            end = body.lower().find("the product")
             truck_date = body[start:end].strip() + "."
             # post content to Slack
             content = f"*{item}*\n{truck_date}"
@@ -214,29 +215,29 @@ def check_oos():
             item_name = body[start:end].strip().replace("=", "")
             item = f"{item_number} {item_name.replace(new_line, '')}"
             start = end
-            end = body.lower().find("product")
+            end = body.lower().find("the product")
             truck_date = body[start:end].strip().replace("=", "") + "."
             # post content to Slack
             content = f"*{item}*\n{truck_date}"
             logger.info(content)
             content = "".join(char for char in content if char.isascii())
             logger.info(content)
-            # payload = {
-            #     "text": "Out of Stock Notification",
-            #     "blocks": [
-            #         {
-            #             "type": "section",
-            #             "text": {
-            #                 "type": "mrkdwn",
-            #                 "text": content
-            #             }
-            #         }
-            #     ]
-            # }
-            # r = requests.post(creds.webhook_test, json=payload)
-            # if r.status_code != 200:
-            #     raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
-            #                      f"The response is: {r.text}")
+            payload = {
+                "text": "Out of Stock Notification",
+                "blocks": [
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": content
+                        }
+                    }
+                ]
+            }
+            r = requests.post(creds.webhook_test, json=payload)
+            if r.status_code != 200:
+                raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
+                                 f"The response is: {r.text}")
 
 
 def post_symbol_goal():
