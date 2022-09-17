@@ -1,5 +1,3 @@
-import quopri
-
 import creds
 import datetime
 import email
@@ -8,6 +6,7 @@ import gspread
 import imaplib
 import matplotlib.pyplot as plt
 import pandas as pd
+import quopri
 import requests
 import time
 
@@ -192,19 +191,18 @@ def check_oos():
         typ, data = mail.fetch(i, "(RFC822)")
         raw = data[0][1]
         msg = email.message_from_bytes(raw)
-        logger.info(msg)
         if msg.is_multipart():
             for part in msg.walk():
                 part_type = part.get_content_type()
                 if part_type == "text/plain" and "attachment" not in part:
-                    body = part.get_payload()
+                    body = quopri.decodestring(part.get_payload())
                 if part.get("Content-Disposition") is None:
                     pass
         else:
-            body = msg.get_payload()
+            body = quopri.decodestring(msg.get_payload())
         # body captured, search for relevant text
         if body:
-            body = quopri.decodestring(body)
+            body = body.decode()
             logger.info(body)
             new_line = "\n"
             start = body.find("#")
