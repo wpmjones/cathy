@@ -189,7 +189,7 @@ def check_oos():
     for i in id_list:
         typ, data = mail.fetch(i, "(RFC822)")
         raw = data[0][1]
-        msg = email.message_from_bytes(raw)
+        msg = email.message_from_string(raw)
         logger.info(msg)
         if msg.is_multipart():
             for part in msg.walk():
