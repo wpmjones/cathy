@@ -190,6 +190,7 @@ def check_oos():
         typ, data = mail.fetch(i, "(RFC822)")
         raw = data[0][1]
         msg = email.message_from_bytes(raw)
+        logger.info(msg)
         if msg.is_multipart():
             for part in msg.walk():
                 part_type = part.get_content_type()
@@ -204,14 +205,13 @@ def check_oos():
             logger.info(body)
             new_line = "\n"
             start = body.find("#")
-            logger.info(start)
             end = start + 10
             item_number = "Item" + body[start:end].strip()
 
             start = end + 1
             end = body.lower().find("this item was") - 1
             item_name = body[start:end].strip().replace("=", "")
-            item = f"{item_number} - {item_name.replace(new_line, '')}"
+            item = f"{item_number} {item_name.replace(new_line, '')}"
             start = end
             end = body.lower().find("product")
             truck_date = body[start:end].strip().replace("=", "") + "."
