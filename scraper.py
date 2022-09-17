@@ -230,10 +230,10 @@ def check_oos():
                     }
                 ]
             }
-            # r = requests.post(creds.webhook_announce, json=payload)
-            # if r.status_code != 200:
-            #     raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
-            #                      f"The response is: {r.text}")
+            r = requests.post(creds.webhook_test, json=payload)
+            if r.status_code != 200:
+                raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
+                                 f"The response is: {r.text}")
 
 
 def post_symbol_goal():
