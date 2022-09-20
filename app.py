@@ -282,6 +282,7 @@ async def handle_add_view(ack, body, client, view):
                 ]
             }
         ]
+        logger.info(r)
         await client.chat_postMessage(channel=channel_id,
                                       blocks=blocks,
                                       text=f"{name} added to {location} Trello board.")
@@ -312,12 +313,20 @@ async def handle_add_view(ack, body, client, view):
     staff_sheet = sh.worksheet("Sheet1")
     staff_sheet.append_row([name], value_input_option="USER_ENTERED")
     staff_sheet.sort([1, "asc"])
+    if staff_sheet.row_count > 100:
+        await client.chat_postMessage(channel=channel_id,
+                                      text="The number of rows in CFA Staff has exceeded 100. This will cause the "
+                                           "/sick command to stop working. Please notify Patrick as soon as "
+                                           "possible so old names can be removed.")
     # add user to Pay Scale Tracking
     sh = gc.open_by_key(creds.pay_scale_id)
     pay_sheet = sh.worksheet("Champs Info")
     to_post = [name, "Team Member", "", start_date]
     pay_sheet.append_row(to_post, value_input_option="USER_ENTERED")
     pay_sheet.sort([1, "asc"])
+    await client.conversations_open(users=creds.pj_user_id,
+                                    text=f"{name} was added to Pay Scale Tracking as a Team Member. If they are "
+                                         f"anything other than a Team Member, please manually update their title.")
 
 
 @app.command("/sick")
