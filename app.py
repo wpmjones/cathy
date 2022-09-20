@@ -149,7 +149,7 @@ async def add_trello(ack, body, client):
     in the board that is used as a source. Using this command will open a form to select FOH/BOH, employee name,
     and start date.
 
-    Slack forms (refered to as modals or views) require to functions. The command that initiates the form (this
+    Slack forms (referred to as modals or views) require to functions. The command that initiates the form (this
     function) and a view handler (the next function).
 
     Example usage:
@@ -307,6 +307,17 @@ async def handle_add_view(ack, body, client, view):
                                       text=f"{name} failed to add to {location} Trello board.")
         await client.chat_postMessage(channel=creds.pj_user_id,
                                       text=f"There was an error while adding {name} to {location} Trello board.")
+    # add user to CFA Staff spreadsheet (for use in /sick dropdown list)
+    sh = gc.open_by_key(creds.staff_id)
+    staff_sheet = sh.worksheet("Sheet1")
+    staff_sheet.append_row([name], value_input_option="USER_ENTERED")
+    staff_sheet.sort([1, "asc"])
+    # add user to Pay Scale Tracking
+    sh = gc.open_by_key(creds.pay_scale_id)
+    pay_sheet = sh.worksheet("Champs Info")
+    to_post = [name, "Team Member", "", start_date]
+    pay_sheet.append_row(to_post, value_input_option="USER_ENTERED")
+    pay_sheet.sort([1, "asc"])
 
 
 @app.command("/sick")
