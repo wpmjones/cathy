@@ -8,6 +8,7 @@ import creds
 
 import asyncio
 import gspread
+import json
 import os
 import re
 import requests
@@ -267,10 +268,14 @@ async def handle_add_view(ack, body, client, view):
     }
     r = requests.post("https://api.trello.com/1/cards", headers=headers, params=query)
     if r.status_code == 200:
+        data = json.loads(r.content)
+        trello_url = data['shortUrl']
+        logger.info(trello_url)
         blocks = [
             {
                 "type": "section",
-                "text": {"type": "plain_text", "text": f"{name} successfully added to the Trello {location} board."}
+                "text": {"type": "mrkdwn", "text": f"{name} successfully added to the Trello {location} board.\n"
+                                                   f"<{trello_url}|Click here to access card>"}
             },
             {
                 "type": "context",
@@ -282,8 +287,6 @@ async def handle_add_view(ack, body, client, view):
                 ]
             }
         ]
-        logger.info(r.json)
-        logger.info(r.content)
         await client.chat_postMessage(channel=channel_id,
                                       blocks=blocks,
                                       text=f"{name} added to {location} Trello board.")
@@ -325,9 +328,12 @@ async def handle_add_view(ack, body, client, view):
     to_post = [name, "Team Member", "", start_date]
     pay_sheet.append_row(to_post, value_input_option="USER_ENTERED")
     pay_sheet.sort([1, "asc"])
-    await client.conversations_open(users=creds.pj_user_id,
-                                    text=f"{name} was added to Pay Scale Tracking as a Team Member. If they are "
-                                         f"anything other than a Team Member, please manually update their title.")
+    r = await client.conversations_open(users=creds.pj_user_id)
+    logger.info(r)
+    dm_id = r['channel']['id']
+    await client.chat_postMessage(channel=dm_id,
+                                  text=f"{name} was added to Pay Scale Tracking as a Team Member. If they are "
+                                       f"anything other than a Team Member, please manually update their title.")
 
 
 @app.command("/sick")
