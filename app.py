@@ -270,7 +270,6 @@ async def handle_add_view(ack, body, client, view):
     if r.status_code == 200:
         data = json.loads(r.content)
         trello_url = data['shortUrl']
-        logger.info(trello_url)
         blocks = [
             {
                 "type": "section",
@@ -328,8 +327,7 @@ async def handle_add_view(ack, body, client, view):
     to_post = [name, "Team Member", "", start_date]
     pay_sheet.append_row(to_post, value_input_option="USER_ENTERED")
     pay_sheet.sort([1, "asc"])
-    r = await client.conversations_open(users=creds.pj_user_id)
-    logger.info(r)
+    r = await client.conversations_open(users=creds.jj_user_id)
     dm_id = r['channel']['id']
     await client.chat_postMessage(channel=dm_id,
                                   text=f"{name} was added to Pay Scale Tracking as a Team Member. If they are "
