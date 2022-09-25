@@ -7,7 +7,7 @@ from datetime import datetime
 # Connect to Google Sheets
 gc = gspread.service_account(filename=creds.gspread)
 spreadsheet = gc.open_by_key(creds.cater_id)
-sheet = spreadsheet.worksheet("Sheet1")
+sheet1 = spreadsheet.worksheet("Sheet1")
 
 maps_url_base = "https://www.google.com/maps/search/?api=1&query="
 
@@ -17,13 +17,13 @@ def main():
     webhook_url = creds.webhook_cater
 
     now = datetime.today().strftime("%m/%d/%Y")
-    list_of_cells = sheet.findall(now, in_column=1)
-    if not list_of_cells:
+    list_of_orders = sheet1.findall(now, in_column=1)
+    if not list_of_orders:
         return
-    list_of_rows = [x.row for x in list_of_cells]
+    list_of_rows = [x.row for x in list_of_orders]
     blocks = []
     for row in list_of_rows:
-        values_list = sheet.row_values(row)
+        values_list = sheet1.row_values(row)
         if values_list[2] == "PICKUP":
             blocks.append(
                 {
@@ -56,6 +56,15 @@ def main():
                 }
             )
         else:
+            sheet2 = spreadsheet.worksheet("Sheet2")
+            driver_list = sheet2.get_all_values()
+            driver_name = values_list[2]
+            for driver in driver_list:
+                if driver[0] == driver_name:
+                    driver_tag = f"<@{driver[1]}>"
+                    break
+            else:
+                driver_tag = driver_name
             blocks.append(
                 {
                     "type": "header",
@@ -72,7 +81,7 @@ def main():
                         },
                         {
                             "type": "mrkdwn",
-                            "text": f"*Driver:*\n{values_list[2]}"
+                            "text": f"*Driver:*\n{driver_tag}"
                         },
                         {
                             "type": "mrkdwn",
