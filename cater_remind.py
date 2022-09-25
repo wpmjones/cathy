@@ -2,7 +2,7 @@ import creds
 import gspread
 import requests
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Connect to Google Sheets
 gc = gspread.service_account(filename=creds.gspread)
@@ -14,9 +14,11 @@ maps_url_base = "https://www.google.com/maps/search/?api=1&query="
 
 def main():
     """Notification of catering orders for each day"""
-    webhook_url = creds.webhook_cater
+    # webhook_url = creds.webhook_cater
+    webhook_url = creds.webhook_test
 
-    now = datetime.today().strftime("%m/%d/%Y")
+    now = datetime.today() + timedelta(days=1)
+    now = now.strftime("%m/%d/%Y")
     list_of_orders = sheet1.findall(now, in_column=1)
     if not list_of_orders:
         return
