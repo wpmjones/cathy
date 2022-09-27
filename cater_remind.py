@@ -58,7 +58,7 @@ def main():
         else:
             sheet2 = spreadsheet.worksheet("Sheet2")
             driver_list = sheet2.get_all_values()
-            driver_name = values_list[2]
+            driver_name = values_list[2].strip()
             for driver in driver_list:
                 if driver[0] == driver_name:
                     driver_tag = f"<@{driver[1]}>"
