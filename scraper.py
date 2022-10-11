@@ -66,17 +66,22 @@ def check_cem():
             body = msg.get_payload(decode=True).decode("utf-8")
     # find percentages in body
     if body:
-        for j in range(7):
-            start = find_nth(body, "%", j + 1) - 3
-            end = start + 4
-            score_dict[categories[j]] = body[start:end].strip()
-            # catch the colon in case where response is 0% (e.g. ": 0%")
-            if ":" in score_dict[categories[j]]:
-                score_dict[categories[j]] = score_dict[categories[j]].replace(": ", "")
-        # find number of respondents
-        start = body.find("n:") + 3
-        end = start + 3
-        num_responses = body[start:end].strip()
+        if "**" not in body:
+            for j in range(7):
+                start = find_nth(body, "%", j + 1) - 3
+                end = start + 4
+                score_dict[categories[j]] = body[start:end].strip()
+                # catch the colon in case where response is 0% (e.g. ": 0%")
+                if ":" in score_dict[categories[j]]:
+                    score_dict[categories[j]] = score_dict[categories[j]].replace(": ", "")
+            # find number of respondents
+            start = body.find("n:") + 3
+            end = start + 3
+            num_responses = body[start:end].strip()
+        else:
+            for j in range(7):
+                score_dict[categories[j]] = "100"
+            num_responses = 0
         # Google Sheet work
         sh = gc.open_by_key(creds.cem_id)
         daily = sh.worksheet("Daily")
