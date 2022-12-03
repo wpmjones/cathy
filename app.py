@@ -938,46 +938,46 @@ async def sales(ack, body, say):
                         "multiline": False
                     }
                 },
-                {
-                    "type": "input",
-                    "block_id": "input_c",
-                    "label": {"type": "plain_text", "text": "Catering"},
-                    "element": {
-                        "type": "plain_text_input",
-                        "action_id": "cater_amount",
-                        "multiline": False
-                    }
-                },
-                {
-                    "type": "input",
-                    "block_id": "input_d",
-                    "label": {"type": "plain_text", "text": "Transactions"},
-                    "element": {
-                        "type": "plain_text_input",
-                        "action_id": "transaction_count",
-                        "multiline": False
-                    }
-                },
-                {
-                    "type": "input",
-                    "block_id": "input_e",
-                    "label": {"type": "plain_text", "text": "Labor %"},
-                    "element": {
-                        "type": "plain_text_input",
-                        "action_id": "labor_percent",
-                        "multiline": False
-                    }
-                },
-                {
-                    "type": "input",
-                    "block_id": "input_f",
-                    "label": {"type": "plain_text", "text": "Labor Hours"},
-                    "element": {
-                        "type": "plain_text_input",
-                        "action_id": "labor_hours",
-                        "multiline": False
-                    }
-                }
+                # {
+                #     "type": "input",
+                #     "block_id": "input_c",
+                #     "label": {"type": "plain_text", "text": "Catering"},
+                #     "element": {
+                #         "type": "plain_text_input",
+                #         "action_id": "cater_amount",
+                #         "multiline": False
+                #     }
+                # },
+                # {
+                #     "type": "input",
+                #     "block_id": "input_d",
+                #     "label": {"type": "plain_text", "text": "Transactions"},
+                #     "element": {
+                #         "type": "plain_text_input",
+                #         "action_id": "transaction_count",
+                #         "multiline": False
+                #     }
+                # },
+                # {
+                #     "type": "input",
+                #     "block_id": "input_e",
+                #     "label": {"type": "plain_text", "text": "Labor %"},
+                #     "element": {
+                #         "type": "plain_text_input",
+                #         "action_id": "labor_percent",
+                #         "multiline": False
+                #     }
+                # },
+                # {
+                #     "type": "input",
+                #     "block_id": "input_f",
+                #     "label": {"type": "plain_text", "text": "Labor Hours"},
+                #     "element": {
+                #         "type": "plain_text_input",
+                #         "action_id": "labor_hours",
+                #         "multiline": False
+                #     }
+                # }
             ]
         }
     )
@@ -989,10 +989,10 @@ async def handle_sales_input(ack, body, client, view):
     logger.info("Processing sales input...")
     sales_date = view['state']['values']['input_a']['sales_date']['selected_date']
     sales_amount = view['state']['values']['input_b']['sales_amount']['value']
-    cater_amount = view['state']['values']['input_c']['cater_amount']['value']
-    transactions = view['state']['values']['input_d']['transaction_count']['value']
-    labor_percent = view['state']['values']['input_e']['labor_percent']['value']
-    labor_hours = view['state']['values']['input_f']['labor_hours']['value']
+    # cater_amount = view['state']['values']['input_c']['cater_amount']['value']
+    # transactions = view['state']['values']['input_d']['transaction_count']['value']
+    # labor_percent = view['state']['values']['input_e']['labor_percent']['value']
+    # labor_hours = view['state']['values']['input_f']['labor_hours']['value']
     await client.chat_postMessage(channel=creds.test_channel,
                                   text=f"Sales date: {sales_date}\nSales amount: {sales_amount}")
 
