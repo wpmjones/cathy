@@ -936,8 +936,7 @@ async def sales(ack, body, say):
                         "type": "plain_text_input",
                         "action_id": "sales_amount",
                         "multiline": False
-                    },
-                    "optional": False
+                    }
                 },
                 {
                     "type": "input",
@@ -947,8 +946,7 @@ async def sales(ack, body, say):
                         "type": "plain_text_input",
                         "action_id": "cater_amount",
                         "multiline": False
-                    },
-                    "optional": False
+                    }
                 },
                 {
                     "type": "input",
@@ -958,8 +956,7 @@ async def sales(ack, body, say):
                         "type": "plain_text_input",
                         "action_id": "transaction_count",
                         "multiline": False
-                    },
-                    "optional": False
+                    }
                 },
                 {
                     "type": "input",
@@ -969,8 +966,7 @@ async def sales(ack, body, say):
                         "type": "plain_text_input",
                         "action_id": "labor_percent",
                         "multiline": False
-                    },
-                    "optional": False
+                    }
                 },
                 {
                     "type": "input",
@@ -980,8 +976,7 @@ async def sales(ack, body, say):
                         "type": "plain_text_input",
                         "action_id": "labor_hours",
                         "multiline": False
-                    },
-                    "optional": False
+                    }
                 }
             ]
         }
