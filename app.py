@@ -1002,12 +1002,13 @@ async def handle_sales_input(ack, body, client, view):
             sheet.update_cell(cell.row, 6, cater_amount)
             sheet.update_cell(cell.row, 9, labor_percent)
             sheet.update_cell(cell.row, 10, labor_hours)
-            copy_from_list = [7, 8, 11, 12]
-            for col in copy_from_list:
-                formula = sheet.cell(cell.row - 1, col, value_render_option="FORMULA").value
-                sheet.update_cell(cell.row, col, formula)
+            sheet.update_cell(cell.row, 7, f"=E{cell.row}/D{cell.row}")
+            sheet.update_cell(cell.row, 8, f"=E{cell.row}*I{cell.row}")
+            sheet.update_cell(cell.row, 11, f"=H{cell.row}/J{cell.row}")
+            sheet.update_cell(cell.row, 12, f"=E{cell.row}/J{cell.row}")
+    content = "**Sales posted**"
     await client.chat_postMessage(channel=creds.test_channel,
-                                  text=f"Sales date: {sales_date}\nSales amount: {sales_amount}")
+                                  text=content)
 
 
 @app.command("/find")
