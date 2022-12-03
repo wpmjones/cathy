@@ -910,7 +910,7 @@ async def sales(ack, body, say):
     yesterday = current_date - timedelta(days=-1)
     regex = r'[^\d.]'
     await client.views_open(
-        trigger_id=['trigger_id'],
+        trigger_id=body['trigger_id'],
         view={
             "type": "modal",
             "callback_id": "sales_view",
