@@ -348,7 +348,7 @@ async def sick(ack, body, client):
     """
     await ack()
     # Create options for select menu
-    sheet = gc.open_by_key("1FoTA25nVdkEdqC01eBwjtt2Y8sXglOzASho92huzDDM")
+    sheet = gc.open_by_key(creds.staff_id)
     worksheet = sheet.get_worksheet(0)
     values = worksheet.col_values(1)
     options = []
@@ -897,105 +897,109 @@ async def waste_goals(ack, say):
     await say(content)
 
 
-@app.command("/symbol")
-async def symbol(ack, body, say):
-    """Record today's sales (if needed) and report current state.  We are going for a Symbol run this year, so
-    this command helps us track where we are and what we need to hit the goals.  The Google Sheet used here has
-    all of last year's daily sales and we add this year's daily sales.... daily.
+@app.command("/sales")
+async def sales(ack, body, say):
+    """Record sales numbers for forecasting/revenue.  A modal will pop up asking for information.
 
     Example usage:
-    /symbol
-    /symbol $36,008.12
-
-
-    The first command (without a dollar amount) simply posts our current stats.  The second command records the day's
-    sales and then posts the stats.  If it's before noon, it assumes you are recording yesterday's sales. If it's
-    after noon but before 11pm, it will tell you to wait.  After 11pm, it assumes it is today's sales."""
+    /sales
+    """
     await ack()
     now = datetime.now()
     current_date = date.today()
-    if "text" in body.keys():  # user provided sales info
-        # Convert text input (string) to decimal
-        input_sales = Decimal(re.sub(r'[^\d.]', '', body['text']))
-        # Calculate the reporting date
-        if now.hour < 12:
-            current_date = date.today() - timedelta(days=1)
-        elif now.hour < 23:
-            return await say("Let's wait until after closing to update sales figures.")
-    else:  # user did not provide sales info
-        input_sales = 0.0
-        if now.hour < 23:
-            current_date = date.today() - timedelta(days=1)
-    # find the current date's information in the sheet
-    sh = gc.open_by_key(creds.symbol_id)
-    sheet = sh.worksheet("Daily Goals")
-    cell = sheet.find(current_date.strftime("%Y-%m-%d"))
-    if input_sales > 0:
-        sheet.update_cell(cell.row, cell.col + 2, input_sales)
-        # copy formula for Daily Gap
-        formula = f"=K{cell.row}-G{cell.row}"
-        sheet.update_cell(cell.row, cell.col + 7, formula)
-    # report on status of symbol run
-    # daily_sales = sheet.cell(cell.row, cell.col + 2).value
-    # daily_goal = sheet.cell(cell.row, cell.col + 6).value
-    # sheet = sh.worksheet("Monthly Goals")
-    # current_month = now.strftime("%B")
-    # cell = sheet.find(current_month)
-    # monthly_goal = sheet.cell(cell.row, cell.col + 2).value
-    # monthly_to_date = sheet.cell(cell.row, cell.col + 6).value
-    # cell = sheet.find("TOTAL")
-    # year_goal = sheet.cell(cell.row, cell.col + 2).value
-    # year_to_date = sheet.cell(cell.row, cell.col + 6).value
-    # cell = sheet.find("Current Gap:")
-    # gap = sheet.cell(cell.row, cell.col + 1).value
-    # gap_cover = sheet.cell(cell.row + 1, cell.col + 1).value
-    # blocks = [
-    #     {
-    #         "type": "section",
-    #         "text": {
-    #             "type": "mrkdwn",
-    #             "text": "*Symbol of Success Status*"
-    #         }
-    #     },
-    #     {
-    #         "type": "section",
-    #         "fields": [
-    #             {
-    #                 "type": "mrkdwn",
-    #                 "text": f"*Most Recent Goal:*\n{daily_goal}"
-    #             },
-    #             {
-    #                 "type": "mrkdwn",
-    #                 "text": f"*Most Recent Sales:*\n{daily_sales}"
-    #             },
-    #             {
-    #                 "type": "mrkdwn",
-    #                 "text": f"*Monthly Goal:*\n{monthly_goal}"
-    #             },
-    #             {
-    #                 "type": "mrkdwn",
-    #                 "text": f"*Month to Date:*\n{monthly_to_date}"
-    #             },
-    #             {
-    #                 "type": "mrkdwn",
-    #                 "text": f"*Year Goal:*\n{year_goal}"
-    #             },
-    #             {
-    #                 "type": "mrkdwn",
-    #                 "text": f"*Year to Date:*\n{year_to_date}"
-    #             },
-    #             {
-    #                 "type": "mrkdwn",
-    #                 "text": f"*Gap to Meet Symbol:*\n{gap}"
-    #             },
-    #             {
-    #                 "type": "mrkdwn",
-    #                 "text": f"*Amount (over 20%) Needed per Day:*\n{gap_cover}"
-    #             }
-    #         ]
-    #     }
-    # ]
-    await say("Symbol updated")
+    yesterday = current_date - timedelta(days=-1)
+    regex = r'[^\d.]'
+    await client.views_open(
+        trigger_id=['trigger_id'],
+        view={
+            "type": "modal",
+            "callback_id": "sales_view",
+            "title": {"type": "plain_text", "text": "Sales Input"},
+            "submit": {"type": "plain_text", "text": "Submit"},
+            "blocks": [
+                {
+                    "type": "input",
+                    "block_id": "input_a",
+                    "label": {"type": "plain_text", "text": "Sales Date:"},
+                    "element": {
+                        "type": "datepicker",
+                        "action_id": "sales_date",
+                        "initial_date": yesterday,
+                        "placeholder": {"type": "plain_text", "text": "Sales date"}
+                    }
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_b",
+                    "label": {"type": "plain_text", "text": "Sales"},
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "sales_amount",
+                        "multiline": False
+                    },
+                    "optional": False
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_c",
+                    "label": {"type": "plain_text", "text": "Catering"},
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "cater_amount",
+                        "multiline": False
+                    },
+                    "optional": False
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_d",
+                    "label": {"type": "plain_text", "text": "Transactions"},
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "transaction_count",
+                        "multiline": False
+                    },
+                    "optional": False
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_e",
+                    "label": {"type": "plain_text", "text": "Labor %"},
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "labor_percent",
+                        "multiline": False
+                    },
+                    "optional": False
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_f",
+                    "label": {"type": "plain_text", "text": "Labor Hours"},
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "labor_hours",
+                        "multiline": False
+                    },
+                    "optional": False
+                }
+            ]
+        }
+    )
+
+
+@app.view("sales_view")
+async def handle_sales_input(ack, body, client, view):
+    """Process input from sales form. This is the view handler for the previous function."""
+    logger.info("Processing sales input...")
+    sales_date = view['state']['values']['input_a']['sales_date']['selected_date']
+    sales_amount = view['state']['values']['input_b']['sales_amount']['value']
+    cater_amount = view['state']['values']['input_c']['cater_amount']['value']
+    transactions = view['state']['values']['input_d']['transaction_count']['value']
+    labor_percent = view['state']['values']['input_e']['labor_percent']['value']
+    labor_hours = view['state']['values']['input_f']['labor_hours']['value']
+    await client.chat_postMessage(channel=creds.test_channel,
+                                  text=f"Sales date: {sales_date}\nSales amount: {sales_amount}")
 
 
 @app.command("/find")
