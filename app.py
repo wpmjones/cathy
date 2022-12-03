@@ -905,9 +905,8 @@ async def sales(ack, body, say):
     /sales
     """
     await ack()
-    now = datetime.now()
     current_date = date.today()
-    yesterday = current_date - timedelta(days=-1)
+    yesterday = current_date - timedelta(days=1)
     regex = r'[^\d.]'
     await client.views_open(
         trigger_id=body['trigger_id'],
@@ -993,6 +992,20 @@ async def handle_sales_input(ack, body, client, view):
     transactions = view['state']['values']['input_d']['transaction_count']['value']
     labor_percent = view['state']['values']['input_e']['labor_percent']['value']
     labor_hours = view['state']['values']['input_f']['labor_hours']['value']
+    sh = gc.open_by_key(creds.sales_id)
+    sheet = sh.worksheet("Sales")
+    cell_list = sheet.findall(sales_date)
+    for cell in cell_list:
+        if cell.col == 1:
+            sheet.update_cell(cell.row, 4, transactions)
+            sheet.update_cell(cell.row, 5, sales_amount)
+            sheet.update_cell(cell.row, 6, cater_amount)
+            sheet.update_cell(cell.row, 9, labor_percent)
+            sheet.update_cell(cell.row, 10, labor_hours)
+            copy_from_list = [7, 8, 11, 12]
+            for col in copy_from_list:
+                formula = sheet.cell(cell.row - 1, col, value_render_option="FORMULA").value
+                sheet.update_cell(cell.row, col, formula)
     await client.chat_postMessage(channel=creds.test_channel,
                                   text=f"Sales date: {sales_date}\nSales amount: {sales_amount}")
 
