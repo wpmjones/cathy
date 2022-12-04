@@ -998,7 +998,7 @@ async def handle_sales_input(ack, body, client, view):
             sheet.update_cell(cell.row, 4, transactions)
             sheet.update_cell(cell.row, 5, sales_amount)
             sheet.update_cell(cell.row, 6, cater_amount)
-            sheet.update_cell(cell.row, 9, int(labor_percent)/100)
+            sheet.update_cell(cell.row, 9, float(labor_percent)/100)
             sheet.update_cell(cell.row, 10, labor_hours)
             sheet.update_cell(cell.row, 7, f"=(E{cell.row}-F{cell.row})/D{cell.row}")
             sheet.update_cell(cell.row, 8, f"=E{cell.row}*I{cell.row}")
