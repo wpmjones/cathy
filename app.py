@@ -898,16 +898,14 @@ async def waste_goals(ack, say):
 
 
 @app.command("/sales")
-async def sales(ack, body, say):
+async def sales(ack, body, client):
     """Record sales numbers for forecasting/revenue.  A modal will pop up asking for information.
 
     Example usage:
     /sales
     """
     await ack()
-    current_date = date.today()
-    yesterday = current_date - timedelta(days=1)
-    regex = r'[^\d.]'
+    yesterday = date.today() - timedelta(days=1)
     await client.views_open(
         trigger_id=body['trigger_id'],
         view={
