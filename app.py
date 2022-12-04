@@ -984,6 +984,7 @@ async def sales(ack, body, client):
 async def handle_sales_input(ack, body, client, view):
     """Process input from sales form. This is the view handler for the previous function."""
     logger.info("Processing sales input...")
+    await ack()
     sales_date = view['state']['values']['input_a']['sales_date']['selected_date']
     sales_amount = view['state']['values']['input_b']['sales_amount']['value']
     cater_amount = view['state']['values']['input_c']['cater_amount']['value']
@@ -1004,7 +1005,6 @@ async def handle_sales_input(ack, body, client, view):
             sheet.update_cell(cell.row, 8, f"=E{cell.row}*I{cell.row}")
             sheet.update_cell(cell.row, 11, f"=H{cell.row}/J{cell.row}")
             sheet.update_cell(cell.row, 12, f"=E{cell.row}/J{cell.row}")
-    await ack()
     content = "**Sales posted**"
     await client.chat_postMessage(channel=creds.test_channel,
                                   text=content)
