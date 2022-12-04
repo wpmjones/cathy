@@ -1004,6 +1004,7 @@ async def handle_sales_input(ack, body, client, view):
             sheet.update_cell(cell.row, 8, f"=E{cell.row}*I{cell.row}")
             sheet.update_cell(cell.row, 11, f"=H{cell.row}/J{cell.row}")
             sheet.update_cell(cell.row, 12, f"=E{cell.row}/J{cell.row}")
+    await ack()
     content = "**Sales posted**"
     await client.chat_postMessage(channel=creds.test_channel,
                                   text=content)
