@@ -996,15 +996,15 @@ async def handle_sales_input(ack, body, client, view):
     cell_list = sheet.findall(sales_date)
     for cell in cell_list:
         if cell.col == 1:
-            sheet.update_cell(cell.row, 4, transactions)
-            sheet.update_cell(cell.row, 5, sales_amount)
-            sheet.update_cell(cell.row, 6, cater_amount)
-            sheet.update_cell(cell.row, 9, float(labor_percent)/100)
-            sheet.update_cell(cell.row, 10, labor_hours)
-            sheet.update_cell(cell.row, 7, f"=(E{cell.row}-F{cell.row})/D{cell.row}")
-            sheet.update_cell(cell.row, 8, f"=E{cell.row}*I{cell.row}")
-            sheet.update_cell(cell.row, 11, f"=H{cell.row}/J{cell.row}")
-            sheet.update_cell(cell.row, 12, f"=E{cell.row}/J{cell.row}")
+            sheet.update_cell(cell.row, 5, transactions)
+            sheet.update_cell(cell.row, 6, sales_amount)
+            sheet.update_cell(cell.row, 7, cater_amount)
+            sheet.update_cell(cell.row, 10, float(labor_percent)/100)
+            sheet.update_cell(cell.row, 11, labor_hours)
+            sheet.update_cell(cell.row, 8, f"=(E{cell.row}-F{cell.row})/D{cell.row}")
+            sheet.update_cell(cell.row, 9, f"=E{cell.row}*I{cell.row}")
+            sheet.update_cell(cell.row, 12, f"=H{cell.row}/J{cell.row}")
+            sheet.update_cell(cell.row, 13, f"=E{cell.row}/J{cell.row}")
     content = "**Sales posted**"
     await client.chat_postMessage(channel=creds.test_channel,
                                   text=content)
