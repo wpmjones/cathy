@@ -499,6 +499,16 @@ async def waste_sheet(ack):
     await ack()
 
 
+@app.block_action("no_waste")
+async def no_waste(ack, body, client):
+    """This is not a command!  waste_remind.py is the script that posts a reminder in Slack at determined
+    times. That reminder has a button for No Waste.  That button initiates this modal."""
+    await ack()
+    await client.chat_postMessage(channel=creds.boh_channel,
+                                  text="No waste for the most recent waste period.  Well done!",
+                                  icon_emoji=":thumbsup:")
+
+
 @app.block_action("waste_tracking_form")
 async def waste(ack, body, client):
     """This is not a command!  waste_remind.py is the script that posts a reminder in Slack at determined
@@ -1094,12 +1104,12 @@ async def illness(ack, say):
 
 
 @app.command("/test")
-async def bot_test(ack, body, say):
+async def bot_test(ack, body, client):
     """Testing various features"""
     await ack()
-    user = client.users_info(user=body['user_id'])
-    logger.info(user['user'])
-    await say(user['user']['real_name'])
+    await client.chat_postMessage(channel=creds.boh_channel,
+                                  text="No waste for the most recent waste period.  Well done!",
+                                  icon_emoji=":thumbsup:")
 
 
 # Start your app

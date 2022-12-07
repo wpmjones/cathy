@@ -43,6 +43,15 @@ def main():
                     "action_id": "waste_sheet",
                     "url": waste_tracking_sheet,
                     "style": "primary"
+                },
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "No Waste"
+                    },
+                    "value": "button_no_waste",
+                    "action_id": "no_waste"
                 }
             ]
         }
