@@ -1112,7 +1112,7 @@ async def bot_test(ack, body, client):
     logger.info(response)
     logger.info(response['channel'])
     logger.info(response['message']['ts'])
-    await client.reactions_add(name="thumgsup",
+    await client.reactions_add(name="thumbsup",
                                channel=response['channel'],
                                timestamp=response['message']['ts'])
 
