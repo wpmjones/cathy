@@ -1110,9 +1110,11 @@ async def bot_test(ack, body, client):
     response = await client.chat_postMessage(channel=creds.test_channel,
                                              text="No waste for the most recent waste period.  Well done!")
     logger.info(response)
+    logger.info(response['channel'])
+    logger.info(response['message']['ts'])
     await client.reactions_add(name="thumgsup",
                                channel=response['channel'],
-                               timestamp=response['ts'])
+                               timestamp=response['message']['ts'])
 
 
 # Start your app
