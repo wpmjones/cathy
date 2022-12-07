@@ -51,7 +51,8 @@ def main():
                         "text": "No Waste"
                     },
                     "value": "button_no_waste",
-                    "action_id": "no_waste"
+                    "action_id": "no_waste",
+                    "style": "danger"
                 }
             ]
         }
