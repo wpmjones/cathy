@@ -504,9 +504,11 @@ async def no_waste(ack, body, client):
     """This is not a command!  waste_remind.py is the script that posts a reminder in Slack at determined
     times. That reminder has a button for No Waste.  That button initiates this modal."""
     await ack()
-    await client.chat_postMessage(channel=creds.boh_channel,
-                                  text="No waste for the most recent waste period.  Well done!",
-                                  icon_emoji=":thumbsup:")
+    response = await client.chat_postMessage(channel=creds.boh_channel,
+                                             text="No waste for the most recent waste period.  Well done!")
+    await client.reactions_add(name="thumbsup",
+                               channel=response['channel'],
+                               timestamp=response['message']['ts'])
 
 
 @app.block_action("waste_tracking_form")
