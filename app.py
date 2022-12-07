@@ -1107,7 +1107,7 @@ async def illness(ack, say):
 async def bot_test(ack, body, client):
     """Testing various features"""
     await ack()
-    await client.chat_postMessage(channel=creds.boh_channel,
+    await client.chat_postMessage(channel=creds.test_channel,
                                   text="No waste for the most recent waste period.  Well done!",
                                   icon_emoji=":thumbsup:")
 
