@@ -509,6 +509,13 @@ async def no_waste(ack, body, client):
     await client.reactions_add(name="thumbsup",
                                channel=response['channel'],
                                timestamp=response['message']['ts'])
+    logger.info("Attempting to delete waste_remind message.")
+    try:
+        await client.chat_delete(channel=creds.boh_channel,
+                                 ts=body['container']['message_ts'],
+                                 token=creds.user_token)
+    except SlackApiError as e:
+        logger.exception(f"Message deletion failed: {e}")
 
 
 @app.block_action("waste_tracking_form")
