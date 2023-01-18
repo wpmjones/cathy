@@ -857,7 +857,8 @@ async def handle_waste_view(ack, body, client, view):
         blocks.append(block4)
     block5 = {
         "type": "section",
-        "text": {"type": "mrkdwn", "text": "Please remember to replace stickers on all waste containers."}
+        "text": {"type": "mrkdwn", "text": ("Please remember:\n* Place stickers on all waste "
+                                            "containers\n* Temp each type of chicken\n* Swap all utensils")}
     }
     blocks.append(block5)
     # Send data to Google Sheet
