@@ -14,7 +14,8 @@ def main():
                 "type": "mrkdwn",
                 "text": ("It's time to record waste!\nPlease click the button below to launch the waste form. "
                          "All waste must be recorded in decimals.\n\n*Examples:*\n1 lb 12 oz = 1.75 lbs.\n"
-                         ".4 oz = .25 lbs.\n\nPlease remember to replace stickers on all waste containers.")
+                         ".4 oz = .25 lbs.\n\nPlease remember the following:\n* Place stickers on all waste "
+                         "containers\n* Temp each type of chicken\n* Swap all utensils")
             }
         },
         {

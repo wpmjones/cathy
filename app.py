@@ -1002,9 +1002,9 @@ async def sales(ack, body, client):
 @app.view("sales_view")
 async def handle_sales_input(ack, body, client, view):
     """Process input from sales form. This is the view handler for the previous function."""
+    await ack()
     logger.info("Processing sales input...")
     logger.info(body)
-    await ack()
     sales_date = view['state']['values']['input_a']['sales_date']['selected_date']
     sales_amount = view['state']['values']['input_b']['sales_amount']['value']
     cater_amount = view['state']['values']['input_c']['cater_amount']['value']
