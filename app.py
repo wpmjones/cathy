@@ -351,6 +351,13 @@ async def sick(ack, body, client):
     sheet = gc.open_by_key(creds.staff_id)
     worksheet = sheet.get_worksheet(0)
     values = worksheet.col_values(1)
+    if len(values) > 100:
+        await client.chat_postMessage(channel=creds.pj_user_id,
+                                      text="The CFA Staff list is full. Time for a purge.")
+        return await client.chat_postMessage(channel=creds.sick_channel,
+                                             text="The list of staff members has exceed 100 names, preventing "
+                                                  "/sick from working properly. Patrick has been notified and "
+                                                  "will correct the issue shortly.")
     options = []
     for name in values:
         options.append(
