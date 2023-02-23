@@ -97,6 +97,12 @@ async def clear_messages(ack, body, say, client):
         counter += 1
 
 
+@app.command("/quiz")
+async def quiz(ack, say):
+    await ack()
+    await say("FOH Trainer Quiz: https://forms.gle/AMHcTCfRwHXeUwV6A")
+
+
 @app.command("/tardy")
 async def tardy(ack, body, say, client):
     """Record when someone shows up late for their shift. We take away their meal credit when this happens
