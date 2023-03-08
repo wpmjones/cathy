@@ -100,7 +100,8 @@ async def clear_messages(ack, body, say, client):
 @app.command("/quiz")
 async def quiz(ack, say):
     await ack()
-    await say("FOH Trainer Quiz: https://forms.gle/AMHcTCfRwHXeUwV6A")
+    await say("FOH Trainer Quiz: https://forms.gle/AMHcTCfRwHXeUwV6A\n"
+              "BOH Trainer Quiz: https://forms.gle/aMpiXkFm8T6A6uPL9")
 
 
 @app.command("/tardy")
