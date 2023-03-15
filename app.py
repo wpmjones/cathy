@@ -74,9 +74,10 @@ async def cathy_help(ack, say):
 
 
 # Check for green check emoji for items that we have loaned to other locations
-@app.event("message.channels")
-async def new_reaction(message):
+@app.event("message")
+async def new_reaction(event, message):
     if message["channel_id"] == CHANNEL_TESTING:
+        logger.info(event)
         logger.info(message)
 
 
