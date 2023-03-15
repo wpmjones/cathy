@@ -77,8 +77,8 @@ async def cathy_help(ack, say):
 @app.message("loan")
 async def new_message(message):
     logger.info(message)
-    if message["channel"] == CHANNEL_TESTING:
-        logger.info("success")
+    # if message["channel"] == CHANNEL_TESTING:
+    #     logger.info("success")
 
 
 # Remove all Slack messages from the channel you are in. I only use this in my test channel.
