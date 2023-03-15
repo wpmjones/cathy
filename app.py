@@ -14,7 +14,6 @@ import re
 import requests
 import string
 
-# from slack_bolt import App
 from datetime import datetime, date, timedelta
 from decimal import Decimal
 from fuzzywuzzy import fuzz
@@ -34,6 +33,10 @@ client = WebClient(token=creds.bot_token)
 
 # Connect to Google Sheets
 gc = gspread.service_account(filename=creds.gspread)
+
+# Constants
+CHANNEL_TESTING = "G01QADSDVDW"
+CHANNEL_BORROW = "C01BUADKHLK"
 
 
 # look for whitespace in string
@@ -68,6 +71,13 @@ async def cathy_help(ack, say):
               "`/symbol` Report on the most recent day of sales for our Symbol run\n"
               "`/add` Opens a form to add new hire to Trello"
               "`/help` List these commands")
+
+
+# Check for green check emoji for items that we have loaned to other locations
+@app.event("message.channels")
+async def new_reaction(message):
+    if message["channel_id"] == CHANNEL_TESTING:
+        logger.info(message)
 
 
 # Remove all Slack messages from the channel you are in. I only use this in my test channel.
