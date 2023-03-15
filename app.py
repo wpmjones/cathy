@@ -75,10 +75,10 @@ async def cathy_help(ack, say):
 
 # Check for green check emoji for items that we have loaned to other locations
 @app.event("message")
-async def new_reaction(event, message):
+async def new_message(event):
     logger.info(event)
     if event.channel_id == CHANNEL_TESTING:
-        logger.info(message)
+        logger.info("success")
 
 
 # Remove all Slack messages from the channel you are in. I only use this in my test channel.
