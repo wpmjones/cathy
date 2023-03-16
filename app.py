@@ -73,6 +73,12 @@ async def cathy_help(ack, say):
               "`/help` List these commands")
 
 
+@app.event("app_home_opened")
+async def home_opened(client, event):
+    user_id = event["user"]
+    await client.chat_postMessage(text=f"{user_id} clicked home", channel=CHANNEL_TESTING)
+
+
 # Check for green check emoji for items that we have loaned to other locations
 @app.message(re.compile("(loaned|Loaned)"))
 async def say_hello(message, say):
