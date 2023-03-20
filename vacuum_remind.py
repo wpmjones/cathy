@@ -3,11 +3,10 @@ import requests
 
 
 def main():
-    """Reminder to submit QIC form for missing truck items"""
-    webhook_url = creds.webhook_boh
+    """Reminder to vacuum rugs"""
+    webhook_url = creds.webhook_foh
 
-    qic_url = "https://www.cfahome.com/go/appurl.go?app=QIC_FORM"
-    content = f"Have you submitted any QIC's yet?  If not, <{qic_url}|click here.>"
+    content = "Please remind staff to vacuum the rugs."
 
     blocks = [
         {
@@ -21,7 +20,7 @@ def main():
     ]
 
     payload = {
-        "text": "QIC Reminder",
+        "text": "Rug Reminder",
         "blocks": blocks
     }
 
