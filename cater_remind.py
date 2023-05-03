@@ -1,6 +1,7 @@
 import creds
 import gspread
 import requests
+import sys
 
 from datetime import datetime, timedelta
 
@@ -9,18 +10,17 @@ gc = gspread.service_account(filename=creds.gspread)
 spreadsheet = gc.open_by_key(creds.cater_id)
 sheet1 = spreadsheet.worksheet("Sheet1")
 
+now = datetime.today().strftime("%m/%d/%Y")
 maps_url_base = "https://www.google.com/maps/search/?api=1&query="
+webhook_url = creds.webhook_cater
 
 
-def main():
-    """Notification of catering orders for each day"""
-    webhook_url = creds.webhook_cater
-
-    now = datetime.today().strftime("%m/%d/%Y")
+def morning():
+    """Notification of catering orders for each day (details)"""
     list_of_orders = sheet1.findall(now, in_column=1)
-    if not list_of_orders:
-        return
     list_of_rows = [x.row for x in list_of_orders]
+    print(list_of_orders)
+    print(list_of_rows)
     blocks = []
     for row in list_of_rows:
         values_list = sheet1.row_values(row)
@@ -104,18 +104,37 @@ def main():
                 }
             )
     blocks = blocks[:-1]
-    print(blocks)
 
     payload = {
         "text": "Catering Orders for Today",
         "blocks": blocks
     }
 
-    r = requests.post(webhook_url, json=payload)
-    if r.status_code != 200:
-        raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
-                         f"The response is: {r.text}")
+    # r = requests.post(webhook_url, json=payload)
+    # if r.status_code != 200:
+    #     raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
+    #                      f"The response is: {r.text}")
+
+
+def evening():
+    """Notification of catering orders for upcoming days (summary)"""
+    list_of_orders = sheet1.get_values()
+    blocks = []
+
+
+    payload = {
+        "text": "Catering Orders for Today",
+        "blocks": blocks
+    }
+
+    # r = requests.post(webhook_url, json=payload)
+    # if r.status_code != 200:
+    #     raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
+    #                      f"The response is: {r.text}")
 
 
 if __name__ == "__main__":
-    main()
+    if sys.argv[1] == "morning":
+        morning()
+    else:
+        evening()
