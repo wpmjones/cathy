@@ -919,7 +919,8 @@ async def handle_waste_view(ack, body, client, view):
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": content}
+                    "text": content
+                }
             }
         ]
         await client.chat_postMessage(channel=creds.boh_channel,

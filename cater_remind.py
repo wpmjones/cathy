@@ -121,7 +121,7 @@ def evening():
     blocks = [
         {
             "type": "header",
-            "text": {"type": "plain_text", "text": "Delivery"}
+            "text": {"type": "plain_text", "text": "Upcoming Catering Orders"}
         }
     ]
     for row in list_of_rows:
@@ -147,10 +147,24 @@ def evening():
             }
         }
     )
+    blocks.append(
+        {
+            "type": "divider"
+        }
+    )
+    blocks.append(
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": f"For more information, please view the <Catering Scheduling|{creds.cater_link} sheet."
+            }
+        }
+    )
 
 
     payload = {
-        "text": "Catering Orders for Today",
+        "text": "Upcoming Catering Orders",
         "blocks": blocks
     }
 
