@@ -12,7 +12,7 @@ sheet1 = spreadsheet.worksheet("Sheet1")
 
 now = datetime.today().strftime("%m/%d/%Y")
 maps_url_base = "https://www.google.com/maps/search/?api=1&query="
-webhook_url = creds.test_channel  # creds.webhook_cater
+webhook_url = creds.webhook_test  # creds.webhook_cater
 
 
 def morning():
