@@ -14,12 +14,13 @@ now_str = datetime.today().strftime("%m/%d/%Y")
 now = datetime.today()
 then = datetime.today() + timedelta(days=7)
 maps_url_base = "https://www.google.com/maps/search/?api=1&query="
-webhook_url = creds.webhook_test  # creds.webhook_cater
+webhook_url = creds.webhook_cater
 
 
 def morning():
     """Notification of catering orders for each day (details)"""
-    list_of_rows = sheet1.findall(now_str, in_column=1)
+    list_of_orders = sheet1.findall(now_str, in_column=1)
+    list_of_rows = [x.row for x in list_of_orders]
     blocks = []
     for row in list_of_rows:
         if row[2] == "PICKUP":
