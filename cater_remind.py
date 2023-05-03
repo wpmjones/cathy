@@ -20,8 +20,7 @@ def morning():
     list_of_rows = sheet1.findall(now, in_column=1)
     blocks = []
     for row in list_of_rows:
-        values_list = sheet1.row_values(row)
-        if values_list[2] == "PICKUP":
+        if row[2] == "PICKUP":
             blocks.append(
                 {
                     "type": "header",
@@ -34,15 +33,15 @@ def morning():
                     "fields": [
                         {
                             "type": "mrkdwn",
-                            "text": f"*Time:*\n{values_list[1]}"
+                            "text": f"*Time:*\n{row[1]}"
                         },
                         {
                             "type": "mrkdwn",
-                            "text": f"*Customer:*\n{values_list[3]}"
+                            "text": f"*Customer:*\n{row[3]}"
                         },
                         {
                             "type": "mrkdwn",
-                            "text": f"*Phone:*\n{values_list[5]}"
+                            "text": f"*Phone:*\n{row[5]}"
                         }
                     ]
                 }
@@ -55,7 +54,7 @@ def morning():
         else:
             sheet2 = spreadsheet.worksheet("Sheet2")
             driver_list = sheet2.get_all_values()
-            driver_name = values_list[2].strip()
+            driver_name = row[2].strip()
             for driver in driver_list:
                 if driver[0] == driver_name:
                     driver_tag = f"<@{driver[1]}>"
@@ -74,7 +73,7 @@ def morning():
                     "fields": [
                         {
                             "type": "mrkdwn",
-                            "text": f"*Time:*\n{values_list[1]}"
+                            "text": f"*Time:*\n{row[1]}"
                         },
                         {
                             "type": "mrkdwn",
@@ -82,15 +81,15 @@ def morning():
                         },
                         {
                             "type": "mrkdwn",
-                            "text": f"*Customer:*\n{values_list[3]}"
+                            "text": f"*Customer:*\n{row[3]}"
                         },
                         {
                             "type": "mrkdwn",
-                            "text": f"*Phone:*\n{values_list[5]}"
+                            "text": f"*Phone:*\n{row[5]}"
                         },
                         {
                             "type": "mrkdwn",
-                            "text": f"*Address:*\n<{maps_url_base + values_list[4].replace(' ', '%20')}|{values_list[4]}>"
+                            "text": f"*Address:*\n<{maps_url_base + row[4].replace(' ', '%20')}|{row[4]}>"
                         }
                     ]
                 }
@@ -124,20 +123,17 @@ def evening():
         }
     ]
     for row in list_of_rows:
-        print(row)
-        values_list = sheet1.row_values(row)
-        print(values_list)
-        if values_list[2] != "PICKUP":
+        if row[2] != "PICKUP":
             sheet2 = spreadsheet.worksheet("Sheet2")
             driver_list = sheet2.get_all_values()
-            driver_name = values_list[2].strip()
+            driver_name = row[2].strip()
             for driver in driver_list:
                 if driver[0] == driver_name:
                     driver_tag = f"<@{driver[1]}>"
                     break
             else:
                 driver_tag = driver_name
-            list_of_deliveries.append(f"{values_list[0]} - {values_list[1]} - {driver_tag}")
+            list_of_deliveries.append(f"{row[0]} - {row[1]} - {driver_tag}")
     new_line = "\n"
     blocks.append(
         {
