@@ -20,7 +20,9 @@ webhook_url = creds.webhook_cater
 def morning():
     """Notification of catering orders for each day (details)"""
     list_of_orders = sheet1.findall(now_str, in_column=1)
+    print(list_of_orders)
     list_of_rows = [x.row for x in list_of_orders]
+    print(list_of_rows)
     blocks = []
     for row in list_of_rows:
         if row[2] == "PICKUP":
