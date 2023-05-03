@@ -17,8 +17,7 @@ webhook_url = creds.test_channel  # creds.webhook_cater
 
 def morning():
     """Notification of catering orders for each day (details)"""
-    list_of_orders = sheet1.findall(now, in_column=1)
-    list_of_rows = [x.row for x in list_of_orders]
+    list_of_rows = sheet1.findall(now, in_column=1)
     blocks = []
     for row in list_of_rows:
         values_list = sheet1.row_values(row)
@@ -116,9 +115,7 @@ def morning():
 
 def evening():
     """Notification of catering orders for upcoming days (summary)"""
-    list_of_orders = sheet1.get_values("A368:F380")
-    print(list_of_orders, type(list_of_orders))
-    list_of_rows = [x.row for x in list_of_orders]
+    list_of_rows = sheet1.get_values("A368:F380")
     list_of_deliveries = []
     blocks = [
         {
