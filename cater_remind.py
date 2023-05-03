@@ -20,12 +20,14 @@ webhook_url = creds.webhook_cater
 def morning():
     """Notification of catering orders for each day (details)"""
     list_of_orders = sheet1.findall(now_str, in_column=1)
-    print(list_of_orders)
+    if not list_of_orders:
+        # no catering orders for this day
+        return
     list_of_rows = [x.row for x in list_of_orders]
-    print(list_of_rows)
     blocks = []
     for row in list_of_rows:
-        if row[2] == "PICKUP":
+        values_list = sheet1.row_values(row)
+        if values_list[2] == "PICKUP":
             blocks.append(
                 {
                     "type": "header",
@@ -38,15 +40,15 @@ def morning():
                     "fields": [
                         {
                             "type": "mrkdwn",
-                            "text": f"*Time:*\n{row[1]}"
+                            "text": f"*Time:*\n{values_list[1]}"
                         },
                         {
                             "type": "mrkdwn",
-                            "text": f"*Customer:*\n{row[3]}"
+                            "text": f"*Customer:*\n{values_list[3]}"
                         },
                         {
                             "type": "mrkdwn",
-                            "text": f"*Phone:*\n{row[5]}"
+                            "text": f"*Phone:*\n{values_list[5]}"
                         }
                     ]
                 }
@@ -59,7 +61,7 @@ def morning():
         else:
             sheet2 = spreadsheet.worksheet("Sheet2")
             driver_list = sheet2.get_all_values()
-            driver_name = row[2].strip()
+            driver_name = values_list[2].strip()
             for driver in driver_list:
                 if driver[0] == driver_name:
                     driver_tag = f"<@{driver[1]}>"
@@ -78,7 +80,7 @@ def morning():
                     "fields": [
                         {
                             "type": "mrkdwn",
-                            "text": f"*Time:*\n{row[1]}"
+                            "text": f"*Time:*\n{values_list[1]}"
                         },
                         {
                             "type": "mrkdwn",
@@ -86,15 +88,15 @@ def morning():
                         },
                         {
                             "type": "mrkdwn",
-                            "text": f"*Customer:*\n{row[3]}"
+                            "text": f"*Customer:*\n{values_list[3]}"
                         },
                         {
                             "type": "mrkdwn",
-                            "text": f"*Phone:*\n{row[5]}"
+                            "text": f"*Phone:*\n{values_list[5]}"
                         },
                         {
                             "type": "mrkdwn",
-                            "text": f"*Address:*\n<{maps_url_base + row[4].replace(' ', '%20')}|{row[4]}>"
+                            "text": f"*Address:*\n<{maps_url_base + values_list[4].replace(' ', '%20')}|{values_list[4]}>"
                         }
                     ]
                 }
