@@ -117,6 +117,7 @@ def morning():
 def evening():
     """Notification of catering orders for upcoming days (summary)"""
     list_of_orders = sheet1.get_values("A368:F380")
+    print(list_of_orders, type(list_of_orders))
     list_of_rows = [x.row for x in list_of_orders]
     list_of_deliveries = []
     blocks = [
