@@ -157,7 +157,7 @@ def evening():
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": f"For more information, please view the <Catering Scheduling|{creds.cater_link} sheet."
+                "text": f"For more information, please view the <Catering Scheduling|{creds.cater_link}> sheet."
             }
         }
     )
