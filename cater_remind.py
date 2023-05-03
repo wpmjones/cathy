@@ -10,14 +10,16 @@ gc = gspread.service_account(filename=creds.gspread)
 spreadsheet = gc.open_by_key(creds.cater_id)
 sheet1 = spreadsheet.worksheet("Sheet1")
 
-now = datetime.today().strftime("%m/%d/%Y")
+now_str = datetime.today().strftime("%m/%d/%Y")
+now = datetime.today()
+then = datetime.today() + timedelta(days=7)
 maps_url_base = "https://www.google.com/maps/search/?api=1&query="
 webhook_url = creds.webhook_test  # creds.webhook_cater
 
 
 def morning():
     """Notification of catering orders for each day (details)"""
-    list_of_rows = sheet1.findall(now, in_column=1)
+    list_of_rows = sheet1.findall(now_str, in_column=1)
     blocks = []
     for row in list_of_rows:
         if row[2] == "PICKUP":
@@ -114,7 +116,7 @@ def morning():
 
 def evening():
     """Notification of catering orders for upcoming days (summary)"""
-    list_of_rows = sheet1.get_values("A368:F380")
+    list_of_rows = sheet1.get_values()
     list_of_deliveries = []
     blocks = [
         {
@@ -123,7 +125,7 @@ def evening():
         }
     ]
     for row in list_of_rows:
-        if row[2] != "PICKUP":
+        if now < datetime.strptime(row[0], "%m/%d/%Y") < then and row[2] != "PICKUP":
             sheet2 = spreadsheet.worksheet("Sheet2")
             driver_list = sheet2.get_all_values()
             driver_name = row[2].strip()
@@ -133,7 +135,8 @@ def evening():
                     break
             else:
                 driver_tag = driver_name
-            list_of_deliveries.append(f"{row[0]} - {row[1]} - {driver_tag}")
+            if driver_tag:
+                list_of_deliveries.append(f"{row[0]} - {row[1]} - {driver_tag}")
     new_line = "\n"
     blocks.append(
         {
