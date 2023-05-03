@@ -125,6 +125,8 @@ def evening():
         }
     ]
     for row in list_of_rows:
+        print(row[0], type(row[0]))
+        print(datetime.strptime(row[0], "%m/%d/%Y"))
         if now < datetime.strptime(row[0], "%m/%d/%Y") < then and row[2] != "PICKUP":
             sheet2 = spreadsheet.worksheet("Sheet2")
             driver_list = sheet2.get_all_values()
