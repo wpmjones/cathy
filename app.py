@@ -294,7 +294,7 @@ async def handle_add_injury_view(ack, body, client, view):
     dob = view['state']['values']['input_e']['date_of_birth']['value']
     claim = view['state']['values']['input_f']['claim_num']['value']
     description = view['state']['values']['input_g']['description']['value']
-    channel_id = view['blocks'][8]['elements'][0]['text']
+    channel_id = view['blocks'][9]['elements'][0]['text']
     # Data retrieved, acknowldge modal
     await ack()
     # Format for posting
