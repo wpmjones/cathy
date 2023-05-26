@@ -313,7 +313,7 @@ async def handle_add_injury_view(ack, body, client, view):
     await client.chat_postEphemeral(channel=channel_id,
                                     user=body['user']['id'],
                                     text="Sedgwick report posted for restaurant leadership.")
-    await client.chat_postMessage(channel=CHANNEL_TESTING,
+    await client.chat_postMessage(channel=CHANNEL_SEDGWICK,
                                   blocks=blocks,
                                   text="New Sedgwick claim posted.")
 
