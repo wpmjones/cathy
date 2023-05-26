@@ -266,6 +266,16 @@ async def add_injury(ack, body, client):
                     },
                     "optional": False
                 },
+                {
+                    "type": "context",
+                    "block_id": "context_a",
+                    "elements": [
+                        {
+                            "type": "plain_text",
+                            "text": body['channel_id']
+                        }
+                    ]
+                }
             ]
         }
     )
@@ -284,6 +294,9 @@ async def handle_add_injury_view(ack, body, client, view):
     dob = view['state']['values']['input_e']['date_of_birth']['value']
     claim = view['state']['values']['input_f']['claim_num']['value']
     description = view['state']['values']['input_g']['description']['value']
+    channel_id = view['blocks'][8]['elements'][0]['text']
+    # Data retrieved, acknowldge modal
+    await ack()
     # Format for posting
     blocks = [
         {
@@ -297,7 +310,9 @@ async def handle_add_injury_view(ack, body, client, view):
                                                f"Description of incident: {description}"}
         }
     ]
-    logger.info(blocks[0])
+    await client.chat_postMessage(channel=CHANNEL_TESTING,
+                                  blocks=blocks,
+                                  text="New Sedgwick claim posted.")
 
 
 @app.command("/add")
