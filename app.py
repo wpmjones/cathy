@@ -301,15 +301,18 @@ async def handle_add_injury_view(ack, body, client, view):
     blocks = [
         {
             "type": "section",
-            "text": {"type": "mrkdwn", "text": f"**New Sedgwick Claim:**\n\n"
-                                               f"Date: {incident_date}\nTime:{incident_time}\n\n"
-                                               f"Posted by: {director}\n\n"
-                                               f"Sedgwick Claim Number: {claim}\n\n"
-                                               f"Injured party: {employee} ({dob})\n\n"
-                                               f"Location of incident: {location}\n"
-                                               f"Description of incident: {description}"}
+            "text": {"type": "mrkdwn", "text": f"*New Sedgwick Claim:*\n\n"
+                                               f"*Date:* {incident_date}\n*Time:* {incident_time}\n\n"
+                                               f"*Posted by:* {director}\n\n"
+                                               f"*Sedgwick Claim Number:* {claim}\n\n"
+                                               f"*Injured party:* {employee} ({dob})\n\n"
+                                               f"*Location of incident:* {location}\n"
+                                               f"*Description of incident:* {description}"}
         }
     ]
+    await client.chat_postEphemeral(channel=channel_id,
+                                    user=body['user']['id'],
+                                    text="Sedgwick report posted for restaurant leadership.")
     await client.chat_postMessage(channel=CHANNEL_TESTING,
                                   blocks=blocks,
                                   text="New Sedgwick claim posted.")
