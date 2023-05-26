@@ -37,6 +37,7 @@ gc = gspread.service_account(filename=creds.gspread)
 # Constants
 CHANNEL_TESTING = "G01QADSDVDW"
 CHANNEL_BORROW = "C01BUADKHLK"
+CHANNEL_SEDGWICK = "C059TU4SYR2"
 
 
 # look for whitespace in string
@@ -71,15 +72,6 @@ async def cathy_help(ack, say):
               "`/symbol` Report on the most recent day of sales for our Symbol run\n"
               "`/add` Opens a form to add new hire to Trello"
               "`/help` List these commands")
-
-
-# Check for green check emoji for items that we have loaned to other locations
-@app.message(re.compile("(loaned|Loaned)"))
-async def say_hello(message, event, say):
-    logger.info(message)
-    logger.info(event)
-    user = message['user']
-    await say(f"Hi there, <@{user}>!")
 
 
 # Remove all Slack messages from the channel you are in. I only use this in my test channel.
@@ -161,6 +153,151 @@ async def tardy(ack, body, say, client):
                                       text=f"There was an error while storing the message to the Google Sheet.\n{e}")
         await client.chat_postMessage(channel=creds.pj_user_id,
                                       text=f"There was an error while storing the message to the Google Sheet.\n{e}")
+
+
+@app.command("/injury")
+async def add_injury(ack, body, client):
+    """This ommand adds a report to the Sedgwick channel"""
+    await ack()
+    await client.views_open(
+        trigger_id=body['trigger_id'],
+        view={
+            "type": "modal",
+            "callback_id": "add_injury_view",
+            "title": {"type": "plain_text", "text": "Add Sedgwick Claim"},
+            "submit": {"type": "plain_text", "text": "Submit"},
+            "blocks": [
+                {
+                    "type": "input",
+                    "block_id": "input_a",
+                    "label": {"type": "plain_text", "text": "Select date of incident:"},
+                    "element": {
+                        "type": "datepicker",
+                        "action_id": "incident_date",
+                        "initial_date": str(date.today()),
+                        "placeholder": {
+                            "type": "plain_text",
+                            "text": "Date of incident",
+                            "emoji": True
+                        }
+                    }
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_aa",
+                    "label": {"type": "plain_text", "text": "Select time of incident:"},
+                    "element": {
+                        "type": "timepicker",
+                        "action_id": "incident_time",
+                        "initial_time": "12:00",
+                        "placeholder": {
+                            "type": "plain_text",
+                            "text": "Time of incident",
+                            "emoji": True
+                        }
+                    }
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_b",
+                    "label": {"type": "plain_text", "text": "Location:"},
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "location",
+                        "multiline": False
+                    },
+                    "optional": False
+                },
+                {
+                    "type": "divider"
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_c",
+                    "label": {"type": "plain_text", "text": "Director completing the report:"},
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "director",
+                        "multiline": False
+                    },
+                    "optional": False
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_d",
+                    "label": {"type": "plain_text", "text": "Employee (full name):"},
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "employee",
+                        "multiline": False
+                    },
+                    "optional": False
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_e",
+                    "label": {"type": "plain_text", "text": "Employee Date of Birth:"},
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "date_of_birth",
+                        "multiline": False
+                    },
+                    "optional": False
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_f",
+                    "label": {"type": "plain_text", "text": "Sedgwick Claim Number:"},
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "claim_num",
+                        "multiline": False
+                    },
+                    "optional": False
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_g",
+                    "label": {"type": "plain_text", "text": "Description of Incident:"},
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "description",
+                        "multiline": True
+                    },
+                    "optional": False
+                },
+            ]
+        }
+    )
+
+
+@app.view("add_injury_view")
+async def handle_add_injury_view(ack, body, client, view):
+    """Process info from the add injury form."""
+    logger.info("Processing injury input...")
+    logger.info(body)
+    incident_date = view['state']['values']['input_a']['incident_date']['selected_date']
+    incident_time = view['state']['values']['input_aa']['incident_time']['selected_time']
+    location = view['state']['values']['input_b']['location']['value']
+    director = view['state']['values']['input_c']['director']['value']
+    employee = view['state']['values']['input_d']['employee']['value']
+    dob = view['state']['values']['input_e']['date_of_birth']['value']
+    claim = view['state']['values']['input_f']['claim_num']['value']
+    description = view['state']['values']['input_g']['description']['value']
+    # Format for posting
+    blocks = [
+        {
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": f"**New Sedgwick Claim:**\n\n"
+                                               f"Date: {incident_date}\nTime:{incident_time}\n\n"
+                                               f"Posted by: {director}\n\n"
+                                               f"Sedgwick Claim Number: {claim}\n\n"
+                                               f"Injured party: {employee} ({dob})\n\n"
+                                               f"Location of incident: {location}\n"
+                                               f"Description of incident: {description}"}
+        }
+    ]
+    logger.info(blocks[0])
 
 
 @app.command("/add")
@@ -1047,7 +1184,7 @@ async def handle_sales_input(ack, body, client, view):
             sheet.update_cell(cell.row, 5, transactions)
             sheet.update_cell(cell.row, 6, sales_amount)
             sheet.update_cell(cell.row, 7, cater_amount)
-            sheet.update_cell(cell.row, 10, float(labor_percent)/100)
+            sheet.update_cell(cell.row, 10, float(labor_percent) / 100)
             sheet.update_cell(cell.row, 11, labor_hours)
             sheet.update_cell(cell.row, 8, f"=(F{cell.row}-G{cell.row})/E{cell.row}")
             sheet.update_cell(cell.row, 9, f"=F{cell.row}*J{cell.row}")
