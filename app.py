@@ -258,7 +258,8 @@ async def add_injury(ack, body, client):
                 {
                     "type": "input",
                     "block_id": "input_g",
-                    "label": {"type": "plain_text", "text": "Description of Incident:"},
+                    "label": {"type": "plain_text", "text": ("Description of Incident (please note if any "
+                                                             "physical evidence or video was captured):")},
                     "element": {
                         "type": "plain_text_input",
                         "action_id": "description",
