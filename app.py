@@ -847,6 +847,19 @@ async def waste(ack, body, client):
         blocks.append(
             {
                 "type": "input",
+                "block_id": "input_k",
+                "label": {"type": "plain_text", "text": "Spicy Breakfast Filets"},
+                "element": {
+                    "type": "plain_text_input",
+                    "action_id": "spicy_breakfast",
+                    "initial_value": "0"
+                },
+                "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
+            }
+        )
+        blocks.append(
+            {
+                "type": "input",
                 "block_id": "input_i",
                 "label": {"type": "plain_text", "text": "Grilled Breakfast"},
                 "element": {
@@ -940,6 +953,10 @@ async def handle_waste_view(ack, body, client, view):
             g_breakfast = float(view['state']['values']['input_i']['grilled3']['value'])
         except ValueError:
             errors['input_i'] = text_error
+        try:
+            s_breakfast = float(view['state']['values']['input_k']['spicy_breakfast']['value'])
+        except ValueError:
+            errors['input_k'] = text_error
     if len(errors) > 0:
         return await ack(response_action="errors", errors=errors)
     await ack()
@@ -1013,8 +1030,9 @@ async def handle_waste_view(ack, body, client, view):
     if datetime.now().hour < 13:
         to_post.append(breakfast)
         to_post.append(g_breakfast)
-        if sum([breakfast, g_breakfast]) > 0:
-            total_weight += sum([breakfast, g_breakfast])
+        to_post.append(s_breakfast)
+        if sum([breakfast, g_breakfast, s_breakfast]) > 0:
+            total_weight += sum([breakfast, g_breakfast, s_breakfast])
             if breakfast:
                 if breakfast >= goals['Breakfast Filets']:
                     block4_text += f"_Breakfast Filets: {breakfast} lbs._\n"
@@ -1025,6 +1043,11 @@ async def handle_waste_view(ack, body, client, view):
                     block4_text += f"_Grilled Breakfast: {g_breakfast} lbs._\n"
                 else:
                     block4_text += f"Grilled Breakfast: {g_breakfast} lbs.\n"
+            if s_breakfast:
+                if s_breakfast >= goals['Spicy Breakfast']:
+                    block4_text += f"_Spicy Breakfast: {s_breakfast} lbs._\n"
+                else:
+                    block4_text += f"Spicy Breakfast: {s_breakfast} lbs.\n"
     block4 = {
         "type": "section",
         "text": {"type": "mrkdwn", "text": block4_text}
