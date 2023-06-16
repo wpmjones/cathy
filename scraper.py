@@ -67,6 +67,7 @@ def check_cem():
     # find percentages in body
     if body:
         if "**" not in body:
+            logger.info(body)
             for j in range(7):
                 start = find_nth(body, "%", j + 1) - 3
                 end = start + 4
@@ -74,6 +75,7 @@ def check_cem():
                 # catch the colon in case where response is 0% (e.g. ": 0%")
                 if ":" in score_dict[categories[j]]:
                     score_dict[categories[j]] = score_dict[categories[j]].replace(": ", "")
+            logger.info(score_dict)
             # find number of respondents
             start = body.find("n:") + 3
             end = start + 3
@@ -124,7 +126,7 @@ def check_cem():
                 }
             ]
         }
-        r = requests.post(creds.webhook_announce, json=payload)
+        r = requests.post(creds.test_channel, json=payload)
         if r.status_code != 200:
             raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
                              f"The response is: {r.text}")
@@ -267,6 +269,3 @@ if __name__ == "__main__":
     check_cem()
     # check_oos()
     # check_allocation()
-    # if datetime.date.weekday(today) != 6:
-    #     time.sleep(60*60*3)  # sleep 3 hours
-    #     post_symbol_goal()
