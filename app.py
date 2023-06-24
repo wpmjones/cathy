@@ -296,7 +296,8 @@ async def handle_add_injury_view(ack, body, client, view):
     claim = view['state']['values']['input_f']['claim_num']['value']
     description = view['state']['values']['input_g']['description']['value']
     channel_id = view['blocks'][9]['elements'][0]['text']
-    # Data retrieved, acknowldge modal
+    logger.info(channel_id)
+    # Data retrieved, acknowledge modal
     await ack()
     # Format for posting
     blocks = [
@@ -311,6 +312,7 @@ async def handle_add_injury_view(ack, body, client, view):
                                                f"*Description of incident:* {description}"}
         }
     ]
+    logger.info(f"Getting ready to post messages.\n{blocks}")
     await client.chat_postEphemeral(channel=channel_id,
                                     user=body['user']['id'],
                                     text="Sedgwick report posted for restaurant leadership.")
