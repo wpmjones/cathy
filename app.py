@@ -286,7 +286,6 @@ async def add_injury(ack, body, client):
 async def handle_add_injury_view(ack, body, client, view):
     """Process info from the add injury form."""
     logger.info("Processing injury input...")
-    logger.info(body)
     incident_date = view['state']['values']['input_a']['incident_date']['selected_date']
     incident_time = view['state']['values']['input_aa']['incident_time']['selected_time']
     location = view['state']['values']['input_b']['location']['value']
@@ -296,7 +295,6 @@ async def handle_add_injury_view(ack, body, client, view):
     claim = view['state']['values']['input_f']['claim_num']['value']
     description = view['state']['values']['input_g']['description']['value']
     channel_id = view['blocks'][9]['elements'][0]['text']
-    logger.info(channel_id)
     # Data retrieved, acknowledge modal
     await ack()
     # Format for posting
@@ -308,17 +306,13 @@ async def handle_add_injury_view(ack, body, client, view):
                                                f"*Posted by:* {director}\n\n"
                                                f"*Sedgwick Claim Number:* {claim}\n\n"
                                                f"*Injured party:* {employee} ({dob})\n\n"
-                                               f"*Location of incident:* {location}\n"
+                                               f"*Location of incident:* {location}\n\n"
                                                f"*Description of incident:* {description}"}
         }
     ]
-    logger.info(f"Getting ready to post messages.\n{blocks}")
-    try:
-        await client.chat_postEphemeral(channel=channel_id,
-                                        user=body['user']['id'],
-                                        text="Sedgwick report posted for restaurant leadership.")
-    except:
-        logger.exception("Ephemeral Failed")
+    await client.chat_postEphemeral(channel=channel_id,
+                                    user=body['user']['id'],
+                                    text="Sedgwick report posted for restaurant leadership.")
     await client.chat_postMessage(channel=CHANNEL_SEDGWICK,
                                   blocks=blocks,
                                   text="New Sedgwick claim posted.")
