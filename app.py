@@ -104,8 +104,8 @@ async def clear_messages(ack, body, say, client):
 @app.command("/quiz")
 async def quiz(ack, say):
     await ack()
-    await say("FOH Trainer Quiz: https://forms.gle/AMHcTCfRwHXeUwV6A\n"
-              "BOH Trainer Quiz: https://forms.gle/aMpiXkFm8T6A6uPL9")
+    await say("Trainer quizzes are now found in Pathway 2.0.  Dalia, Patrick, or Phil "
+              "can assign and monitor the quiz.")
 
 
 @app.command("/tardy")
