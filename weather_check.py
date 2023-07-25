@@ -1,7 +1,7 @@
 import creds
 import requests
 
-from loguru import logger
+# from loguru import logger
 
 lat = "36.06302829757474"
 lon = "-115.17006319892765"
@@ -10,6 +10,8 @@ weather_url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={l
 
 def main():
     """Notify team when temps are over 100 degrees"""
+    with open("temp.txt", "r") as f:
+        last_temp = int(f.readline())
     webhook_url = creds.webhook_foh
     response = requests.get(weather_url)
     data = response.json()
@@ -29,6 +31,26 @@ def main():
                 }
             ]
         }
+        r = requests.post(webhook_url, json=payload)
+        if r.status_code != 200:
+            raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
+                             f"The response is: {r.text}")
+    if last_temp > 90 > current_temp:
+        content = f"The current outside temperature is below 90 degrees. Please turn off teh misters."
+        payload = {
+            "text": "Mister Alert",
+            "blocks": [
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": content
+                    }
+                }
+            ]
+        }
+        with open("temp.txt", "w") as f:
+            f.write(str(current_temp))
         r = requests.post(webhook_url, json=payload)
         if r.status_code != 200:
             raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
