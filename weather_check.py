@@ -36,7 +36,7 @@ def main():
             raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
                              f"The response is: {r.text}")
     if last_temp > 90 > current_temp:
-        content = f"The current outside temperature is below 90 degrees. Please turn off teh misters."
+        content = f"The current outside temperature is below 90 degrees. Please turn off the misters."
         payload = {
             "text": "Mister Alert",
             "blocks": [
