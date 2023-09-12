@@ -386,7 +386,7 @@ async def add_trello(ack, body, client):
                     "element": {
                         "type": "datepicker",
                         "action_id": "start_date",
-                        "initial_date": str(next_monday()),
+                        "initial_date": str(date.today()),
                         "placeholder": {
                             "type": "plain_text",
                             "text": "Start date"
@@ -506,6 +506,171 @@ async def handle_add_view(ack, body, client, view):
     await client.chat_postMessage(channel=dm_id,
                                   text=f"{name} was added to Pay Scale Tracking as a Team Member. If they are "
                                        f"anything other than a Team Member, please manually update their title.")
+
+
+@app.command("/discipline")
+async def discipline(ack, body, client):
+    """This command opens the for for tracking discipline issues.  This will post to Slack and maintain a list
+    in a Google Sheet for historical purposes."""
+    await ack()
+    # Create options for select menu
+    sheet = gc.open_by_key(creds.staff_id)
+    worksheet = sheet.get_worksheet(0)
+    values = worksheet.col_values(1)
+    if len(values) > 100:
+        await client.chat_postMessage(channel=creds.pj_user_id,
+                                      text="The CFA Staff list is full. Time for a purge.")
+        return await client.chat_postMessage(channel=creds.sick_channel,
+                                             text="The list of staff members has exceed 100 names, preventing "
+                                                  "/sick from working properly. Patrick has been notified and "
+                                                  "will correct the issue shortly.")
+    options = []
+    for name in values:
+        options.append(
+            {
+                "text": {
+                    "type": "plain_text",
+                    "text": name
+                },
+                "value": name
+            }
+        )
+    # Create list for discipline types
+    discipline_types = []
+    values = ["Verbal", "Written", "Final", "Suspension", "Termination"]
+    for name in values:
+        discipline_types.append(
+            {
+                "text": {
+                    "type": "plain_text",
+                    "text": name
+                },
+                "value": name
+            }
+        )
+    # Open the view
+    await client.views_open(
+        trigger_id=body['trigget_id'],
+        view={
+            "type": "model",
+            "callback_id": "discipline_view",
+            "title": {"type": "plain_text", "text": "Discipline Tracking"},
+            "submit": {"type": "plain_text", "text": "Submit"},
+            "blocks": [
+                {
+                    "type": "input",
+                    "block_id": "input_name",
+                    "label": {"type": "plain_text", "text": "Select a name"},
+                    "element": {
+                        "type": "static_select",
+                        "action_id": "tm_name",
+                        "placeholder": {"type": "plain_text", "text": "Select a name"},
+                        "options": options
+                    }
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_type",
+                    "label": {"type": "plain_text", "text": "Type of Discipline"},
+                    "element": {
+                        "type": "static_select",
+                        "action_id": "discpline_type",
+                        "placeholder": {"type": "plain_text", "text": "Select type of discipline"},
+                        "options": discipline_types
+                    }
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_reason",
+                    "label": {"type": "plain_text", "text": "Reason for Discpline"},
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "reason",
+                        "multiline": True
+                    },
+                    "optional": False
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_leader",
+                    "label": {"type": "plain_text", "text": "Your Name (Leader providing discipline)"},
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "leader",
+                        "multiline": False
+                    },
+                    "optional": False
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_other",
+                    "label": {"type": "plain_text", "text": "Other notes"},
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "other",
+                        "multiline": False
+                    },
+                    "optional": True
+                }
+
+            ]
+        }
+    )
+
+
+@app.view("discpline_view")
+async def handle_discipline_view(ack, body, client, view):
+    """Process input from discpline form. This is the view handler for the previous function. It takes the information
+    you provide in the form and processes it."""
+    logger.info("Processing discipline view...")
+    name = view['state']['values']['input_name']['tm_name']['selected_option']['value']
+    discipline_type = view['state']['values']['input_type']['discipline_type']['selected_option']['value']
+    reason = view['state']['values']['input_reason']['reason']['value']
+    leader = view['state']['values']['input_leader']['leader']['value']
+    other = view['state']['values']['input_other']['other']['value']
+    block_text = {f"*Name*: {name}\n"
+                  f"*Discipline Type*: {discipline_type}\n"
+                  f"*Leader*: {leader}\n"
+                  f"*Reason*: {reason}"}
+    if other:
+        block_text += f"\n*Other notes*: {other}"
+    await ack()
+    # Send data to Google Sheet
+    try:
+        sh = gc.open_by_key(creds.sick_log_id)
+        sheet = sh.get_worksheet(1)
+        now = str(datetime.date(datetime.today()))
+        to_post = [now, name, discipline_type, reason, leader, other]
+        sheet.append_row(to_post)
+    except gspread.exceptions.GSpreadException as e:
+        return await client.chat_postMessage(channel=body['user']['id'],
+                                             text=e)
+    except Exception as e:
+        await client.chat_postMessage(channel=body['user']['id'],
+                                      text=f"There was an error while storing the message to the Google Sheet.\n{e}")
+        await client.chat_postMessage(channel=creds.pj_user_id,
+                                      text=f"There was an error while storing the message to the Google Sheet.\n{e}")
+        return
+    user = await client.users_info(user=body['user']['id'])
+    user_name = user['user']['real_name']
+    blocks = [
+        {
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": block_text}
+        },
+        {
+            "type": "context",
+            "elements": [
+                {
+                    "type": "plain_text",
+                    "text": f"Submitted by: {user_name}"
+                }
+            ]
+        }
+    ]
+    await client.chat_postMessage(channel=creds.sick_channel,
+                                  blocks=blocks,
+                                  text=f"New discpline for {name}.  Review the sheet <{creds.sick_log_link}|here>.")
 
 
 @app.command("/sick")
