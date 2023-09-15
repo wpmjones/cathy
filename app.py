@@ -561,7 +561,6 @@ async def discipline(ack, body, client):
             }
         )
     # Open the view
-    logger.info(discipline_types)
     await client.views_open(
         trigger_id=body['trigger_id'],
         view={
@@ -606,7 +605,7 @@ async def discipline(ack, body, client):
                 {
                     "type": "input",
                     "block_id": "input_reason",
-                    "label": {"type": "plain_text", "text": "Reason for Discpline"},
+                    "label": {"type": "plain_text", "text": "Reason for Discipline"},
                     "element": {
                         "type": "plain_text_input",
                         "action_id": "reason",
@@ -641,7 +640,7 @@ async def discipline(ack, body, client):
     )
 
 
-@app.view("discpline_view")
+@app.view("discipline_view")
 async def handle_discipline_view(ack, body, client, view):
     """Process input from discpline form. This is the view handler for the previous function. It takes the information
     you provide in the form and processes it."""
