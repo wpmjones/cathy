@@ -516,17 +516,17 @@ async def discipline(ack, body, client):
     # Create options for select menu
     sheet = gc.open_by_key(creds.staff_id)
     worksheet = sheet.get_worksheet(0)
-    discipline_values = worksheet.col_values(1)
-    if len(discipline_values) > 100:
+    tm_values = worksheet.col_values(1)
+    if len(tm_values) > 100:
         await client.chat_postMessage(channel=creds.pj_user_id,
                                       text="The CFA Staff list is full. Time for a purge.")
         return await client.chat_postMessage(channel=creds.sick_channel,
                                              text="The list of staff members has exceed 100 names, preventing "
                                                   "/sick from working properly. Patrick has been notified and "
                                                   "will correct the issue shortly.")
-    options = []
-    for name in discipline_values:
-        options.append(
+    tm_names = []
+    for name in tm_values:
+        tm_names.append(
             {
                 "text": {
                     "type": "plain_text",
@@ -577,7 +577,7 @@ async def discipline(ack, body, client):
                         "type": "static_select",
                         "action_id": "tm_name",
                         "placeholder": {"type": "plain_text", "text": "Select a name"},
-                        "options": options
+                        "options": tm_names
                     }
                 },
                 {
