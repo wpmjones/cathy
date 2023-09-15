@@ -561,6 +561,7 @@ async def discipline(ack, body, client):
             }
         )
     # Open the view
+    logger.info(discipline_types)
     await client.views_open(
         trigger_id=body['trigger_id'],
         view={
@@ -580,17 +581,17 @@ async def discipline(ack, body, client):
                         "options": tm_names
                     }
                 },
-                {
-                    "type": "input",
-                    "block_id": "input_type",
-                    "label": {"type": "plain_text", "text": "Type of Discipline"},
-                    "element": {
-                        "type": "static_select",
-                        "action_id": "discipline_type",
-                        "placeholder": {"type": "plain_text", "text": "Select type of discipline"},
-                        "options": discipline_types
-                    }
-                },
+                # {
+                #     "type": "input",
+                #     "block_id": "input_type",
+                #     "label": {"type": "plain_text", "text": "Type of Discipline"},
+                #     "element": {
+                #         "type": "static_select",
+                #         "action_id": "discipline_type",
+                #         "placeholder": {"type": "plain_text", "text": "Select type of discipline"},
+                #         "options": discipline_types
+                #     }
+                # },
                 # {
                 #     "type": "input",
                 #     "block_id": "input_method",
