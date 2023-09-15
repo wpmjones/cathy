@@ -635,7 +635,6 @@ async def discipline(ack, body, client):
                     },
                     "optional": True
                 }
-
             ]
         }
     )
