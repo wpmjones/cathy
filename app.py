@@ -562,7 +562,7 @@ async def discipline(ack, body, client):
         )
     # Open the view
     await client.views_open(
-        trigger_id=body['trigget_id'],
+        trigger_id=body['trigger_id'],
         view={
             "type": "model",
             "callback_id": "discipline_view",
