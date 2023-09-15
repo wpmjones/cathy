@@ -651,17 +651,11 @@ async def handle_discipline_view(ack, body, client, view):
     reason = view['state']['values']['input_reason']['reason']['value']
     leader = view['state']['values']['input_leader']['leader']['value']
     other = view['state']['values']['input_other']['other']['value']
-    block_text = {f"*Name*: {name}\n"
+    block_text = (f"*Name*: {name}\n"
                   f"*Discipline Type*: {discipline_type}\n"
                   f"*Leader*: {leader}\n"
                   f"*Communication Method*: {method_value}\n"
-                  f"*Reason*: {reason}"}
-    logger.info(type(name))
-    logger.info(type(discipline_type))
-    logger.info(type(method_value))
-    logger.info(type(reason))
-    logger.info(type(leader))
-    logger.info(type(other))
+                  f"*Reason*: {reason}")
     if other:
         block_text += f"\n*Other notes*: {other}"
     await ack()
