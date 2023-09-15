@@ -516,8 +516,8 @@ async def discipline(ack, body, client):
     # Create options for select menu
     sheet = gc.open_by_key(creds.staff_id)
     worksheet = sheet.get_worksheet(0)
-    values = worksheet.col_values(1)
-    if len(values) > 100:
+    discipline_values = worksheet.col_values(1)
+    if len(discipline_values) > 100:
         await client.chat_postMessage(channel=creds.pj_user_id,
                                       text="The CFA Staff list is full. Time for a purge.")
         return await client.chat_postMessage(channel=creds.sick_channel,
@@ -525,7 +525,7 @@ async def discipline(ack, body, client):
                                                   "/sick from working properly. Patrick has been notified and "
                                                   "will correct the issue shortly.")
     options = []
-    for name in values:
+    for name in discipline_values:
         options.append(
             {
                 "text": {
@@ -537,9 +537,21 @@ async def discipline(ack, body, client):
         )
     # Create list for discipline types
     discipline_types = []
-    values = ["Verbal", "Written", "Final", "Suspension", "Termination"]
-    for name in values:
+    method_types = []
+    method_values = ["Email", "Face-to-Face"]
+    discipline_values = ["Verbal", "Written", "Final", "Suspension", "Termination"]
+    for name in discipline_values:
         discipline_types.append(
+            {
+                "text": {
+                    "type": "plain_text",
+                    "text": name
+                },
+                "value": name
+            }
+        )
+    for name in method_values:
+        method_types.append(
             {
                 "text": {
                     "type": "plain_text",
@@ -574,9 +586,20 @@ async def discipline(ack, body, client):
                     "label": {"type": "plain_text", "text": "Type of Discipline"},
                     "element": {
                         "type": "static_select",
-                        "action_id": "discpline_type",
+                        "action_id": "discipline_type",
                         "placeholder": {"type": "plain_text", "text": "Select type of discipline"},
                         "options": discipline_types
+                    }
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_method",
+                    "label": {"type": "plain_text", "text": "Method of Communication"},
+                    "element": {
+                        "type": "static_select",
+                        "action_id": "method_type",
+                        "placeholder": {"type": "plain_text", "text": "Select method of communication"},
+                        "options": method_types
                     }
                 },
                 {
@@ -625,12 +648,14 @@ async def handle_discipline_view(ack, body, client, view):
     logger.info("Processing discipline view...")
     name = view['state']['values']['input_name']['tm_name']['selected_option']['value']
     discipline_type = view['state']['values']['input_type']['discipline_type']['selected_option']['value']
+    method_value = view['state']['values']['input_method']['method_type']['selected_option']['value']
     reason = view['state']['values']['input_reason']['reason']['value']
     leader = view['state']['values']['input_leader']['leader']['value']
     other = view['state']['values']['input_other']['other']['value']
     block_text = {f"*Name*: {name}\n"
                   f"*Discipline Type*: {discipline_type}\n"
                   f"*Leader*: {leader}\n"
+                  f"*Communication Method*: {method_value}\n"
                   f"*Reason*: {reason}"}
     if other:
         block_text += f"\n*Other notes*: {other}"
@@ -640,7 +665,7 @@ async def handle_discipline_view(ack, body, client, view):
         sh = gc.open_by_key(creds.sick_log_id)
         sheet = sh.get_worksheet(1)
         now = str(datetime.date(datetime.today()))
-        to_post = [now, name, discipline_type, reason, leader, other]
+        to_post = [now, name, discipline_type, reason, leader, method_value, other]
         sheet.append_row(to_post)
     except gspread.exceptions.GSpreadException as e:
         return await client.chat_postMessage(channel=body['user']['id'],
