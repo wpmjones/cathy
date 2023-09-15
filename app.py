@@ -565,7 +565,7 @@ async def discipline(ack, body, client):
     await client.views_open(
         trigger_id=body['trigger_id'],
         view={
-            "type": "model",
+            "type": "modal",
             "callback_id": "discipline_view",
             "title": {"type": "plain_text", "text": "Discipline Tracking"},
             "submit": {"type": "plain_text", "text": "Submit"},
@@ -581,61 +581,61 @@ async def discipline(ack, body, client):
                         "options": tm_names
                     }
                 },
-                # {
-                #     "type": "input",
-                #     "block_id": "input_type",
-                #     "label": {"type": "plain_text", "text": "Type of Discipline"},
-                #     "element": {
-                #         "type": "static_select",
-                #         "action_id": "discipline_type",
-                #         "placeholder": {"type": "plain_text", "text": "Select type of discipline"},
-                #         "options": discipline_types
-                #     }
-                # },
-                # {
-                #     "type": "input",
-                #     "block_id": "input_method",
-                #     "label": {"type": "plain_text", "text": "Method of Communication"},
-                #     "element": {
-                #         "type": "static_select",
-                #         "action_id": "method_type",
-                #         "placeholder": {"type": "plain_text", "text": "Select method of communication"},
-                #         "options": method_types
-                #     }
-                # },
-                # {
-                #     "type": "input",
-                #     "block_id": "input_reason",
-                #     "label": {"type": "plain_text", "text": "Reason for Discpline"},
-                #     "element": {
-                #         "type": "plain_text_input",
-                #         "action_id": "reason",
-                #         "multiline": True
-                #     },
-                #     "optional": False
-                # },
-                # {
-                #     "type": "input",
-                #     "block_id": "input_leader",
-                #     "label": {"type": "plain_text", "text": "Your Name (Leader providing discipline)"},
-                #     "element": {
-                #         "type": "plain_text_input",
-                #         "action_id": "leader",
-                #         "multiline": False
-                #     },
-                #     "optional": False
-                # },
-                # {
-                #     "type": "input",
-                #     "block_id": "input_other",
-                #     "label": {"type": "plain_text", "text": "Other notes"},
-                #     "element": {
-                #         "type": "plain_text_input",
-                #         "action_id": "other",
-                #         "multiline": False
-                #     },
-                #     "optional": True
-                # }
+                {
+                    "type": "input",
+                    "block_id": "input_type",
+                    "label": {"type": "plain_text", "text": "Type of Discipline"},
+                    "element": {
+                        "type": "static_select",
+                        "action_id": "discipline_type",
+                        "placeholder": {"type": "plain_text", "text": "Select type of discipline"},
+                        "options": discipline_types
+                    }
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_method",
+                    "label": {"type": "plain_text", "text": "Method of Communication"},
+                    "element": {
+                        "type": "static_select",
+                        "action_id": "method_type",
+                        "placeholder": {"type": "plain_text", "text": "Select method of communication"},
+                        "options": method_types
+                    }
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_reason",
+                    "label": {"type": "plain_text", "text": "Reason for Discpline"},
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "reason",
+                        "multiline": True
+                    },
+                    "optional": False
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_leader",
+                    "label": {"type": "plain_text", "text": "Your Name (Leader providing discipline)"},
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "leader",
+                        "multiline": False
+                    },
+                    "optional": False
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_other",
+                    "label": {"type": "plain_text", "text": "Other notes"},
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "other",
+                        "multiline": False
+                    },
+                    "optional": True
+                }
             ]
         }
     )
