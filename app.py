@@ -602,17 +602,17 @@ async def discipline(ack, body, client):
                         "options": method_types
                     }
                 },
-                {
-                    "type": "input",
-                    "block_id": "input_reason",
-                    "label": {"type": "plain_text", "text": "Reason for Discpline"},
-                    "element": {
-                        "type": "plain_text_input",
-                        "action_id": "reason",
-                        "multiline": True
-                    },
-                    "optional": False
-                },
+                # {
+                #     "type": "input",
+                #     "block_id": "input_reason",
+                #     "label": {"type": "plain_text", "text": "Reason for Discpline"},
+                #     "element": {
+                #         "type": "plain_text_input",
+                #         "action_id": "reason",
+                #         "multiline": True
+                #     },
+                #     "optional": False
+                # },
                 # {
                 #     "type": "input",
                 #     "block_id": "input_leader",
