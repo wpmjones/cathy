@@ -613,17 +613,17 @@ async def discipline(ack, body, client):
                     },
                     "optional": False
                 },
-                {
-                    "type": "input",
-                    "block_id": "input_leader",
-                    "label": {"type": "plain_text", "text": "Your Name (Leader providing discipline)"},
-                    "element": {
-                        "type": "plain_text_input",
-                        "action_id": "leader",
-                        "multiline": False
-                    },
-                    "optional": False
-                },
+                # {
+                #     "type": "input",
+                #     "block_id": "input_leader",
+                #     "label": {"type": "plain_text", "text": "Your Name (Leader providing discipline)"},
+                #     "element": {
+                #         "type": "plain_text_input",
+                #         "action_id": "leader",
+                #         "multiline": False
+                #     },
+                #     "optional": False
+                # },
                 # {
                 #     "type": "input",
                 #     "block_id": "input_other",
