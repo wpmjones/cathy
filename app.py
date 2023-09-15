@@ -656,6 +656,7 @@ async def handle_discipline_view(ack, body, client, view):
                   f"*Leader*: {leader}\n"
                   f"*Communication Method*: {method_value}\n"
                   f"*Reason*: {reason}"}
+    logger.info(block_text)
     if other:
         block_text += f"\n*Other notes*: {other}"
     await ack()
@@ -692,6 +693,7 @@ async def handle_discipline_view(ack, body, client, view):
             ]
         }
     ]
+    logger.info(f"{creds.sick_channel}\n{name}\n{creds.sick_log_link}")
     await client.chat_postMessage(channel=creds.sick_channel,
                                   blocks=blocks,
                                   text=f"New discipline for {name}.  Review the sheet <{creds.sick_log_link}|here>.")
@@ -857,7 +859,6 @@ async def handle_sick_input(ack, body, client, view):
             ]
         }
     ]
-    logger.info(f"{creds.sick_channel}\n{name}\n{creds.sick_log_link}")
     await client.chat_postMessage(channel=creds.sick_channel,
                                   blocks=blocks,
                                   text=f"New callout for {name}.  Review the sheet <{creds.sick_log_link}|here>.")
