@@ -624,17 +624,17 @@ async def discipline(ack, body, client):
                     },
                     "optional": False
                 },
-                {
-                    "type": "input",
-                    "block_id": "input_other",
-                    "label": {"type": "plain_text", "text": "Other notes"},
-                    "element": {
-                        "type": "plain_text_input",
-                        "action_id": "other",
-                        "multiline": False
-                    },
-                    "optional": True
-                }
+                # {
+                #     "type": "input",
+                #     "block_id": "input_other",
+                #     "label": {"type": "plain_text", "text": "Other notes"},
+                #     "element": {
+                #         "type": "plain_text_input",
+                #         "action_id": "other",
+                #         "multiline": False
+                #     },
+                #     "optional": True
+                # }
             ]
         }
     )
