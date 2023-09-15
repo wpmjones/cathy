@@ -680,7 +680,19 @@ async def handle_discipline_view(ack, body, client, view):
     blocks = [
         {
             "type": "section",
-            "text": {"type": "mrkdwn", "text": block_text}
+            "text": {
+                "type": "mrkdwn",
+                "text": f"New discipline recorded:\n<{creds.sick_log_link}|Click here to view in Google Sheets>"
+            }
+        },
+        {
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": block_text},
+            "accessory": {
+                "type": "image",
+                "image_url": "http://www.mayodev.com/images/discipline.png",
+                "alt_text": "Discipline image"
+            }
         },
         {
             "type": "context",
@@ -692,7 +704,6 @@ async def handle_discipline_view(ack, body, client, view):
             ]
         }
     ]
-    logger.info(f"{creds.sick_channel}\n{name}\n{creds.sick_log_link}")
     await client.chat_postMessage(channel=creds.sick_channel,
                                   blocks=blocks,
                                   text=f"New discipline for {name}.  Review the sheet <{creds.sick_log_link}|here>.")
