@@ -656,7 +656,12 @@ async def handle_discipline_view(ack, body, client, view):
                   f"*Leader*: {leader}\n"
                   f"*Communication Method*: {method_value}\n"
                   f"*Reason*: {reason}"}
-    logger.info(block_text)
+    logger.info(type(name))
+    logger.info(type(discipline_type))
+    logger.info(type(method_value))
+    logger.info(type(reason))
+    logger.info(type(leader))
+    logger.info(type(other))
     if other:
         block_text += f"\n*Other notes*: {other}"
     await ack()
