@@ -591,17 +591,17 @@ async def discipline(ack, body, client):
                         "options": discipline_types
                     }
                 },
-                {
-                    "type": "input",
-                    "block_id": "input_method",
-                    "label": {"type": "plain_text", "text": "Method of Communication"},
-                    "element": {
-                        "type": "static_select",
-                        "action_id": "method_type",
-                        "placeholder": {"type": "plain_text", "text": "Select method of communication"},
-                        "options": method_types
-                    }
-                },
+                # {
+                #     "type": "input",
+                #     "block_id": "input_method",
+                #     "label": {"type": "plain_text", "text": "Method of Communication"},
+                #     "element": {
+                #         "type": "static_select",
+                #         "action_id": "method_type",
+                #         "placeholder": {"type": "plain_text", "text": "Select method of communication"},
+                #         "options": method_types
+                #     }
+                # },
                 # {
                 #     "type": "input",
                 #     "block_id": "input_reason",
