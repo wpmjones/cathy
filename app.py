@@ -654,10 +654,11 @@ async def handle_discipline_view(ack, body, client, view):
     block_text = (f"*Name*: {name}\n"
                   f"*Discipline Type*: {discipline_type}\n"
                   f"*Leader*: {leader}\n"
-                  f"*Communication Method*: {method_value}\n"
-                  f"*Reason*: {reason}")
+                  f"*Communication Method*: {method_value}\n")
+    if reason not in ["Suspension", "Termination"]:
+        block_text += f"*Reason*: {reason}\n"
     if other:
-        block_text += f"\n*Other notes*: {other}"
+        block_text += f"*Other notes*: {other}"
     await ack()
     # Send data to Google Sheet
     try:
