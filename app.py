@@ -1453,7 +1453,7 @@ async def find_names(ack, body, client):
     data = sheet.get_all_values()
     count = 0
     input_name = body['text']
-    sick_text = f"*Sick records for {input_name}:*"
+    sick_text = f"*Absence records for {input_name}:*"
     for row in data:
         ratio = fuzz.token_sort_ratio(input_name.lower(), row[1].lower())
         if ratio > fuzzy_number:
@@ -1461,7 +1461,6 @@ async def find_names(ack, body, client):
             sick_text += f"\n{row[0]} - {row[2]}"
             if row[3]:
                 sick_text += f" ({row[3]})"
-
             logger.info(f"Sick - {row[1]} matches {input_name}")
     if count == 0:
         sick_text = f"No absences found for {input_name}."
@@ -1478,6 +1477,19 @@ async def find_names(ack, body, client):
             logger.info(f"Tardy - {row[0]} matches {input_name}")
     if count == 0:
         tardy_text = f"No tardies found for {input_name}"
+    # Collect Discipline
+    sheet = sh.worksheet("Discipline")
+    data = sheet.get_all_values()
+    count = 0
+    disc_text = f"*Discipline records for {input_name}*"
+    for row in data:
+        ratio = fuzz.token_sort_ratio(input_name.lower(), row[1].lower())
+        if ratio > fuzzy_number:
+            count += 1
+            disc_text += f"\n{row[0]} - ({row[2]}) {row[3]}"
+        logger.info(f"Discpline - {row[1]} matches {input_name}")
+    if count == 0:
+        disc_text = f"No discpline found for {input_name}."
     blocks = [
         {
             "type": "section",
@@ -1486,12 +1498,16 @@ async def find_names(ack, body, client):
         {
             "type": "section",
             "text": {"type": "mrkdwn", "text": tardy_text}
+        },
+        {
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": disc_text}
         }
     ]
     await client.chat_postEphemeral(channel=body['channel_id'],
                                     user=body['user_id'],
                                     blocks=blocks,
-                                    text=f"Sick & tardy records for {body['text']}.")
+                                    text=f"Absence, tardy, and discpline records for {body['text']}.")
 
 
 @app.command("/symptoms")
