@@ -615,7 +615,7 @@ async def handle_tms_check_in_view(ack, body, client, view):
     """Processes input from TMS Check In View."""
     logger.info("Processing TMS Check In...")
     logger.info(view)
-    value = view['state']['values']['bag_num']['selected_option']['value']
+    value = view['state']['values']['bag_num']['bag_num_action']['selected_option']['value']
     sh = gc.open_by_key(creds.tms_id)
     sheet = sh.get_worksheet(0)
     cell = sheet.find(value)
