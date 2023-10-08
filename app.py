@@ -559,7 +559,7 @@ async def tms_check_in(ack, body, client):
     """After a user issues /tms and responds with the check in button, this view is triggered."""
     now = str(datetime.date(datetime.today()))
     try:
-        sh = gc.open_by_key(creds.sick_log_id)
+        sh = gc.open_by_key(creds.tms_id)
         sheet = sh.get_worksheet(0)
     except gspread.exceptions.GSpreadException as e:
         return await client.chat_postMessage(channel=body['user']['id'],
