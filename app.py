@@ -577,7 +577,7 @@ async def tms_check_in(ack, body, client):
                     "text": {
                         "type": "plain_text",
                         "text": f"Bag #{row[0]}",
-                        "emoji" False
+                        "emoji": False
                     },
                     "value": row[0]
                 }
