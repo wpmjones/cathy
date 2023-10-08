@@ -570,7 +570,6 @@ async def tms_check_in(ack, body, client):
         await client.chat_postMessage(channel=creds.pj_user_id,
                                       text=f"There was an error while storing the message to the Google Sheet.\n{e}")
         return
-    logger.info(body)
     bag_numbers = []
     tms_values = sheet.get_all_values()[1:]
     for row in tms_values:
@@ -602,7 +601,7 @@ async def tms_check_in(ack, body, client):
                     "label": {"type": "plain_text", "text": "Select a name"},
                     "element": {
                         "type": "static_select",
-                        "action_id": "bag_num",
+                        "action_id": "bag_num_action",
                         "placeholder": {"type": "plain_text", "text": "Select a bag to check in"},
                         "options": bag_numbers
                     }
@@ -617,7 +616,10 @@ async def handle_tms_check_in_view(ack, body, client, view):
     """Processes input from TMS Check In View."""
     logger.info("Processing TMS Check In...")
     value = view['state']['values']['bag_num']['selected_option']['value']
-    logger.info(value)
+    sh = gc.open_by_key(creds.tms_id)
+    sheet = sh.get_worksheet(0)
+    cell = sheet.find(value)
+    logger.info(cell)
     await ack()
 
 
