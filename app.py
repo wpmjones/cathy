@@ -564,6 +564,68 @@ async def tms(ack, say):
     await say(blocks=blocks, text="TMS Tracking")
 
 
+@app.block_action("req_status")
+async def tms_req_status(ack, respond, body, say):
+    """After a user issues /tms and responds with the status button, this view is triggered."""
+    await ack()
+    await respond({"delete_original": True})
+    try:
+        sh = gc.open_by_key(creds.tms_id)
+        sheet = sh.get_worksheet(0)
+    except gspread.exceptions.GSpreadException as e:
+        return await client.chat_postMessage(channel=body['user']['id'],
+                                             text=e)
+    except Exception as e:
+        await client.chat_postMessage(channel=body['user']['id'],
+                                      text=f"There was an error while storing the message to the Google Sheet.\n{e}")
+        await client.chat_postMessage(channel=creds.pj_user_id,
+                                      text=f"There was an error while storing the message to the Google Sheet.\n{e}")
+        return
+    tms_values = sheet.get_all_values()[1:]
+    blocks = [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "*TMS Bag Status*\nClick Check In to return a bag to store inventory"
+            }
+        },
+        {
+            "type": "divider"
+        }
+    ]
+    for row in tms_values:
+        if row[2]:
+            blocks.append(
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": f"*TMS Bag #{row[0]}*\nChecked out by {row[2]}\nCurrently at {row[3]}"
+                    },
+                    "accessory": {
+                        "type": "button",
+                        "text": {
+                            "type": "plain_text",
+                            "emoji": True,
+                            "text": "Check In"
+                        },
+                        "value": row[0],
+                        "action_id": "req_check_in"
+                    }
+                }
+            )
+    await say(blocks=blocks, text="TMS Bag Status")
+
+
+@app.block_action("req_check_in")
+async def handle_req_check_in(ack, client, body):
+    """Handle button clicks from TMS Status Request"""
+    logger.info("Procession Check in from TMS Status")
+    logger.info(body)
+    await ack()
+
+
 @app.block_action("tms_out")
 async def tms_check_out(ack, body, respond, client):
     """After a user issues /tms and responds with the check out button, this view is triggered."""
@@ -680,6 +742,7 @@ async def tms_check_out(ack, body, respond, client):
 async def handle_tms_check_out_view(ack, body, client, view):
     """Processes input from TMS Check Out View."""
     logger.info("Processing TMS Check Out...")
+    now = str(datetime.date(datetime.today()))
     value = view['state']['values']['bag_num']['bag_num_action']['selected_option']['value']
     name = view['state']['values']['input_name']['driver_name']['value']
     location = view['state']['values']['input_business']['business_name']['value']
@@ -695,7 +758,14 @@ async def handle_tms_check_out_view(ack, body, client, view):
     # Update sheet with new info
     sh = gc.open_by_key(creds.tms_id)
     sheet = sh.get_worksheet(0)
-
+    cell = sheet.find(value)
+    sheet.update_cell(cell.row, 2, now)
+    sheet.update_cell(cell.row, 3, name)
+    sheet.update_cell(cell.row, 4, location)
+    sheet.update_cell(cell.row, 5, contact_name)
+    sheet.update_cell(cell.row, 6, contact_number)
+    await ack()
+    await client.chat_postMessage(channel=channel_id, text=f"TMS Bag#{value} has been checked out by {name}.")
 
 
 @app.block_action("tms_in")
