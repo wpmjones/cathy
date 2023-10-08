@@ -527,6 +527,7 @@ async def tms(ack, say):
         },
         {
             "type": "actions",
+            "action_id": "tms_buttons",
             "elements": [
                 {
                     "type": "button",
@@ -552,7 +553,7 @@ async def tms(ack, say):
     await say(blocks=blocks, text="TMS Tracking")
 
 
-@app.block_action("tms_in")
+@app.block_action("tms_buttons")
 async def tms_check_in(ack, body, client):
     """After a user issues /tms and responds with the check in button, this view is triggered."""
     now = str(datetime.date(datetime.today()))
@@ -568,6 +569,7 @@ async def tms_check_in(ack, body, client):
         await client.chat_postMessage(channel=creds.pj_user_id,
                                       text=f"There was an error while storing the message to the Google Sheet.\n{e}")
         return
+    logger.info(body)
     bag_numbers = []
     tms_values = sheet.get_all_values()[1:]
     for row in tms_values:
