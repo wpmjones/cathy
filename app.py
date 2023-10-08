@@ -508,9 +508,118 @@ async def handle_add_view(ack, body, client, view):
                                        f"anything other than a Team Member, please manually update their title.")
 
 
+@app.command("/tms")
+async def tms(ack, say):
+    """This command opens the form for tracking TMS bags."""
+    await ack()
+    blocks = [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "Thank you for using TMS Tracking. The best way not to lose your TMS bags!\n\nAre we..."
+            },
+            "accessory": {
+                "type": "image",
+                "image_url": "http://mayodev.com/images/tms.jpg",
+                "alt_text": "TMS logo"
+            }
+        },
+        {
+            "type": "actions",
+            "elements": [
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "emoji": True,
+                        "text": "Checking Out"
+                    },
+                    "value": "tms_out"
+                },
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "emoji": True,
+                        "text": "Checking In"
+                    },
+                    "value": "tms_in"
+                }
+            ]
+        }
+    ]
+    await say(blocks=blocks, text="TMS Tracking")
+
+
+@app.block_action("tms_in")
+async def tms_check_in(ack, body, client):
+    """After a user issues /tms and responds with the check in button, this view is triggered."""
+    now = str(datetime.date(datetime.today()))
+    try:
+        sh = gc.open_by_key(creds.sick_log_id)
+        sheet = sh.get_worksheet(0)
+    except gspread.exceptions.GSpreadException as e:
+        return await client.chat_postMessage(channel=body['user']['id'],
+                                             text=e)
+    except Exception as e:
+        await client.chat_postMessage(channel=body['user']['id'],
+                                      text=f"There was an error while storing the message to the Google Sheet.\n{e}")
+        await client.chat_postMessage(channel=creds.pj_user_id,
+                                      text=f"There was an error while storing the message to the Google Sheet.\n{e}")
+        return
+    bag_numbers = []
+    tms_values = sheet.get_all_values()[1:]
+    for row in tms_values:
+        if row[2]:
+            bag_numbers.append(
+                {
+                    "text": {
+                        "type": "plain_text",
+                        "text": f"Bag #{row[0]}",
+                        "emoji" False
+                    },
+                    "value": row[0]
+                }
+            )
+    if len(bag_numbers) == 0:
+        return await client.chat_postMessage("There are no bags currently checked out.")
+    await client.views_open(
+        trigger_id=body['trigger_id'],
+        view={
+            "type": "modal",
+            "callback_id": "tms_checkin_view",
+            "title": {"type": "plain_text", "text": "TMS Tracking - Check In"},
+            "submit": {"type": "plain_text", "text": "Submit"},
+            "blocks": [
+                {
+                    "type": "input",
+                    "block_id": "bag_num",
+                    "label": {"type": "plain_text", "text": "Select a name"},
+                    "element": {
+                        "type": "static_select",
+                        "action_id": "bag_num",
+                        "placeholder": {"type": "plain_text", "text": "Select a bag to check in"},
+                        "options": bag_numbers
+                    }
+                }
+            ]
+        }
+    )
+
+
+@app.view("tms_check_in_view")
+async def handle_tms_check_in_view(ack, body, client, view):
+    """Processes input from TMS Check In View."""
+    logger.info("Processing TMS Check In...")
+    value = view['state']['values']['bag_num']['selected_option']['value']
+    logger.info(value)
+    await ack()
+
+
 @app.command("/discipline")
 async def discipline(ack, body, client):
-    """This command opens the for for tracking discipline issues.  This will post to Slack and maintain a list
+    """This command opens the form for tracking discipline issues.  This will post to Slack and maintain a list
     in a Google Sheet for historical purposes."""
     await ack()
     # Create options for select menu
