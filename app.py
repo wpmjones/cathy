@@ -604,6 +604,16 @@ async def tms_check_in(ack, body, client):
                         "placeholder": {"type": "plain_text", "text": "Select a bag to check in"},
                         "options": bag_numbers
                     }
+                },
+                {
+                    "type": "context",
+                    "block_id": "context_a",
+                    "elements": [
+                        {
+                            "type": "plain_text",
+                            "text": body['channel']['id']
+                        }
+                    ]
                 }
             ]
         }
@@ -616,11 +626,13 @@ async def handle_tms_check_in_view(ack, body, client, view):
     logger.info("Processing TMS Check In...")
     logger.info(view)
     value = view['state']['values']['bag_num']['bag_num_action']['selected_option']['value']
+    channel_id = view['blocks'][1]['elements'][0]['text']
     sh = gc.open_by_key(creds.tms_id)
     sheet = sh.get_worksheet(0)
     cell = sheet.find(value)
-    logger.info(cell)
+    sheet.batch_clear([f"B{cell.row}:F{cell.row}"])
     await ack()
+    await client.chat_postMessage(channel_id=channel_id, text=f"Bag #{value} has been marked as returned.")
 
 
 @app.command("/discipline")
