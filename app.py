@@ -555,9 +555,10 @@ async def tms(ack, say):
 
 
 @app.block_action("tms_in")
-async def tms_check_in(ack, body, client):
+async def tms_check_in(ack, body, respond, client):
     """After a user issues /tms and responds with the check in button, this view is triggered."""
-    now = str(datetime.date(datetime.today()))
+    await ack()
+    await respond({"delete_original": True})
     try:
         sh = gc.open_by_key(creds.tms_id)
         sheet = sh.get_worksheet(0)
