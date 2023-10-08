@@ -585,6 +585,7 @@ async def tms_check_in(ack, body, client):
                     "value": row[0]
                 }
             )
+    logger.info(bag_numbers)
     if len(bag_numbers) == 0:
         return await client.chat_postMessage("There are no bags currently checked out.")
     await client.views_open(
