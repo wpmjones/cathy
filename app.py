@@ -584,14 +584,13 @@ async def tms_check_in(ack, body, client):
                     "value": row[0]
                 }
             )
-    logger.info(bag_numbers)
     if len(bag_numbers) == 0:
         return await client.chat_postMessage("There are no bags currently checked out.")
     await client.views_open(
         trigger_id=body['trigger_id'],
         view={
             "type": "modal",
-            "callback_id": "tms_checkin_view",
+            "callback_id": "tms_check_in_view",
             "title": {"type": "plain_text", "text": "TMS Tracking - Check In"},
             "submit": {"type": "plain_text", "text": "Submit"},
             "blocks": [
