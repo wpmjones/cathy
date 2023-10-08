@@ -527,7 +527,6 @@ async def tms(ack, say):
         },
         {
             "type": "actions",
-            "action_id": "tms_buttons",
             "elements": [
                 {
                     "type": "button",
@@ -536,7 +535,8 @@ async def tms(ack, say):
                         "emoji": True,
                         "text": "Checking Out"
                     },
-                    "value": "tms_out"
+                    "value": "tms_out",
+                    "action_id": "tms_out"
                 },
                 {
                     "type": "button",
@@ -545,7 +545,8 @@ async def tms(ack, say):
                         "emoji": True,
                         "text": "Checking In"
                     },
-                    "value": "tms_in"
+                    "value": "tms_in",
+                    "action_id": "tms_in"
                 }
             ]
         }
@@ -553,7 +554,7 @@ async def tms(ack, say):
     await say(blocks=blocks, text="TMS Tracking")
 
 
-@app.block_action("tms_buttons")
+@app.block_action("tms_in")
 async def tms_check_in(ack, body, client):
     """After a user issues /tms and responds with the check in button, this view is triggered."""
     now = str(datetime.date(datetime.today()))
