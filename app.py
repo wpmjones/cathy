@@ -547,11 +547,155 @@ async def tms(ack, say):
                     },
                     "value": "tms_in",
                     "action_id": "tms_in"
+                },
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "emoji": True,
+                        "text": "Requesting Status"
+                    },
+                    "value": "req_status",
+                    "action_id": "req_status"
                 }
             ]
         }
     ]
     await say(blocks=blocks, text="TMS Tracking")
+
+
+@app.block_action("tms_out")
+async def tms_check_out(ack, body, respond, client):
+    """After a user issues /tms and responds with the check out button, this view is triggered."""
+    await ack()
+    await respond({"delete_original": True})
+    try:
+        sh = gc.open_by_key(creds.tms_id)
+        sheet = sh.get_worksheet(0)
+    except gspread.exceptions.GSpreadException as e:
+        return await client.chat_postMessage(channel=body['user']['id'],
+                                             text=e)
+    except Exception as e:
+        await client.chat_postMessage(channel=body['user']['id'],
+                                      text=f"There was an error while storing the message to the Google Sheet.\n{e}")
+        await client.chat_postMessage(channel=creds.pj_user_id,
+                                      text=f"There was an error while storing the message to the Google Sheet.\n{e}")
+        return
+    bag_numbers = []
+    tms_values = sheet.get_all_values()[1:]
+    for row in tms_values:
+        if not row[2] and row[0]:
+            bag_numbers.append(
+                {
+                    "text": {
+                        "type": "plain_text",
+                        "text": f"Bag #{row[0]}",
+                        "emoji": False
+                    },
+                    "value": row[0]
+                }
+            )
+    if len(bag_numbers) == 0:
+        return await client.chat_postMessage("All bags are currently checked out.")
+    await client.views_open(
+        trigger_id=body['trigger_id'],
+        view={
+            "type": "modal",
+            "callback_id": "tms_check_out_view",
+            "title": {"type": "plain_text", "text": "TMS Tracking - Check Out"},
+            "submit": {"type": "plain_text", "text": "Submit"},
+            "blocks": [
+                {
+                    "type": "input",
+                    "block_id": "bag_num",
+                    "label": {"type": "plain_text", "text": "Select a bag"},
+                    "element": {
+                        "type": "static_select",
+                        "action_id": "bag_num_action",
+                        "placeholder": {"type": "plain_text", "text": "Select a bag to check in"},
+                        "options": bag_numbers
+                    },
+                    "optional": False
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_name",
+                    "label": {"type": "plain_text", "text": "Driver Name"},
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "driver_name",
+                        "multiline": False
+                    },
+                    "optional": False
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_business",
+                    "label": {"type": "plain_text", "text": "Business Name"},
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "business_name",
+                        "multiline": False
+                    },
+                    "optional": False
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_contact",
+                    "label": {"type": "plain_text", "text": "Contact Name"},
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "contact_name",
+                        "multiline": False
+                    },
+                    "optional": False
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_phone",
+                    "label": {"type": "plain_text", "text": "Contact Phone Number"},
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "contact_number",
+                        "multiline": False
+                    },
+                    "optional": False
+                },
+                {
+                    "type": "context",
+                    "block_id": "context_a",
+                    "elements": [
+                        {
+                            "type": "plain_text",
+                            "text": body['channel']['id']
+                        }
+                    ]
+                }
+            ]
+        }
+    )
+
+
+@app.view("tms_check_out_view")
+async def handle_tms_check_out_view(ack, body, client, view):
+    """Processes input from TMS Check Out View."""
+    logger.info("Processing TMS Check Out...")
+    value = view['state']['values']['bag_num']['bag_num_action']['selected_option']['value']
+    name = view['state']['values']['input_name']['driver_name']['value']
+    location = view['state']['values']['input_business']['business_name']['value']
+    contact_name = view['state']['values']['input_contact']['contact_name']['value']
+    contact_number = view['state']['values']['input_phone']['contact_number']['value']
+    channel_id = view['blocks'][1]['elements'][0]['text']
+    errors = {}
+    regex = r"^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$"
+    if not re.match(regex, contact_number):
+        errors['input_contact'] = "Please enter a valid, 10 digit phone number"
+    if len(errors) > 0:
+        return await ack(response_action="errors", errors=errors)
+    # Update sheet with new info
+    sh = gc.open_by_key(creds.tms_id)
+    sheet = sh.get_worksheet(0)
+
 
 
 @app.block_action("tms_in")
@@ -598,7 +742,7 @@ async def tms_check_in(ack, body, respond, client):
                 {
                     "type": "input",
                     "block_id": "bag_num",
-                    "label": {"type": "plain_text", "text": "Select a name"},
+                    "label": {"type": "plain_text", "text": "Select a bag"},
                     "element": {
                         "type": "static_select",
                         "action_id": "bag_num_action",
@@ -625,7 +769,6 @@ async def tms_check_in(ack, body, respond, client):
 async def handle_tms_check_in_view(ack, body, client, view):
     """Processes input from TMS Check In View."""
     logger.info("Processing TMS Check In...")
-    logger.info(view)
     value = view['state']['values']['bag_num']['bag_num_action']['selected_option']['value']
     channel_id = view['blocks'][1]['elements'][0]['text']
     sh = gc.open_by_key(creds.tms_id)
@@ -633,7 +776,7 @@ async def handle_tms_check_in_view(ack, body, client, view):
     cell = sheet.find(value)
     sheet.batch_clear([f"B{cell.row}:F{cell.row}"])
     await ack()
-    await client.chat_postMessage(channel=channel_id, text=f"Bag #{value} has been marked as returned.")
+    await client.chat_postMessage(channel=channel_id, text=f"TMS Bag #{value} has been marked as returned.")
 
 
 @app.command("/discipline")
