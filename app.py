@@ -632,7 +632,7 @@ async def handle_tms_check_in_view(ack, body, client, view):
     cell = sheet.find(value)
     sheet.batch_clear([f"B{cell.row}:F{cell.row}"])
     await ack()
-    await client.chat_postMessage(channel_id=channel_id, text=f"Bag #{value} has been marked as returned.")
+    await client.chat_postMessage(channel=channel_id, text=f"Bag #{value} has been marked as returned.")
 
 
 @app.command("/discipline")
