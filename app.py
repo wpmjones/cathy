@@ -615,15 +615,24 @@ async def tms_req_status(ack, respond, body, say):
                     }
                 }
             )
-    await say(blocks=blocks, text="TMS Bag Status")
+    msg = await say(blocks=blocks, text="TMS Bag Status")
+    logger.info(msg)
 
 
 @app.block_action("req_check_in")
-async def handle_req_check_in(ack, client, body):
+async def handle_req_check_in(ack, respond, client, body):
     """Handle button clicks from TMS Status Request"""
     logger.info("Procession Check in from TMS Status")
     logger.info(body)
     await ack()
+    await respond({"delete_original": True})
+    value = body['actions'][0]['value']
+    channel_id = body['container']['channel_id']
+    sh = gc.open_by_key(creds.tms_id)
+    sheet = sh.get_worksheet(0)
+    cell = sheet.find(value)
+    sheet.batch_clear([f"B{cell.row}:F{cell.row}"])
+    await client.chat_postMessage(channel=channel_id, text=f"TMS Bag #{value} has been marked as returned.")
 
 
 @app.block_action("tms_out")
@@ -739,7 +748,7 @@ async def tms_check_out(ack, body, respond, client):
 
 
 @app.view("tms_check_out_view")
-async def handle_tms_check_out_view(ack, body, client, view):
+async def handle_tms_check_out_view(ack, client, view):
     """Processes input from TMS Check Out View."""
     logger.info("Processing TMS Check Out...")
     now = str(datetime.date(datetime.today()))
@@ -836,7 +845,7 @@ async def tms_check_in(ack, body, respond, client):
 
 
 @app.view("tms_check_in_view")
-async def handle_tms_check_in_view(ack, body, client, view):
+async def handle_tms_check_in_view(ack, client, view):
     """Processes input from TMS Check In View."""
     logger.info("Processing TMS Check In...")
     value = view['state']['values']['bag_num']['bag_num_action']['selected_option']['value']
