@@ -616,7 +616,11 @@ async def tms_req_status(ack, respond, body, say):
                 }
             )
     msg = await say(blocks=blocks, text="TMS Bag Status")
-    logger.info(msg)
+    await asyncio.sleep(60)
+    await client.delete(
+        channel=msg['channel'],
+        ts=msg['message']['ts']
+    )
 
 
 @app.block_action("req_check_in")
