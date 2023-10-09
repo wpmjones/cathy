@@ -629,13 +629,24 @@ async def handle_req_check_in(ack, respond, client, body):
     logger.info("Procession Check in from TMS Status")
     logger.info(body)
     await ack()
-    # await respond({"delete_original": True})
+    blocks = body['message']['blocks']
+    clicked = body['actions'][0]['block_id']
     value = body['actions'][0]['value']
     channel_id = body['container']['channel_id']
     sh = gc.open_by_key(creds.tms_id)
     sheet = sh.get_worksheet(0)
     cell = sheet.find(value)
     sheet.batch_clear([f"B{cell.row}:F{cell.row}"])
+    for x in range(len(blocks)):
+        if blocks[x]['block_id'] == clicked:
+            blocks.pop(x)
+            break
+    await respond(
+        {
+            "replace_original": True,
+            "blocks": blocks
+        }
+    )
     await client.chat_postMessage(channel=channel_id, text=f"TMS Bag #{value} has been marked as returned.")
 
 
