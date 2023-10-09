@@ -762,7 +762,7 @@ async def handle_tms_check_out_view(ack, client, view):
     location = view['state']['values']['input_business']['business_name']['value']
     contact_name = view['state']['values']['input_contact']['contact_name']['value']
     contact_number = view['state']['values']['input_phone']['contact_number']['value']
-    channel_id = view['blocks'][1]['elements'][0]['text']
+    channel_id = view['blocks'][5]['elements'][0]['text']
     errors = {}
     regex = r"^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$"
     if not re.match(regex, contact_number):
