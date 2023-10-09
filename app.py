@@ -617,7 +617,7 @@ async def tms_req_status(ack, respond, body, say):
             )
     msg = await say(blocks=blocks, text="TMS Bag Status")
     await asyncio.sleep(60)
-    await client.delete(
+    await client.chat_delete(
         channel=msg['channel'],
         ts=msg['message']['ts']
     )
@@ -629,7 +629,7 @@ async def handle_req_check_in(ack, respond, client, body):
     logger.info("Procession Check in from TMS Status")
     logger.info(body)
     await ack()
-    await respond({"delete_original": True})
+    # await respond({"delete_original": True})
     value = body['actions'][0]['value']
     channel_id = body['container']['channel_id']
     sh = gc.open_by_key(creds.tms_id)
@@ -762,7 +762,7 @@ async def handle_tms_check_out_view(ack, client, view):
     location = view['state']['values']['input_business']['business_name']['value']
     contact_name = view['state']['values']['input_contact']['contact_name']['value']
     contact_number = view['state']['values']['input_phone']['contact_number']['value']
-    channel_id = view['blocks'][5]['elements'][0]['text']
+    channel_id = view['blocks'][-1]['elements'][0]['text']
     errors = {}
     regex = r"^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$"
     if not re.match(regex, contact_number):
@@ -854,7 +854,7 @@ async def handle_tms_check_in_view(ack, client, view):
     """Processes input from TMS Check In View."""
     logger.info("Processing TMS Check In...")
     value = view['state']['values']['bag_num']['bag_num_action']['selected_option']['value']
-    channel_id = view['blocks'][1]['elements'][0]['text']
+    channel_id = view['blocks'][-1]['elements'][0]['text']
     sh = gc.open_by_key(creds.tms_id)
     sheet = sh.get_worksheet(0)
     cell = sheet.find(value)
