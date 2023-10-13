@@ -627,7 +627,6 @@ async def tms_req_status(ack, respond, body, say):
 async def handle_req_check_in(ack, respond, client, body):
     """Handle button clicks from TMS Status Request"""
     logger.info("Procession Check in from TMS Status")
-    logger.info(body)
     await ack()
     blocks = body['message']['blocks']
     clicked = body['actions'][0]['block_id']
