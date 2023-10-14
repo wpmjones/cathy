@@ -15,7 +15,6 @@ import requests
 import string
 
 from datetime import datetime, date, timedelta
-from decimal import Decimal
 from fuzzywuzzy import fuzz
 from loguru import logger
 from slack_bolt.async_app import AsyncApp
@@ -72,6 +71,163 @@ async def cathy_help(ack, say):
               "`/symbol` Report on the most recent day of sales for our Symbol run\n"
               "`/add` Opens a form to add new hire to Trello"
               "`/help` List these commands")
+
+
+@app.event("app_home_opened")
+async def update_home_tab(client, event):
+    """Provide user specific content to the Cathy Home tab"""
+    # Establish link to Google Sheets
+    spreadsheet = gc.open_by_key(creds.cater_id)
+    cater_sheet = spreadsheet.worksheet("Sheet1")
+    spreadsheet = gc.open_by_key(creds.staff_id)
+    leader_sheet = spreadsheet.worksheet("Leaders")
+    notes_sheet = spreadsheet.worksheet("Shift Notes")
+    user_cell = leader_sheet.find(event['user'])
+    user_first = leader_sheet.cell(user_cell.row, 1)
+    user_loc = leader_sheet.cell(user_cell.row, 5)
+    # build blocks
+    blocks = [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": (f"Hey there {user_first} 👋 I'm Cathy - you're gateway to a number of cool features inside of "
+                         f"Slack.  Use /help to see all the different commands you can use in Slack.")
+            }
+        },
+        {"type": "divider"}
+    ]
+    if user_loc == "BOH":
+        list_of_boh_leader = notes_sheet.findall("BOH Leadership", in_column=1)
+        list_of_boh_all = notes_sheet.findall("BOH All", in_column=1)
+        boh_leader_elements = []
+        boh_all_elements = []
+        for row in list_of_boh_leader:
+            boh_leader_elements.append(
+                {
+                    "type": "rich_text_section",
+                    "elements": [{"type": "text", "text": row[1]}]
+                }
+            )
+        for row in list_of_boh_all:
+            boh_all_elements.append(
+                {
+                    "type": "rich_text_section",
+                    "elements": [{"type": "text", "text": row[1]}]
+                }
+            )
+        blocks.append(
+            {
+                "type": "rich_text",
+                "elements": [
+                    {
+                        "type": "rich_text_section",
+                        "elements": [
+                            {
+                                "type": "text",
+                                "text": "BOH Leadership Notes\n"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "rich_text_list",
+                        "style": "bullet",
+                        "elements": boh_leader_elements
+                    }
+                ]
+            }
+        )
+        blocks.append(
+            {
+                "type": "rich_text",
+                "elements": [
+                    {
+                        "type": "rich_text_section",
+                        "elements": [
+                            {
+                                "type": "text",
+                                "text": "BOH All Notes\n"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "rich_text_list",
+                        "style": "bullet",
+                        "elements": boh_all_elements
+                    }
+                ]
+            }
+        )
+    else:
+        list_of_foh_leader = notes_sheet.findall("FOH Leadership", in_column=1)
+        list_of_foh_all = notes_sheet.findall("FOH All", in_column=1)
+        foh_leader_elements = []
+        foh_all_elements = []
+        for row in list_of_foh_leader:
+            foh_leader_elements.append(
+                {
+                    "type": "rich_text_section",
+                    "elements": [{"type": "text", "text": row[1]}]
+                }
+            )
+        for row in list_of_foh_all:
+            foh_all_elements.append(
+                {
+                    "type": "rich_text_section",
+                    "elements": [{"type": "text", "text": row[1]}]
+                }
+            )
+        blocks.append(
+            {
+                "type": "rich_text",
+                "elements": [
+                    {
+                        "type": "rich_text_section",
+                        "elements": [
+                            {
+                                "type": "text",
+                                "text": "FOH Leadership Notes\n"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "rich_text_list",
+                        "style": "bullet",
+                        "elements": foh_leader_elements
+                    }
+                ]
+            }
+        )
+        blocks.append(
+            {
+                "type": "rich_text",
+                "elements": [
+                    {
+                        "type": "rich_text_section",
+                        "elements": [
+                            {
+                                "type": "text",
+                                "text": "FOH All Notes\n"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "rich_text_list",
+                        "style": "bullet",
+                        "elements": foh_all_elements
+                    }
+                ]
+            }
+        )
+    # Publish view to home tab
+    client.views_publish(
+        user_id=event['user'],
+        view={
+            "type": "home",
+            "callback_id": "home_view",
+            "blocks": blocks
+        }
+    )
 
 
 # Remove all Slack messages from the channel you are in. I only use this in my test channel.
