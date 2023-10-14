@@ -92,14 +92,45 @@ async def update_home_tab(client, event):
             "text": {
                 "type": "mrkdwn",
                 "text": (f"Hey there {user_first} 👋 I'm Cathy - you're gateway to a number of cool features inside of "
-                         f"Slack.  Use /help to see all the different commands you can use in Slack.")
+                         f"Slack. Use /help to see all the different commands you can use in Slack.")
             }
         },
         {"type": "divider"}
     ]
+    # Look for and add catering deliveries if they exist
+    now_str = datetime.today().strftime("%m/%d/%Y")
+    list_of_orders = cater_sheet.findall(now_str, in_column=1)
+    my_orders = []
+    if list_of_orders:
+        list_of_rows = [x.row for x in list_of_orders]
+        for row in list_of_rows:
+            row_values = cater_sheet.row_values(row)
+            if row_values[2] == user_first:
+                my_orders.append(
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": f"{row_values[1]} ⏱️ {row_values[3]} - {row_values[5]}"
+                        }
+                    }
+                )
+    if my_orders:
+        blocks.append(
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "*Your Catering Orders for today*"
+                }
+            }
+        )
+        for order in my_orders:
+            blocks.append(order)
+        blocks.append({"type": "divider"})
+    # Add Shift Notes
     if user_loc == "BOH":
         list_of_boh_leader = notes_sheet.findall("BOH Leadership", in_column=1)
-        logger.info(list_of_boh_leader)
         list_of_boh_all = notes_sheet.findall("BOH All", in_column=1)
         boh_leader_elements = []
         boh_all_elements = []
@@ -140,6 +171,7 @@ async def update_home_tab(client, event):
                 ]
             }
         )
+        blocks.append({"type": "divider"})
         blocks.append(
             {
                 "type": "rich_text",
