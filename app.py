@@ -103,18 +103,20 @@ async def update_home_tab(client, event):
         list_of_boh_all = notes_sheet.findall("BOH All", in_column=1)
         boh_leader_elements = []
         boh_all_elements = []
-        for row in [x.row for x in list_of_boh_leader]:
+        for x in list_of_boh_leader:
+            value = notes_sheet.cell(x.row, 2).value
             boh_leader_elements.append(
                 {
                     "type": "rich_text_section",
-                    "elements": [{"type": "text", "text": row[1]}]
+                    "elements": [{"type": "text", "text": value}]
                 }
             )
-        for row in [x.row for x in list_of_boh_all]:
+        for x in list_of_boh_all:
+            value = notes_sheet.cell(x.row, 2).value
             boh_all_elements.append(
                 {
                     "type": "rich_text_section",
-                    "elements": [{"type": "text", "text": row[1]}]
+                    "elements": [{"type": "text", "text": value}]
                 }
             )
         blocks.append(
@@ -164,18 +166,20 @@ async def update_home_tab(client, event):
         list_of_foh_all = notes_sheet.findall("FOH All", in_column=1)
         foh_leader_elements = []
         foh_all_elements = []
-        for row in [x.row for x in list_of_foh_leader]:
+        for row in list_of_foh_leader:
+            value = notes_sheet.cell(x.row, 2).value
             foh_leader_elements.append(
                 {
                     "type": "rich_text_section",
-                    "elements": [{"type": "text", "text": row[1]}]
+                    "elements": [{"type": "text", "text": value}]
                 }
             )
-        for row in [x.row for x in list_of_foh_all]:
+        for row in list_of_foh_all:
+            value = notes_sheet.cell(x.row, 2).value
             foh_all_elements.append(
                 {
                     "type": "rich_text_section",
-                    "elements": [{"type": "text", "text": row[1]}]
+                    "elements": [{"type": "text", "text": value}]
                 }
             )
         blocks.append(
