@@ -221,7 +221,7 @@ async def update_home_tab(client, event):
     #     )
     # Publish view to home tab
     logger.info(blocks)
-    client.views_publish(
+    await client.views_publish(
         user_id=event['user'],
         view={
             "type": "home",
