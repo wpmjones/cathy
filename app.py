@@ -111,7 +111,7 @@ async def update_home_tab(client, event):
                         "type": "section",
                         "text": {
                             "type": "mrkdwn",
-                            "text": f"{row_values[1]} ⏱️ {row_values[3]} - {row_values[5]}"
+                            "text": f"{row_values[1]} ⏱️ {row_values[3]} 📞 {row_values[5]}"
                         }
                     }
                 )
@@ -129,6 +129,15 @@ async def update_home_tab(client, event):
             blocks.append(order)
         blocks.append({"type": "divider"})
     # Add Shift Notes
+    blocks.append(
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "✍️ *Weekly Shift Notes*"
+            }
+        }
+    )
     if user_loc == "BOH":
         list_of_boh_leader = notes_sheet.findall("BOH Leadership", in_column=1)
         list_of_boh_all = notes_sheet.findall("BOH All", in_column=1)
