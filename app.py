@@ -117,27 +117,29 @@ async def pull_cater(user_first):
 async def pull_notes(user_loc):
     start = time.perf_counter()
     notes_sheet = staff_spreadsheet.worksheet("Shift Notes")
-    list_of_leader = notes_sheet.findall(f"{user_loc} Leadership", in_column=1)
-    list_of_all = notes_sheet.findall(f"{user_loc} All", in_column=1)
+    all_values = notes_sheet.get_all_values()
+    leader_text = f"{user_loc} Leadership"
+    all_text = f"{user_loc} All"
     leader_elements = []
     all_elements = []
     temp_blocks = []
-    for x in list_of_leader:
-        value = notes_sheet.cell(x.row, 2).value
-        leader_elements.append(
-            {
-                "type": "rich_text_section",
-                "elements": [{"type": "text", "text": value}]
-            }
-        )
-    for x in list_of_all:
-        value = notes_sheet.cell(x.row, 2).value
-        all_elements.append(
-            {
-                "type": "rich_text_section",
-                "elements": [{"type": "text", "text": value}]
-            }
-        )
+    for row in all_values:
+        if row[0] == leader_text:
+            value = row[2]
+            leader_elements.append(
+                {
+                    "type": "rich_text_section",
+                    "elements": {"type": "text", "text": value}
+                }
+            )
+        if row[0] == all_text:
+            value = row[2]
+            all_elements.append(
+                {
+                    "type": "rich_text_section",
+                    "elements": {"type": "text", "text": value}
+                }
+            )
     temp_blocks.append(
         {
             "type": "rich_text",
