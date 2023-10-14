@@ -73,34 +73,14 @@ async def cathy_help(ack, say):
               "`/help` List these commands")
 
 
-@app.event("app_home_opened")
-async def update_home_tab(client, event):
-    """Provide user specific content to the Cathy Home tab"""
-    # Establish link to Google Sheets
+async def pull_cater(user_first):
+    # Look for and add catering deliveries if they exist
     spreadsheet = gc.open_by_key(creds.cater_id)
     cater_sheet = spreadsheet.worksheet("Sheet1")
-    spreadsheet = gc.open_by_key(creds.staff_id)
-    leader_sheet = spreadsheet.worksheet("Leaders")
-    notes_sheet = spreadsheet.worksheet("Shift Notes")
-    user_cell = leader_sheet.find(event['user'])
-    user_first = leader_sheet.cell(user_cell.row, 1).value
-    user_loc = leader_sheet.cell(user_cell.row, 5).value
-    # build blocks
-    blocks = [
-        {
-            "type": "section",
-            "text": {
-                "type": "mrkdwn",
-                "text": (f"Hey there {user_first} 👋 I'm Cathy - you're gateway to a number of cool features inside of "
-                         f"Slack. Use /help to see all the different commands you can use in Slack.")
-            }
-        },
-        {"type": "divider"}
-    ]
-    # Look for and add catering deliveries if they exist
     now_str = datetime.today().strftime("%m/%d/%Y")
     list_of_orders = cater_sheet.findall(now_str, in_column=1)
     my_orders = []
+    temp_blocks = []
     if list_of_orders:
         list_of_rows = [x.row for x in list_of_orders]
         for row in list_of_rows:
@@ -116,7 +96,7 @@ async def update_home_tab(client, event):
                     }
                 )
     if my_orders:
-        blocks.append(
+        temp_blocks.append(
             {
                 "type": "section",
                 "text": {
@@ -126,8 +106,108 @@ async def update_home_tab(client, event):
             }
         )
         for order in my_orders:
-            blocks.append(order)
-        blocks.append({"type": "divider"})
+            temp_blocks.append(order)
+        temp_blocks.append({"type": "divider"})
+    return temp_blocks
+
+
+async def pull_notes(user_loc):
+    spreadsheet = gc.open_by_key(creds.staff_id)
+    notes_sheet = spreadsheet.worksheet("Shift Notes")
+    list_of_leader = notes_sheet.findall(f"{user_loc} Leadership", in_column=1)
+    list_of_all = notes_sheet.findall(f"{user_loc} All", in_column=1)
+    leader_elements = []
+    all_elements = []
+    temp_blocks = []
+    for x in list_of_leader:
+        value = notes_sheet.cell(x.row, 2).value
+        leader_elements.append(
+            {
+                "type": "rich_text_section",
+                "elements": [{"type": "text", "text": value}]
+            }
+        )
+    for x in list_of_all:
+        value = notes_sheet.cell(x.row, 2).value
+        all_elements.append(
+            {
+                "type": "rich_text_section",
+                "elements": [{"type": "text", "text": value}]
+            }
+        )
+    temp_blocks.append(
+        {
+            "type": "rich_text",
+            "elements": [
+                {
+                    "type": "rich_text_section",
+                    "elements": [
+                        {
+                            "type": "text",
+                            "text": f"{user_loc} Leadership Notes\n"
+                        }
+                    ]
+                },
+                {
+                    "type": "rich_text_list",
+                    "style": "bullet",
+                    "elements": leader_elements
+                }
+            ]
+        }
+    )
+    temp_blocks.append({"type": "divider"})
+    temp_blocks.append(
+        {
+            "type": "rich_text",
+            "elements": [
+                {
+                    "type": "rich_text_section",
+                    "elements": [
+                        {
+                            "type": "text",
+                            "text": f"{user_loc} All Notes\n"
+                        }
+                    ]
+                },
+                {
+                    "type": "rich_text_list",
+                    "style": "bullet",
+                    "elements": all_elements
+                }
+            ]
+        }
+    )
+    return temp_blocks
+
+
+@app.event("app_home_opened")
+async def update_home_tab(client, event):
+    """Provide user specific content to the Cathy Home tab"""
+    # Establish link to Google Sheets
+    spreadsheet = gc.open_by_key(creds.staff_id)
+    leader_sheet = spreadsheet.worksheet("Leaders")
+    user_cell = leader_sheet.find(event['user'])
+    user_first = leader_sheet.cell(user_cell.row, 1).value
+    user_loc = leader_sheet.cell(user_cell.row, 5).value
+    # build blocks
+    blocks = [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": (f"Hey there {user_first} 👋 I'm Cathy - you're gateway to a number of cool features inside of "
+                         f"Slack. Use /help to see all the different commands you can use in Slack.")
+            }
+        },
+        {
+            "type": "divider"
+        }
+    ]
+    # Add catering deliveries for this user, if they exist
+    cater_blocks = await pull_cater(user_first)
+    if cater_blocks:
+        blocks = blocks + cater_blocks
     # Add Shift Notes
     blocks.append(
         {
@@ -135,136 +215,20 @@ async def update_home_tab(client, event):
             "text": {
                 "type": "mrkdwn",
                 "text": "✍️ *Weekly Shift Notes*"
+            },
+            "accessory": {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "emoji": True,
+                    "text": "Swap Notes"
+                },
+                "value": "swap_notes"
             }
         }
     )
-    if user_loc == "BOH":
-        list_of_boh_leader = notes_sheet.findall("BOH Leadership", in_column=1)
-        list_of_boh_all = notes_sheet.findall("BOH All", in_column=1)
-        boh_leader_elements = []
-        boh_all_elements = []
-        for x in list_of_boh_leader:
-            value = notes_sheet.cell(x.row, 2).value
-            boh_leader_elements.append(
-                {
-                    "type": "rich_text_section",
-                    "elements": [{"type": "text", "text": value}]
-                }
-            )
-        for x in list_of_boh_all:
-            value = notes_sheet.cell(x.row, 2).value
-            boh_all_elements.append(
-                {
-                    "type": "rich_text_section",
-                    "elements": [{"type": "text", "text": value}]
-                }
-            )
-        blocks.append(
-            {
-                "type": "rich_text",
-                "elements": [
-                    {
-                        "type": "rich_text_section",
-                        "elements": [
-                            {
-                                "type": "text",
-                                "text": "BOH Leadership Notes\n"
-                            }
-                        ]
-                    },
-                    {
-                        "type": "rich_text_list",
-                        "style": "bullet",
-                        "elements": boh_leader_elements
-                    }
-                ]
-            }
-        )
-        blocks.append({"type": "divider"})
-        blocks.append(
-            {
-                "type": "rich_text",
-                "elements": [
-                    {
-                        "type": "rich_text_section",
-                        "elements": [
-                            {
-                                "type": "text",
-                                "text": "BOH All Notes\n"
-                            }
-                        ]
-                    },
-                    {
-                        "type": "rich_text_list",
-                        "style": "bullet",
-                        "elements": boh_all_elements
-                    }
-                ]
-            }
-        )
-    else:
-        list_of_foh_leader = notes_sheet.findall("FOH Leadership", in_column=1)
-        list_of_foh_all = notes_sheet.findall("FOH All", in_column=1)
-        foh_leader_elements = []
-        foh_all_elements = []
-        for x in list_of_foh_leader:
-            value = notes_sheet.cell(x.row, 2).value
-            foh_leader_elements.append(
-                {
-                    "type": "rich_text_section",
-                    "elements": [{"type": "text", "text": value}]
-                }
-            )
-        for x in list_of_foh_all:
-            value = notes_sheet.cell(x.row, 2).value
-            foh_all_elements.append(
-                {
-                    "type": "rich_text_section",
-                    "elements": [{"type": "text", "text": value}]
-                }
-            )
-        blocks.append(
-            {
-                "type": "rich_text",
-                "elements": [
-                    {
-                        "type": "rich_text_section",
-                        "elements": [
-                            {
-                                "type": "text",
-                                "text": "FOH Leadership Notes\n"
-                            }
-                        ]
-                    },
-                    {
-                        "type": "rich_text_list",
-                        "style": "bullet",
-                        "elements": foh_leader_elements
-                    }
-                ]
-            }
-        )
-        blocks.append(
-            {
-                "type": "rich_text",
-                "elements": [
-                    {
-                        "type": "rich_text_section",
-                        "elements": [
-                            {
-                                "type": "text",
-                                "text": "FOH All Notes\n"
-                            }
-                        ]
-                    },
-                    {
-                        "type": "rich_text_list",
-                        "style": "bullet",
-                        "elements": foh_all_elements
-                    }
-                ]
-            }
-        )
+    notes_blocks = await pull_notes(user_loc)
+    blocks = blocks + notes_blocks
     # Publish view to home tab
     await client.views_publish(
         user_id=event['user'],
@@ -274,6 +238,37 @@ async def update_home_tab(client, event):
             "blocks": blocks
         }
     )
+
+
+@app.block_action("swap_notes")
+async def home_swap_notes(ack, body, client):
+    """"Update the Home tab following a button click by the user"""
+    await ack()
+    logger.info(body)
+    # build blocks
+    blocks = [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": (f"Hey there 👋 I'm Cathy - you're gateway to a number of cool features inside of "
+                         f"Slack. Use /help to see all the different commands you can use in Slack.")
+            }
+        },
+        {
+            "type": "divider"
+        }
+    ]
+    # Publish view to home tab
+    # await client.views_publish(
+    #     user_id=event['user'],
+    #     view={
+    #         "type": "home",
+    #         "callback_id": "home_view",
+    #         "blocks": blocks
+    #     }
+    # )
+
 
 
 # Remove all Slack messages from the channel you are in. I only use this in my test channel.
