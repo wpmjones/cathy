@@ -223,7 +223,8 @@ async def update_home_tab(client, event):
                     "emoji": True,
                     "text": "Swap Notes"
                 },
-                "value": "swap_notes"
+                "value": "swap_notes",
+                "action_id": "swap_notes"
             }
         }
     )
