@@ -246,9 +246,7 @@ async def home_swap_notes(ack, body, client):
     await ack()
     blocks = body['view']['blocks']
     # update blocks
-    logger.info(body['view']['blocks'][-1]['elements']['elements'][0])
-    logger.info(body['view']['blocks'][-1]['elements']['elements'][0]['text'])
-    user_loc = body['view']['blocks'][-1]['elements']['elements'][0]['text'][:3]
+    user_loc = body['view']['blocks'][-1]['elements'][0]['elements'][0]['text'][:3]
     logger.info(user_loc)
     if user_loc == "BOH":
         # Swap to FOH
