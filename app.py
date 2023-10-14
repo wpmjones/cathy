@@ -190,7 +190,7 @@ async def pull_notes(user_loc):
 
 
 @app.event("app_home_opened")
-async def update_home_tab(client, event):
+async def initiate_home_tab(client, event):
     """Provide user specific content to the Cathy Home tab"""
     # Establish link to Google Sheets
     leader_sheet = staff_spreadsheet.worksheet("Leaders")
@@ -235,6 +235,8 @@ async def update_home_tab(client, event):
         }
     )
     notes_blocks = await pull_notes(user_loc)
+    logger.info(blocks)
+    logger.info(notes_blocks)
     blocks = blocks + notes_blocks
     # Publish view to home tab
     await client.views_publish(
