@@ -102,15 +102,14 @@ async def update_home_tab(client, event):
         list_of_boh_all = notes_sheet.findall("BOH All", in_column=1)
         boh_leader_elements = []
         boh_all_elements = []
-        for row in list_of_boh_leader:
-            logger.info(row)
+        for row in [x.row for x in list_of_boh_leader]:
             boh_leader_elements.append(
                 {
                     "type": "rich_text_section",
                     "elements": [{"type": "text", "text": row[1]}]
                 }
             )
-        for row in list_of_boh_all:
+        for row in [x.row for x in list_of_boh_all]:
             boh_all_elements.append(
                 {
                     "type": "rich_text_section",
@@ -164,14 +163,14 @@ async def update_home_tab(client, event):
         list_of_foh_all = notes_sheet.findall("FOH All", in_column=1)
         foh_leader_elements = []
         foh_all_elements = []
-        for row in list_of_foh_leader:
+        for row in [x.row for x in list_of_foh_leader]:
             foh_leader_elements.append(
                 {
                     "type": "rich_text_section",
                     "elements": [{"type": "text", "text": row[1]}]
                 }
             )
-        for row in list_of_foh_all:
+        for row in [x.row for x in list_of_foh_all]:
             foh_all_elements.append(
                 {
                     "type": "rich_text_section",
