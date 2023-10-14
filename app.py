@@ -97,129 +97,130 @@ async def update_home_tab(client, event):
         },
         {"type": "divider"}
     ]
-    if user_loc == "BOH":
-        list_of_boh_leader = notes_sheet.findall("BOH Leadership", in_column=1)
-        list_of_boh_all = notes_sheet.findall("BOH All", in_column=1)
-        boh_leader_elements = []
-        boh_all_elements = []
-        for row in list_of_boh_leader:
-            boh_leader_elements.append(
-                {
-                    "type": "rich_text_section",
-                    "elements": [{"type": "text", "text": row[1]}]
-                }
-            )
-        for row in list_of_boh_all:
-            boh_all_elements.append(
-                {
-                    "type": "rich_text_section",
-                    "elements": [{"type": "text", "text": row[1]}]
-                }
-            )
-        blocks.append(
-            {
-                "type": "rich_text",
-                "elements": [
-                    {
-                        "type": "rich_text_section",
-                        "elements": [
-                            {
-                                "type": "text",
-                                "text": "BOH Leadership Notes\n"
-                            }
-                        ]
-                    },
-                    {
-                        "type": "rich_text_list",
-                        "style": "bullet",
-                        "elements": boh_leader_elements
-                    }
-                ]
-            }
-        )
-        blocks.append(
-            {
-                "type": "rich_text",
-                "elements": [
-                    {
-                        "type": "rich_text_section",
-                        "elements": [
-                            {
-                                "type": "text",
-                                "text": "BOH All Notes\n"
-                            }
-                        ]
-                    },
-                    {
-                        "type": "rich_text_list",
-                        "style": "bullet",
-                        "elements": boh_all_elements
-                    }
-                ]
-            }
-        )
-    else:
-        list_of_foh_leader = notes_sheet.findall("FOH Leadership", in_column=1)
-        list_of_foh_all = notes_sheet.findall("FOH All", in_column=1)
-        foh_leader_elements = []
-        foh_all_elements = []
-        for row in list_of_foh_leader:
-            foh_leader_elements.append(
-                {
-                    "type": "rich_text_section",
-                    "elements": [{"type": "text", "text": row[1]}]
-                }
-            )
-        for row in list_of_foh_all:
-            foh_all_elements.append(
-                {
-                    "type": "rich_text_section",
-                    "elements": [{"type": "text", "text": row[1]}]
-                }
-            )
-        blocks.append(
-            {
-                "type": "rich_text",
-                "elements": [
-                    {
-                        "type": "rich_text_section",
-                        "elements": [
-                            {
-                                "type": "text",
-                                "text": "FOH Leadership Notes\n"
-                            }
-                        ]
-                    },
-                    {
-                        "type": "rich_text_list",
-                        "style": "bullet",
-                        "elements": foh_leader_elements
-                    }
-                ]
-            }
-        )
-        blocks.append(
-            {
-                "type": "rich_text",
-                "elements": [
-                    {
-                        "type": "rich_text_section",
-                        "elements": [
-                            {
-                                "type": "text",
-                                "text": "FOH All Notes\n"
-                            }
-                        ]
-                    },
-                    {
-                        "type": "rich_text_list",
-                        "style": "bullet",
-                        "elements": foh_all_elements
-                    }
-                ]
-            }
-        )
+    # if user_loc == "BOH":
+    #     list_of_boh_leader = notes_sheet.findall("BOH Leadership", in_column=1)
+    #     list_of_boh_all = notes_sheet.findall("BOH All", in_column=1)
+    #     boh_leader_elements = []
+    #     boh_all_elements = []
+    #     for row in list_of_boh_leader:
+    #         boh_leader_elements.append(
+    #             {
+    #                 "type": "rich_text_section",
+    #                 "elements": [{"type": "text", "text": row[1]}]
+    #             }
+    #         )
+    #     for row in list_of_boh_all:
+    #         boh_all_elements.append(
+    #             {
+    #                 "type": "rich_text_section",
+    #                 "elements": [{"type": "text", "text": row[1]}]
+    #             }
+    #         )
+    #     blocks.append(
+    #         {
+    #             "type": "rich_text",
+    #             "elements": [
+    #                 {
+    #                     "type": "rich_text_section",
+    #                     "elements": [
+    #                         {
+    #                             "type": "text",
+    #                             "text": "BOH Leadership Notes\n"
+    #                         }
+    #                     ]
+    #                 },
+    #                 {
+    #                     "type": "rich_text_list",
+    #                     "style": "bullet",
+    #                     "elements": boh_leader_elements
+    #                 }
+    #             ]
+    #         }
+    #     )
+    #     blocks.append(
+    #         {
+    #             "type": "rich_text",
+    #             "elements": [
+    #                 {
+    #                     "type": "rich_text_section",
+    #                     "elements": [
+    #                         {
+    #                             "type": "text",
+    #                             "text": "BOH All Notes\n"
+    #                         }
+    #                     ]
+    #                 },
+    #                 {
+    #                     "type": "rich_text_list",
+    #                     "style": "bullet",
+    #                     "elements": boh_all_elements
+    #                 }
+    #             ]
+    #         }
+    #     )
+    # else:
+    #     list_of_foh_leader = notes_sheet.findall("FOH Leadership", in_column=1)
+    #     list_of_foh_all = notes_sheet.findall("FOH All", in_column=1)
+    #     foh_leader_elements = []
+    #     foh_all_elements = []
+    #     for row in list_of_foh_leader:
+    #         foh_leader_elements.append(
+    #             {
+    #                 "type": "rich_text_section",
+    #                 "elements": [{"type": "text", "text": row[1]}]
+    #             }
+    #         )
+    #     for row in list_of_foh_all:
+    #         foh_all_elements.append(
+    #             {
+    #                 "type": "rich_text_section",
+    #                 "elements": [{"type": "text", "text": row[1]}]
+    #             }
+    #         )
+    #     blocks.append(
+    #         {
+    #             "type": "rich_text",
+    #             "elements": [
+    #                 {
+    #                     "type": "rich_text_section",
+    #                     "elements": [
+    #                         {
+    #                             "type": "text",
+    #                             "text": "FOH Leadership Notes\n"
+    #                         }
+    #                     ]
+    #                 },
+    #                 {
+    #                     "type": "rich_text_list",
+    #                     "style": "bullet",
+    #                     "elements": foh_leader_elements
+    #                 }
+    #             ]
+    #         }
+    #     )
+    #     blocks.append(
+    #         {
+    #             "type": "rich_text",
+    #             "elements": [
+    #                 {
+    #                     "type": "rich_text_section",
+    #                     "elements": [
+    #                         {
+    #                             "type": "text",
+    #                             "text": "FOH All Notes\n"
+    #                         }
+    #                     ]
+    #                 },
+    #                 {
+    #                     "type": "rich_text_list",
+    #                     "style": "bullet",
+    #                     "elements": foh_all_elements
+    #                 }
+    #             ]
+    #         }
+    #     )
     # Publish view to home tab
+    logger.info(blocks)
     client.views_publish(
         user_id=event['user'],
         view={
