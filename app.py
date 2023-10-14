@@ -244,31 +244,21 @@ async def update_home_tab(client, event):
 async def home_swap_notes(ack, body, client):
     """"Update the Home tab following a button click by the user"""
     await ack()
-    logger.info(body)
-    # build blocks
-    blocks = [
-        {
-            "type": "section",
-            "text": {
-                "type": "mrkdwn",
-                "text": (f"Hey there 👋 I'm Cathy - you're gateway to a number of cool features inside of "
-                         f"Slack. Use /help to see all the different commands you can use in Slack.")
-            }
-        },
-        {
-            "type": "divider"
-        },
-        {
-            "type": "section",
-            "text": {
-                "type": "mrkdwn",
-                "text": "Button clicked.  Good job!"
-            }
-        }
-    ]
+    blocks = body['view']['blocks']
+    logger.info(blocks)
+    # update blocks
+    user_loc = body['view']['blocks'][-1]['elements'][0]['text'][:3]
+    logger.info(user_loc)
+    if user_loc == "BOH":
+        # Swap to FOH
+        notes_blocks = await pull_notes("FOH")
+    else:
+        # Swap to BOH
+        notes_blocks = await pull_notes("BOH")
+    blocks = blocks[:-4] + notes_blocks
     # Publish view to home tab
     await client.views_publish(
-        user_id=event['user'],
+        user_id=body['user']['id'],
         view={
             "type": "home",
             "callback_id": "home_view",
