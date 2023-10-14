@@ -4,6 +4,8 @@
 # bot_token = "my_token"
 # Once you import creds, you will access this like this:
 # creds.bot_token
+import time
+
 import creds
 
 import asyncio
@@ -32,6 +34,7 @@ client = WebClient(token=creds.bot_token)
 
 # Connect to Google Sheets
 gc = gspread.service_account(filename=creds.gspread)
+staff_spreadsheet = gc.open_by_key(creds.staff_id)
 
 # Constants
 CHANNEL_TESTING = "G01QADSDVDW"
@@ -112,8 +115,8 @@ async def pull_cater(user_first):
 
 
 async def pull_notes(user_loc):
-    spreadsheet = gc.open_by_key(creds.staff_id)
-    notes_sheet = spreadsheet.worksheet("Shift Notes")
+    start = time.perf_counter()
+    notes_sheet = staff_spreadsheet.worksheet("Shift Notes")
     list_of_leader = notes_sheet.findall(f"{user_loc} Leadership", in_column=1)
     list_of_all = notes_sheet.findall(f"{user_loc} All", in_column=1)
     leader_elements = []
@@ -178,6 +181,8 @@ async def pull_notes(user_loc):
             ]
         }
     )
+    end = time.perf_counter()
+    logger.info(f"{user_loc} notes pulled in {end - start:0.4f} seconds")
     return temp_blocks
 
 
@@ -185,8 +190,7 @@ async def pull_notes(user_loc):
 async def update_home_tab(client, event):
     """Provide user specific content to the Cathy Home tab"""
     # Establish link to Google Sheets
-    spreadsheet = gc.open_by_key(creds.staff_id)
-    leader_sheet = spreadsheet.worksheet("Leaders")
+    leader_sheet = staff_spreadsheet.worksheet("Leaders")
     user_cell = leader_sheet.find(event['user'])
     user_first = leader_sheet.cell(user_cell.row, 1).value
     user_loc = leader_sheet.cell(user_cell.row, 5).value
@@ -678,8 +682,7 @@ async def handle_add_view(ack, body, client, view):
         await client.chat_postMessage(channel=creds.pj_user_id,
                                       text=f"There was an error while adding {name} to {location} Trello board.")
     # add user to CFA Staff spreadsheet (for use in /sick dropdown list)
-    sh = gc.open_by_key(creds.staff_id)
-    staff_sheet = sh.worksheet("Sheet1")
+    staff_sheet = staff_spreadsheet.worksheet("Sheet1")
     staff_sheet.append_row([name], value_input_option="USER_ENTERED")
     staff_sheet.sort([1, "asc"])
     # if staff_sheet.row_count > 100:
@@ -1071,8 +1074,7 @@ async def discipline(ack, body, client):
     in a Google Sheet for historical purposes."""
     await ack()
     # Create options for select menu
-    sheet = gc.open_by_key(creds.staff_id)
-    worksheet = sheet.get_worksheet(0)
+    worksheet = staff_spreadsheet.get_worksheet(0)
     tm_values = worksheet.col_values(1)
     if len(tm_values) > 100:
         await client.chat_postMessage(channel=creds.pj_user_id,
@@ -1281,8 +1283,7 @@ async def sick(ack, body, client):
     """
     await ack()
     # Create options for select menu
-    sheet = gc.open_by_key(creds.staff_id)
-    worksheet = sheet.get_worksheet(0)
+    worksheet = staff_spreadsheet.get_worksheet(0)
     values = worksheet.col_values(1)
     if len(values) > 100:
         await client.chat_postMessage(channel=creds.pj_user_id,
