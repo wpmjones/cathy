@@ -115,7 +115,6 @@ async def pull_cater(user_first):
 
 
 async def pull_notes(user_loc):
-    start = time.perf_counter()
     notes_sheet = staff_spreadsheet.worksheet("Shift Notes")
     all_values = notes_sheet.get_all_values()
     leader_text = f"{user_loc} Leadership"
@@ -183,8 +182,6 @@ async def pull_notes(user_loc):
             ]
         }
     )
-    end = time.perf_counter()
-    logger.info(f"{user_loc} notes pulled in {end - start:0.4f} seconds")
     return temp_blocks
 
 
@@ -234,8 +231,6 @@ async def initiate_home_tab(client, event):
         }
     )
     notes_blocks = await pull_notes(user_loc)
-    logger.info(blocks)
-    logger.info(notes_blocks)
     blocks = blocks + notes_blocks
     # Publish view to home tab
     await client.views_publish(
