@@ -99,11 +99,11 @@ async def update_home_tab(client, event):
     ]
     if user_loc == "BOH":
         list_of_boh_leader = notes_sheet.findall("BOH Leadership", in_column=1)
+        logger.info(list_of_boh_leader)
         list_of_boh_all = notes_sheet.findall("BOH All", in_column=1)
         boh_leader_elements = []
         boh_all_elements = []
         for row in [x.row for x in list_of_boh_leader]:
-            logger.info(row)
             boh_leader_elements.append(
                 {
                     "type": "rich_text_section",
