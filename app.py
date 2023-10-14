@@ -245,9 +245,8 @@ async def home_swap_notes(ack, body, client):
     """"Update the Home tab following a button click by the user"""
     await ack()
     blocks = body['view']['blocks']
-    logger.info(blocks)
     # update blocks
-    user_loc = body['view']['blocks'][-1]['elements'][0]['text'][:3]
+    user_loc = body['view']['blocks'][-1]['elements']['elements'][0]['text'][:3]
     logger.info(user_loc)
     if user_loc == "BOH":
         # Swap to FOH
@@ -255,7 +254,7 @@ async def home_swap_notes(ack, body, client):
     else:
         # Swap to BOH
         notes_blocks = await pull_notes("BOH")
-    blocks = blocks[:-4] + notes_blocks
+    blocks = blocks[:-3] + notes_blocks
     # Publish view to home tab
     await client.views_publish(
         user_id=body['user']['id'],
