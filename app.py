@@ -223,7 +223,6 @@ async def update_home_tab(client, event):
                     "emoji": True,
                     "text": "Swap Notes"
                 },
-                "value": "swap_notes",
                 "action_id": "swap_notes"
             }
         }
@@ -258,18 +257,24 @@ async def home_swap_notes(ack, body, client):
         },
         {
             "type": "divider"
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "Button clicked.  Good job!"
+            }
         }
     ]
     # Publish view to home tab
-    # await client.views_publish(
-    #     user_id=event['user'],
-    #     view={
-    #         "type": "home",
-    #         "callback_id": "home_view",
-    #         "blocks": blocks
-    #     }
-    # )
-
+    await client.views_publish(
+        user_id=event['user'],
+        view={
+            "type": "home",
+            "callback_id": "home_view",
+            "blocks": blocks
+        }
+    )
 
 
 # Remove all Slack messages from the channel you are in. I only use this in my test channel.
