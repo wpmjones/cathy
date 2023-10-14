@@ -166,7 +166,7 @@ async def update_home_tab(client, event):
         list_of_foh_all = notes_sheet.findall("FOH All", in_column=1)
         foh_leader_elements = []
         foh_all_elements = []
-        for row in list_of_foh_leader:
+        for x in list_of_foh_leader:
             value = notes_sheet.cell(x.row, 2).value
             foh_leader_elements.append(
                 {
@@ -174,7 +174,7 @@ async def update_home_tab(client, event):
                     "elements": [{"type": "text", "text": value}]
                 }
             )
-        for row in list_of_foh_all:
+        for x in list_of_foh_all:
             value = notes_sheet.cell(x.row, 2).value
             foh_all_elements.append(
                 {
