@@ -124,8 +124,9 @@ async def pull_notes(user_loc):
     all_elements = []
     temp_blocks = []
     for row in all_values:
+        logger.info(f"Row: {row}")
         if row[0] == leader_text:
-            value = row[2]
+            value = row[1]
             leader_elements.append(
                 {
                     "type": "rich_text_section",
@@ -133,7 +134,7 @@ async def pull_notes(user_loc):
                 }
             )
         if row[0] == all_text:
-            value = row[2]
+            value = row[1]
             all_elements.append(
                 {
                     "type": "rich_text_section",
