@@ -103,6 +103,7 @@ async def update_home_tab(client, event):
         boh_leader_elements = []
         boh_all_elements = []
         for row in [x.row for x in list_of_boh_leader]:
+            logger.info(row)
             boh_leader_elements.append(
                 {
                     "type": "rich_text_section",
