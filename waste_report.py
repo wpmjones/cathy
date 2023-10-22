@@ -25,39 +25,39 @@ def main():
             # catch them all.  Hmm.  Sounds like Pokemon.
             try:
                 filets += float(row[1])
-            except [IndexError, ValueError]:
+            except (ValueError, IndexError):
                 pass
             try:
                 spicy += float(row[2])
-            except [IndexError, ValueError]:
+            except (ValueError, IndexError):
                 pass
             try:
                 nuggets += float(row[3])
-            except [IndexError, ValueError]:
+            except (ValueError, IndexError):
                 pass
             try:
                 strips += float(row[4])
-            except [IndexError, ValueError]:
+            except (ValueError, IndexError):
                 pass
             try:
                 g_filets += float(row[5])
-            except [IndexError, ValueError]:
+            except (ValueError, IndexError):
                 pass
             try:
                 g_nuggets += float(row[6])
-            except [IndexError, ValueError]:
+            except (ValueError, IndexError):
                 pass
             try:
                 b_filets += float(row[7])
-            except [IndexError, ValueError]:
+            except (ValueError, IndexError):
                 pass
             try:
                 gb_filets += float(row[8])
-            except [IndexError, ValueError]:
+            except (ValueError, IndexError):
                 pass
             try:
                 sb_filets += float(row[9])
-            except [IndexError, ValueError]:
+            except (ValueError, IndexError):
                 pass
 
     block_text = ""
