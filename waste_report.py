@@ -8,6 +8,16 @@ from datetime import datetime
 gc = gspread.service_account(filename=creds.gspread)
 spreadsheet = gc.open_by_key(creds.waste_id)
 
+RED_CIRCLE = ":red_circle:"
+GREEN_CIRCLE = ":large_green_circle:"
+
+
+def get_emoji(weight, goal):
+    if weight > goal:
+        return RED_CIRCLE
+    else:
+        return GREEN_CIRCLE
+
 
 def main():
     webhook_url = creds.webhook_test
@@ -21,7 +31,7 @@ def main():
     goals = sheet.get_all_values()
     goal_list = []
     for row in goals:
-        goal_list.append(row[1])
+        goal_list.append(float(row[1]))
 
     filets = spicy = nuggets = strips = g_filets = g_nuggets = b_filets = gb_filets = sb_filets = 0
     for row in values:
@@ -68,23 +78,32 @@ def main():
 
     block_text = ""
     if filets:
-        block_text += f"\nFilets: {filets} lbs. (Goal: {goal_list[1]} lbs.)"
+        emoji = get_emoji(filets, goal_list[1])
+        block_text += f"\n{emoji} Filets: {filets} lbs. (Goal: {goal_list[1]} lbs.)"
     if spicy:
-        block_text += f"\nSpicy: {spicy} lbs. (Goal: {goal_list[2]} lbs.)"
+        emoji = get_emoji(spicy, goal_list[2])
+        block_text += f"\n{emoji} Spicy: {spicy} lbs. (Goal: {goal_list[2]} lbs.)"
     if nuggets:
-        block_text += f"\nNuggets: {nuggets} lbs. (Goal: {goal_list[3]} lbs.)"
+        emoji = get_emoji(nuggets, goal_list[3])
+        block_text += f"\n{emoji} Nuggets: {nuggets} lbs. (Goal: {goal_list[3]} lbs.)"
     if strips:
-        block_text += f"\nStrips: {strips} lbs. (Goal: {goal_list[4]} lbs.)"
+        emoji = get_emoji(strips, goal_list[4])
+        block_text += f"\n{emoji} Strips: {strips} lbs. (Goal: {goal_list[4]} lbs.)"
     if g_filets:
-        block_text += f"\nGrilled Filets: {g_filets} lbs. (Goal: {goal_list[5]} lbs.)"
+        emoji = get_emoji(g_filets, goal_list[5])
+        block_text += f"\n{emoji} Grilled Filets: {g_filets} lbs. (Goal: {goal_list[5]} lbs.)"
     if g_nuggets:
-        block_text += f"\nGrilled Nuggets: {g_nuggets} lbs. (Goal: {goal_list[6]} lbs.)"
+        emoji = get_emoji(g_nuggets, goal_list[6])
+        block_text += f"\n{emoji} Grilled Nuggets: {g_nuggets} lbs. (Goal: {goal_list[6]} lbs.)"
     if b_filets:
-        block_text += f"\nBreakfast Filets: {b_filets} lbs. (Goal: {goal_list[7]} lbs.)"
+        emoji = get_emoji(b_filets, goal_list[7])
+        block_text += f"\n{emoji} Breakfast Filets: {b_filets} lbs. (Goal: {goal_list[7]} lbs.)"
     if gb_filets:
-        block_text += f"\nGrilled Breakfast: {gb_filets} lbs. (Goal: {goal_list[8]} lbs.)"
+        emoji = get_emoji(gb_filets, goal_list[8])
+        block_text += f"\n{emoji} Grilled Breakfast: {gb_filets} lbs. (Goal: {goal_list[8]} lbs.)"
     if sb_filets:
-        block_text += f"\nSpicy Breakfast: {sb_filets} lbs. (Goal: {goal_list[9]} lbs.)"
+        emoji = get_emoji(sb_filets, goal_list[9])
+        block_text += f"\n{emoji} Spicy Breakfast: {sb_filets} lbs. (Goal: {goal_list[9]} lbs.)"
 
     blocks = [
         {
