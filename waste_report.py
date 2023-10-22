@@ -11,7 +11,7 @@ spreadsheet = gc.open_by_key(creds.waste_id)
 
 def main():
     webhook_url = creds.webhook_test
-    now_today = datetime.today().strftime("%m/%d/%Y")
+    now_today = datetime.today().strftime("%Y-%m-%d")
 
     sheet = spreadsheet.worksheet("Data")
     num_rows = sheet.row_count
