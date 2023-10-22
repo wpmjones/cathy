@@ -20,7 +20,7 @@ def get_emoji(weight, goal):
 
 
 def main():
-    webhook_url = creds.webhook_test
+    webhook_url = creds.webhook_boh
     now_today = datetime.today().strftime("%Y-%m-%d")
 
     sheet = spreadsheet.worksheet("Data")
