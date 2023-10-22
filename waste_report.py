@@ -18,7 +18,7 @@ def main():
     values = sheet.get(f"A{num_rows - 10}:J{num_rows}")
 
     for row in values:
-        print(row[0][:9])
+        print(row[0][:10], now_today)
         if row[0][:10] == now_today:
             print(row[1], row[2])
 
