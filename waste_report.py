@@ -17,10 +17,38 @@ def main():
     num_rows = sheet.row_count
     values = sheet.get(f"A{num_rows - 10}:J{num_rows}")
 
+    filets = spicy = nuggets = strips = g_filets = g_nuggets = b_filets = gb_filets = sb_filets = 0
     for row in values:
-        print(row[0][:10], now_today)
         if row[0][:10] == now_today:
-            print(row[1], row[2])
+            filets += row[1]
+            spicy += row[2]
+            nuggets += row[3]
+            strips += row[4]
+            g_filets += row[5]
+            g_nuggets += row[6]
+            b_filets += row[7]
+            gb_filets += row[8]
+            sb_filets += row[9]
+
+    block_text = ""
+    if filets:
+        block_text += f"\nFilets: {filets}"
+    if spicy:
+        block_text += f"\nSpicy: {spicy}"
+    if nuggets:
+        block_text += f"\nNuggets: {nuggets}"
+    if strips:
+        block_text += f"\nStrips: {strips}"
+    if g_filets:
+        block_text += f"\nGrilled Filets: {g_filets}"
+    if g_nuggets:
+        block_text += f"\nGrilled Nuggets: {g_nuggets}"
+    if b_filets:
+        block_text += f"\nBreakfast Filets: {b_filets}"
+    if gb_filets:
+        block_text += f"\nGrilled Breakfast: {gb_filets}"
+    if sb_filets:
+        block_text += f"\nSpicy Breakfast: {sb_filets}"
 
     blocks = [
         {
@@ -36,7 +64,11 @@ def main():
         },
         {
             "type": "section",
-            "block_id": "waste_report"
+            "block_id": "waste_report",
+            "text": {
+                "type": "mrkdwn",
+                "text": block_text
+            }
         }
     ]
 
@@ -45,10 +77,10 @@ def main():
         "blocks": blocks
     }
 
-    # r = requests.post(webhook_url, json=payload)
-    # if r.status_code != 200:
-    #     raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
-    #                      f"The response is: {r.text}")
+    r = requests.post(webhook_url, json=payload)
+    if r.status_code != 200:
+        raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
+                         f"The response is: {r.text}")
 
 
 if __name__ == "__main__":
