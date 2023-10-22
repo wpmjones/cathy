@@ -20,15 +20,15 @@ def main():
     filets = spicy = nuggets = strips = g_filets = g_nuggets = b_filets = gb_filets = sb_filets = 0
     for row in values:
         if row[0][:10] == now_today:
-            filets += row[1]
-            spicy += row[2]
-            nuggets += row[3]
-            strips += row[4]
-            g_filets += row[5]
-            g_nuggets += row[6]
-            b_filets += row[7]
-            gb_filets += row[8]
-            sb_filets += row[9]
+            filets += int(row[1])
+            spicy += int(row[2])
+            nuggets += int(row[3])
+            strips += int(row[4])
+            g_filets += int(row[5])
+            g_nuggets += int(row[6])
+            b_filets += int(row[7])
+            gb_filets += int(row[8])
+            sb_filets += int(row[9])
 
     block_text = ""
     if filets:
