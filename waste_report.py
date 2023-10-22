@@ -20,15 +20,45 @@ def main():
     filets = spicy = nuggets = strips = g_filets = g_nuggets = b_filets = gb_filets = sb_filets = 0
     for row in values:
         if row[0][:10] == now_today:
-            filets += float(row[1])
-            spicy += float(row[2])
-            nuggets += float(row[3])
-            strips += float(row[4])
-            g_filets += float(row[5])
-            g_nuggets += float(row[6])
-            b_filets += float(row[7])
-            gb_filets += float(row[8])
-            sb_filets += float(row[9])
+            # If there is an index error, it's only because there is no value in that cell toward
+            # the end of that row. It will probably never trigger before strips, but lets be safe and
+            # catch them all.  Hmm.  Sounds like Pokemon.
+            try:
+                filets += float(row[1])
+            except IndexError:
+                pass
+            try:
+                spicy += float(row[2])
+            except IndexError:
+                pass
+            try:
+                nuggets += float(row[3])
+            except IndexError:
+                pass
+            try:
+                strips += float(row[4])
+            except IndexError:
+                pass
+            try:
+                g_filets += float(row[5])
+            except IndexError:
+                pass
+            try:
+                g_nuggets += float(row[6])
+            except IndexError:
+                pass
+            try:
+                b_filets += float(row[7])
+            except IndexError:
+                pass
+            try:
+                gb_filets += float(row[8])
+            except IndexError:
+                pass
+            try:
+                sb_filets += float(row[9])
+            except IndexError:
+                pass
 
     block_text = ""
     if filets:
