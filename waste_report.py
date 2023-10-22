@@ -19,6 +19,8 @@ def main():
 
     for row in values:
         print(row[0][:10])
+        if row[0][:10] == now_today:
+            print(row[1], row[2])
 
     blocks = [
         {
