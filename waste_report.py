@@ -17,6 +17,12 @@ def main():
     num_rows = sheet.row_count
     values = sheet.get(f"A{num_rows - 10}:J{num_rows}")
 
+    sheet = spreadsheet.worksheet("Goals")
+    goals = sheet.get_all_values()
+    goal_list = []
+    for row in goals:
+        goal_list.append(row[1])
+
     filets = spicy = nuggets = strips = g_filets = g_nuggets = b_filets = gb_filets = sb_filets = 0
     for row in values:
         if row[0][:10] == now_today:
@@ -62,23 +68,23 @@ def main():
 
     block_text = ""
     if filets:
-        block_text += f"\nFilets: {filets}"
+        block_text += f"\nFilets: {filets} lbs. (Goal: {goal_list[1]} lbs.)"
     if spicy:
-        block_text += f"\nSpicy: {spicy}"
+        block_text += f"\nSpicy: {spicy} lbs. (Goal: {goal_list[2]} lbs.)"
     if nuggets:
-        block_text += f"\nNuggets: {nuggets}"
+        block_text += f"\nNuggets: {nuggets} lbs. (Goal: {goal_list[3]} lbs.)"
     if strips:
-        block_text += f"\nStrips: {strips}"
+        block_text += f"\nStrips: {strips} lbs. (Goal: {goal_list[4]} lbs.)"
     if g_filets:
-        block_text += f"\nGrilled Filets: {g_filets}"
+        block_text += f"\nGrilled Filets: {g_filets} lbs. (Goal: {goal_list[5]} lbs.)"
     if g_nuggets:
-        block_text += f"\nGrilled Nuggets: {g_nuggets}"
+        block_text += f"\nGrilled Nuggets: {g_nuggets} lbs. (Goal: {goal_list[6]} lbs.)"
     if b_filets:
-        block_text += f"\nBreakfast Filets: {b_filets}"
+        block_text += f"\nBreakfast Filets: {b_filets} lbs. (Goal: {goal_list[7]} lbs.)"
     if gb_filets:
-        block_text += f"\nGrilled Breakfast: {gb_filets}"
+        block_text += f"\nGrilled Breakfast: {gb_filets} lbs. (Goal: {goal_list[8]} lbs.)"
     if sb_filets:
-        block_text += f"\nSpicy Breakfast: {sb_filets}"
+        block_text += f"\nSpicy Breakfast: {sb_filets} lbs. (Goal: {goal_list[9]} lbs.)"
 
     blocks = [
         {
@@ -86,7 +92,7 @@ def main():
             "block_id": "section_header",
             "text": {
                 "type": "mrkdwn",
-                "text": f"*Waste Report for {now_today}"
+                "text": f"*Waste Report for {now_today}*"
             }
         },
         {
