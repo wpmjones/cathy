@@ -32,8 +32,9 @@ def main():
     goal_list = []
     for row in goals:
         if row[1] == "Pounds":
-            continue
-        goal_list.append(float(row[1]))
+            goal_list.append(0.0)
+        else:
+            goal_list.append(float(row[1]))
 
     filets = spicy = nuggets = strips = g_filets = g_nuggets = b_filets = gb_filets = sb_filets = 0
     for row in values:
