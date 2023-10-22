@@ -16,7 +16,9 @@ def main():
     sheet = spreadsheet.worksheet("Data")
     num_rows = sheet.row_count
     values = sheet.get(f"A{num_rows - 10}:J{num_rows}")
-    print(values)
+
+    for row in values:
+        print(row[0].strftime("%m/%d/%Y"))
 
     blocks = [
         {
