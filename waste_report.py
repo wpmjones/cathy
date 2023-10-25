@@ -4,6 +4,9 @@ import requests
 import sys
 
 from datetime import datetime, timedelta
+from loguru import logger
+
+logger.add("waste.log", rotation="1 week")
 
 # Connect to Google Sheets
 gc = gspread.service_account(filename=creds.gspread)
@@ -147,6 +150,7 @@ def weekly():
 
 
 def daily():
+    logger.info(f"Daily Range: A{num_rows - 10}:J{num_rows}")
     values = sheet.get(f"A{num_rows - 10}:J{num_rows}")
     filets = spicy = nuggets = strips = g_filets = g_nuggets = b_filets = gb_filets = sb_filets = 0
     for row in values:
