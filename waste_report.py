@@ -27,8 +27,8 @@ def get_emoji(weight, goal):
 now_today = datetime.today().strftime("%Y-%m-%d")
 sheet = spreadsheet.worksheet("Data")
 num_rows = sheet.row_count
-sheet = spreadsheet.worksheet("Goals")
-goals = sheet.get_all_values()
+goal_sheet = spreadsheet.worksheet("Goals")
+goals = goal_sheet.get_all_values()
 goal_list = []
 weekly_goal_list = []
 for row in goals:
