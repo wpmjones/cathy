@@ -696,10 +696,11 @@ async def handle_add_view(ack, body, client, view):
 
 
 @app.command("/tms")
-async def tms(ack, client, body):
+async def tms(ack, client, body, say):
     """This command opens the form for tracking TMS bags."""
     await ack()
-    logger.info(body)
+    if body['channel_id'] != creds.cater_channel:
+        return await say("Please use this command in #catering only.")
     blocks = [
         {
             "type": "section",
@@ -814,7 +815,7 @@ async def tms_req_status(ack, respond, body, say):
 @app.block_action("req_check_in")
 async def handle_req_check_in(ack, respond, client, body):
     """Handle button clicks from TMS Status Request"""
-    logger.info("Procession Check in from TMS Status")
+    logger.info("Process Check in from TMS Status")
     await ack()
     blocks = body['message']['blocks']
     clicked = body['actions'][0]['block_id']
