@@ -296,13 +296,6 @@ async def clear_messages(ack, body, say, client):
         counter += 1
 
 
-@app.command("/quiz")
-async def quiz(ack, say):
-    await ack()
-    await say("Trainer quizzes are now found in Pathway 2.0.  Dalia, Patrick, or Phil "
-              "can assign and monitor the quiz.")
-
-
 @app.command("/tardy")
 async def tardy(ack, body, say, client):
     """Record when someone shows up late for their shift. We take away their meal credit when this happens
@@ -703,9 +696,10 @@ async def handle_add_view(ack, body, client, view):
 
 
 @app.command("/tms")
-async def tms(ack, say):
+async def tms(ack, client, body):
     """This command opens the form for tracking TMS bags."""
     await ack()
+    logger.info(body)
     blocks = [
         {
             "type": "section",
@@ -755,7 +749,7 @@ async def tms(ack, say):
             ]
         }
     ]
-    await say(blocks=blocks, text="TMS Tracking")
+    await client.chat_postMessage(channel=creds.cater_channel, blocks=blocks, text="TMS Tracking")
 
 
 @app.block_action("req_status")
