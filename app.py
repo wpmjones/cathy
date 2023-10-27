@@ -700,7 +700,7 @@ async def tms(ack, client, body, say):
     """This command opens the form for tracking TMS bags."""
     await ack()
     if body['channel_id'] != creds.cater_channel:
-        return await say("Please use this command in #catering only.")
+        return await say(f"Please use this command in <#{creds.cater_channel}> only.")
     blocks = [
         {
             "type": "section",
