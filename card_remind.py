@@ -8,7 +8,7 @@ from operator import itemgetter
 # Connect to Google Sheets
 gc = gspread.service_account(filename=creds.gspread)
 spreadsheet = gc.open_by_key(creds.card_id)
-sheet = spreadsheet.worksheet(0)
+sheet = spreadsheet.get_worksheet(0)
 
 now_str = datetime.today().strftime("%m/%d/%Y")
 now = datetime.today()
