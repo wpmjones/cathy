@@ -963,6 +963,16 @@ async def tms_check_out(ack, body, respond, client):
                             "text": body['channel']['id']
                         }
                     ]
+                },
+                {
+                    "type": "context",
+                    "block_id": "context_b",
+                    "elements": [
+                        {
+                            "type": "plain_text",
+                            "text": body['user']['id']
+                        }
+                    ]
                 }
             ]
         }
@@ -980,7 +990,8 @@ async def handle_tms_check_out_view(ack, client, view):
     location = view['state']['values']['input_business']['business_name']['value']
     contact_name = view['state']['values']['input_contact']['contact_name']['value']
     contact_number = view['state']['values']['input_phone']['contact_number']['value']
-    channel_id = view['blocks'][-1]['elements'][0]['text']
+    channel_id = view['blocks'][-2]['elements'][0]['text']
+    user_id = view['blocks'][-1]['elements'][0]['text']
     errors = {}
     regex = r"^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$"
     if not re.match(regex, contact_number):
@@ -999,7 +1010,7 @@ async def handle_tms_check_out_view(ack, client, view):
     await ack()
     await client.chat_postEphemeral(channel=channel_id,
                                     text=f"TMS Bag#{value} has been checked out by {name}.",
-                                    user=view['user_id'])
+                                    user=user_id)
 
 
 @app.block_action("tms_in")
@@ -1077,7 +1088,8 @@ async def handle_tms_check_in_view(ack, client, view):
     """Processes input from TMS Check In View."""
     logger.info("Processing TMS Check In...")
     value = view['state']['values']['bag_num']['bag_num_action']['selected_option']['value']
-    channel_id = view['blocks'][-1]['elements'][0]['text']
+    channel_id = view['blocks'][-2]['elements'][0]['text']
+    user_id = view['blocks'][-1]['elements'][0]['text']
     sh = gc.open_by_key(creds.tms_id)
     sheet = sh.get_worksheet(0)
     cell = sheet.find(value)
@@ -1085,7 +1097,7 @@ async def handle_tms_check_in_view(ack, client, view):
     await ack()
     await client.chat_postEphemeral(channel=channel_id,
                                     text=f"TMS Bag #{value} has been marked as returned.",
-                                    user=view['user']['id']
+                                    user=user_id
                                     )
 
 
