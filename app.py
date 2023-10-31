@@ -1077,6 +1077,16 @@ async def tms_check_in(ack, body, respond, client):
                             "text": body['channel']['id']
                         }
                     ]
+                },
+                {
+                    "type": "context",
+                    "block_id": "context_b",
+                    "elements": [
+                        {
+                            "type": "plain_text",
+                            "text": body['user']['id']
+                        }
+                    ]
                 }
             ]
         }
