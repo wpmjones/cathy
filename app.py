@@ -695,6 +695,49 @@ async def handle_add_view(ack, body, client, view):
                                        f"anything other than a Team Member, please manually update their title.")
 
 
+async def get_bag_status():
+    """This pulls TMS bag status from Google Sheets"""
+    sh = gc.open_by_key(creds.tms_id)
+    sheet = sh.get_worksheet(0)
+    tms_values = sheet.get_all_values()[1:]
+    any_checked_out = False
+    blocks = [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "*TMS Bag Status*\nClick Check In to return a bag to store inventory"
+            }
+        },
+        {
+            "type": "divider"
+        }
+    ]
+    for row in tms_values:
+        if row[2]:
+            any_checked_out = True
+            blocks.append(
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": f"*TMS Bag #{row[0]}*\nChecked out by {row[2]}\nCurrently at {row[3]}"
+                    },
+                    "accessory": {
+                        "type": "button",
+                        "text": {
+                            "type": "plain_text",
+                            "emoji": True,
+                            "text": "Check In"
+                        },
+                        "value": row[0],
+                        "action_id": "req_check_in"
+                    }
+                }
+            )
+    return blocks, any_checked_out
+
+
 @app.command("/tms")
 async def tms(ack, client, body, say):
     """This command opens the form for tracking TMS bags."""
@@ -762,54 +805,7 @@ async def tms_req_status(ack, respond, body, client):
     """After a user issues /tms and responds with the status button, this view is triggered."""
     await ack()
     await respond({"delete_original": True})
-    try:
-        sh = gc.open_by_key(creds.tms_id)
-        sheet = sh.get_worksheet(0)
-    except gspread.exceptions.GSpreadException as e:
-        return await client.chat_postMessage(channel=body['user']['id'],
-                                             text=e)
-    except Exception as e:
-        await client.chat_postMessage(channel=body['user']['id'],
-                                      text=f"There was an error while storing the message to the Google Sheet.\n{e}")
-        await client.chat_postMessage(channel=creds.pj_user_id,
-                                      text=f"There was an error while storing the message to the Google Sheet.\n{e}")
-        return
-    tms_values = sheet.get_all_values()[1:]
-    any_checked_out = False
-    blocks = [
-        {
-            "type": "section",
-            "text": {
-                "type": "mrkdwn",
-                "text": "*TMS Bag Status*\nClick Check In to return a bag to store inventory"
-            }
-        },
-        {
-            "type": "divider"
-        }
-    ]
-    for row in tms_values:
-        if row[2]:
-            any_checked_out = True
-            blocks.append(
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": f"*TMS Bag #{row[0]}*\nChecked out by {row[2]}\nCurrently at {row[3]}"
-                    },
-                    "accessory": {
-                        "type": "button",
-                        "text": {
-                            "type": "plain_text",
-                            "emoji": True,
-                            "text": "Check In"
-                        },
-                        "value": row[0],
-                        "action_id": "req_check_in"
-                    }
-                }
-            )
+    blocks, any_checked_out = await get_bag_status()
     if any_checked_out:
         await client.chat_postEphemeral(channel=creds.cater_channel,
                                         blocks=blocks,
@@ -828,31 +824,31 @@ async def handle_req_check_in(ack, respond, client, body):
     logger.info("Process Check in from TMS Status")
     await ack()
     channel_id = body['container']['channel_id']
-    msg = await client.conversations_history(channel=channel_id,
-                                             inclusive=True,
-                                             oldest=body['container']['message_ts'],
-                                             limit=1)
-    logger.info(msg)
-    blocks = body['message']['blocks']
-    clicked = body['actions'][0]['block_id']
     value = body['actions'][0]['value']
     sh = gc.open_by_key(creds.tms_id)
     sheet = sh.get_worksheet(0)
     cell = sheet.find(value)
     sheet.batch_clear([f"B{cell.row}:F{cell.row}"])
-    for x in range(len(blocks)):
-        if blocks[x]['block_id'] == clicked:
-            blocks.pop(x)
-            break
-    await respond(
-        {
-            "replace_original": True,
-            "blocks": blocks
-        }
-    )
-    await client.chat_postEphemeral(channel=channel_id,
-                                    text=f"TMS Bag #{value} has been marked as returned.",
-                                    user=body['user']['id'])
+    blocks, any_checked_in = await get_bag_status()
+    if any_checked_in:
+        await respond(
+            {
+                "replace_original": True,
+                "blocks": blocks
+            }
+        )
+        await client.chat_postEphemeral(channel=channel_id,
+                                        text=f"TMS Bag #{value} has been marked as returned.",
+                                        user=body['user']['id'])
+    else:
+        await client.chat_postEphemeral(channel=channel_id,
+                                        text=f"TMS Bag #{value} has been marked as returned.",
+                                        user=body['user']['id'])
+        await respond(
+            {
+                "delete_original": True,
+            }
+        )
 
 
 @app.block_action("tms_out")
