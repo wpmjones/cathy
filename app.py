@@ -827,11 +827,15 @@ async def handle_req_check_in(ack, respond, client, body):
     """Handle button clicks from TMS Status Request"""
     logger.info("Process Check in from TMS Status")
     await ack()
-    logger.info(body)
+    channel_id = body['container']['channel_id']
+    msg = client.conversations_history(channel=channel_id,
+                                       inclusive=True,
+                                       oldest=body['container']['message_ts'],
+                                       limit=1)
+    logger.info(msg)
     blocks = body['message']['blocks']
     clicked = body['actions'][0]['block_id']
     value = body['actions'][0]['value']
-    channel_id = body['container']['channel_id']
     sh = gc.open_by_key(creds.tms_id)
     sheet = sh.get_worksheet(0)
     cell = sheet.find(value)
