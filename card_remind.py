@@ -3,6 +3,7 @@ import gspread
 import requests
 
 from datetime import datetime, timedelta
+from loguru import logger
 from operator import itemgetter
 
 # Connect to Google Sheets
@@ -50,6 +51,8 @@ def main():
                 "text": {"type": "mrkdwn", "text": f"*{key}*\n{names}"}
             }
         )
+
+    logger.info(blocks)
 
     payload = {
         "text": "Expiring Food Handler Cards",
