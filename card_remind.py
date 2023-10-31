@@ -31,10 +31,10 @@ def main():
     data = sorted(data, key=itemgetter(1))
     data_dict = {}
     for row in data:
-        if row[1] in data_dict.keys():
-            data_dict[row[1]].append(row[0])
+        if row[2] in data_dict.keys():
+            data_dict[row[2]].append(row[0])
         else:
-            data_dict[row[1]] = [row[0]]
+            data_dict[row[2]] = [row[0]]
     if not data_dict:
         return
     blocks = [
