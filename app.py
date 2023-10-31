@@ -699,7 +699,6 @@ async def handle_add_view(ack, body, client, view):
 async def tms(ack, client, body, say):
     """This command opens the form for tracking TMS bags."""
     await ack()
-    logger.info(body['user_id'])
     if body['channel_id'] != creds.cater_channel:
         return await say(f"Please use this command in <#{creds.cater_channel}> only.")
     blocks = [
@@ -776,6 +775,7 @@ async def tms_req_status(ack, respond, body, client):
                                       text=f"There was an error while storing the message to the Google Sheet.\n{e}")
         return
     tms_values = sheet.get_all_values()[1:]
+    any_checked_out = False
     blocks = [
         {
             "type": "section",
@@ -790,6 +790,7 @@ async def tms_req_status(ack, respond, body, client):
     ]
     for row in tms_values:
         if row[2]:
+            any_checked_out = True
             blocks.append(
                 {
                     "type": "section",
@@ -809,15 +810,21 @@ async def tms_req_status(ack, respond, body, client):
                     }
                 }
             )
-    msg = await client.chat_postEphemeral(channel=creds.cater_channel,
-                                          blocks=blocks,
-                                          text="TMS Bag Status",
-                                          user=body['user']['id'])
-    await asyncio.sleep(60)
-    await client.chat_delete(
-        channel=msg['channel'],
-        ts=msg['message']['ts']
-    )
+    if any_checked_out:
+        msg = await client.chat_postEphemeral(channel=creds.cater_channel,
+                                              blocks=blocks,
+                                              text="TMS Bag Status",
+                                              user=body['user']['id'])
+        await asyncio.sleep(60)
+        await client.chat_delete(
+            channel=msg['channel'],
+            ts=msg['message']['ts']
+        )
+    else:
+        await client.chat_postEphemeral(channel=creds.cater_channel,
+                                        text="There are no bags checked out at this time.",
+                                        user=body['user']['id']
+                                        )
 
 
 @app.block_action("req_check_in")
@@ -966,6 +973,7 @@ async def tms_check_out(ack, body, respond, client):
 async def handle_tms_check_out_view(ack, client, view):
     """Processes input from TMS Check Out View."""
     logger.info("Processing TMS Check Out...")
+    logger.info(view)
     now = str(datetime.date(datetime.today()))
     value = view['state']['values']['bag_num']['bag_num_action']['selected_option']['value']
     name = view['state']['values']['input_name']['driver_name']['value']
@@ -991,7 +999,7 @@ async def handle_tms_check_out_view(ack, client, view):
     await ack()
     await client.chat_postEphemeral(channel=channel_id,
                                     text=f"TMS Bag#{value} has been checked out by {name}.",
-                                    user=view['user']['id'])
+                                    user=view['user_id'])
 
 
 @app.block_action("tms_in")
