@@ -21,9 +21,12 @@ def main():
     data = sheet.get_all_values()
     about_to_expire = []
     for row in data[1:]:
-        expires = datetime.strptime(row[2], "%m/%d/%Y")
-        if expires < then:
-            about_to_expire.append([row[0], expires])
+        try:
+            expires = datetime.strptime(row[2], "%m/%d/%Y")
+            if expires < then:
+                about_to_expire.append([row[0], expires])
+        except ValueError:
+            pass
     data = sorted(data, key=itemgetter(1))
     data_dict = {}
     for row in data:
