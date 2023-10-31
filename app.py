@@ -828,10 +828,10 @@ async def handle_req_check_in(ack, respond, client, body):
     logger.info("Process Check in from TMS Status")
     await ack()
     channel_id = body['container']['channel_id']
-    msg = client.conversations_history(channel=channel_id,
-                                       inclusive=True,
-                                       oldest=body['container']['message_ts'],
-                                       limit=1)
+    msg = await client.conversations_history(channel=channel_id,
+                                             inclusive=True,
+                                             oldest=body['container']['message_ts'],
+                                             limit=1)
     logger.info(msg)
     blocks = body['message']['blocks']
     clicked = body['actions'][0]['block_id']
