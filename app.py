@@ -811,15 +811,10 @@ async def tms_req_status(ack, respond, body, client):
                 }
             )
     if any_checked_out:
-        msg = await client.chat_postEphemeral(channel=creds.cater_channel,
-                                              blocks=blocks,
-                                              text="TMS Bag Status",
-                                              user=body['user']['id'])
-        await asyncio.sleep(60)
-        await client.chat_delete(
-            channel=msg['channel'],
-            ts=msg['message']['ts']
-        )
+        await client.chat_postEphemeral(channel=creds.cater_channel,
+                                        blocks=blocks,
+                                        text="TMS Bag Status",
+                                        user=body['user']['id'])
     else:
         await client.chat_postEphemeral(channel=creds.cater_channel,
                                         text="There are no bags checked out at this time.",
@@ -983,7 +978,6 @@ async def tms_check_out(ack, body, respond, client):
 async def handle_tms_check_out_view(ack, client, view):
     """Processes input from TMS Check Out View."""
     logger.info("Processing TMS Check Out...")
-    logger.info(view)
     now = str(datetime.date(datetime.today()))
     value = view['state']['values']['bag_num']['bag_num_action']['selected_option']['value']
     name = view['state']['values']['input_name']['driver_name']['value']
