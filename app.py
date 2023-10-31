@@ -699,6 +699,7 @@ async def handle_add_view(ack, body, client, view):
 async def tms(ack, client, body, say):
     """This command opens the form for tracking TMS bags."""
     await ack()
+    logger.info(body['user_id'])
     if body['channel_id'] != creds.cater_channel:
         return await say(f"Please use this command in <#{creds.cater_channel}> only.")
     blocks = [
@@ -750,11 +751,15 @@ async def tms(ack, client, body, say):
             ]
         }
     ]
-    await client.chat_postMessage(channel=creds.cater_channel, blocks=blocks, text="TMS Tracking")
+    await client.chat_postEphemeral(channel=creds.cater_channel,
+                                    blocks=blocks,
+                                    text="TMS Tracking",
+                                    user=body['user_id']
+                                    )
 
 
 @app.block_action("req_status")
-async def tms_req_status(ack, respond, body, say):
+async def tms_req_status(ack, respond, body, client):
     """After a user issues /tms and responds with the status button, this view is triggered."""
     await ack()
     await respond({"delete_original": True})
@@ -804,7 +809,10 @@ async def tms_req_status(ack, respond, body, say):
                     }
                 }
             )
-    msg = await say(blocks=blocks, text="TMS Bag Status")
+    msg = await client.chat_postEphemeral(channel=creds.cater_channel,
+                                          blocks=blocks,
+                                          text="TMS Bag Status",
+                                          user=body['user']['id'])
     await asyncio.sleep(60)
     await client.chat_delete(
         channel=msg['channel'],
@@ -835,7 +843,9 @@ async def handle_req_check_in(ack, respond, client, body):
             "blocks": blocks
         }
     )
-    await client.chat_postMessage(channel=channel_id, text=f"TMS Bag #{value} has been marked as returned.")
+    await client.chat_postEphemeral(channel=channel_id,
+                                    text=f"TMS Bag #{value} has been marked as returned.",
+                                    user=body['user']['id'])
 
 
 @app.block_action("tms_out")
@@ -870,7 +880,9 @@ async def tms_check_out(ack, body, respond, client):
                 }
             )
     if len(bag_numbers) == 0:
-        return await client.chat_postMessage("All bags are currently checked out.")
+        return await client.chat_postEphemeral(channel=body['channel']['id'],
+                                               text="All bags are currently checked out.",
+                                               user=body['user']['id'])
     await client.views_open(
         trigger_id=body['trigger_id'],
         view={
@@ -954,7 +966,6 @@ async def tms_check_out(ack, body, respond, client):
 async def handle_tms_check_out_view(ack, client, view):
     """Processes input from TMS Check Out View."""
     logger.info("Processing TMS Check Out...")
-    logger.info(view)
     now = str(datetime.date(datetime.today()))
     value = view['state']['values']['bag_num']['bag_num_action']['selected_option']['value']
     name = view['state']['values']['input_name']['driver_name']['value']
@@ -978,7 +989,9 @@ async def handle_tms_check_out_view(ack, client, view):
     sheet.update_cell(cell.row, 5, contact_name)
     sheet.update_cell(cell.row, 6, contact_number)
     await ack()
-    await client.chat_postMessage(channel=channel_id, text=f"TMS Bag#{value} has been checked out by {name}.")
+    await client.chat_postEphemeral(channel=channel_id,
+                                    text=f"TMS Bag#{value} has been checked out by {name}.",
+                                    user=view['user']['id'])
 
 
 @app.block_action("tms_in")
@@ -1013,7 +1026,10 @@ async def tms_check_in(ack, body, respond, client):
                 }
             )
     if len(bag_numbers) == 0:
-        return await client.chat_postMessage("There are no bags currently checked out.")
+        return await client.chat_postEphemeral(channel=body['channel']['id'],
+                                               text="There are no bags currently checked out.",
+                                               user=body['user']['id']
+                                               )
     await client.views_open(
         trigger_id=body['trigger_id'],
         view={
@@ -1059,7 +1075,10 @@ async def handle_tms_check_in_view(ack, client, view):
     cell = sheet.find(value)
     sheet.batch_clear([f"B{cell.row}:F{cell.row}"])
     await ack()
-    await client.chat_postMessage(channel=channel_id, text=f"TMS Bag #{value} has been marked as returned.")
+    await client.chat_postEphemeral(channel=channel_id,
+                                    text=f"TMS Bag #{value} has been marked as returned.",
+                                    user=view['user']['id']
+                                    )
 
 
 @app.command("/discipline")
