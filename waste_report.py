@@ -90,31 +90,40 @@ def weekly():
     block_text = ""
     if filets:
         emoji = get_emoji(filets, weekly_goal_list[1])
-        block_text += f"\n{emoji} Filets: {filets} lbs. (Goal: {'{:.2f}'.format(weekly_goal_list[1])} lbs.)"
+        block_text += (f"\n{emoji} Filets: {'{:.2f}'.format(filets)} lbs. "
+                       f"(Goal: {'{:.2f}'.format(weekly_goal_list[1])} lbs.)")
     if spicy:
         emoji = get_emoji(spicy, weekly_goal_list[2])
-        block_text += f"\n{emoji} Spicy: {spicy} lbs. (Goal: {'{:.2f}'.format(weekly_goal_list[2])} lbs.)"
+        block_text += (f"\n{emoji} Spicy: {'{:.2f}'.format(spicy)} lbs. "
+                       f"(Goal: {'{:.2f}'.format(weekly_goal_list[2])} lbs.)")
     if nuggets:
         emoji = get_emoji(nuggets, weekly_goal_list[3])
-        block_text += f"\n{emoji} Nuggets: {nuggets} lbs. (Goal: {'{:.2f}'.format(weekly_goal_list[3])} lbs.)"
+        block_text += (f"\n{emoji} Nuggets: {'{:.2f}'.format(nuggets)} lbs. "
+                       f"(Goal: {'{:.2f}'.format(weekly_goal_list[3])} lbs.)")
     if strips:
         emoji = get_emoji(strips, weekly_goal_list[4])
-        block_text += f"\n{emoji} Strips: {strips} lbs. (Goal: {'{:.2f}'.format(weekly_goal_list[4])} lbs.)"
+        block_text += (f"\n{emoji} Strips: {'{:.2f}'.format(strips)} lbs. "
+                       f"(Goal: {'{:.2f}'.format(weekly_goal_list[4])} lbs.)")
     if g_filets:
         emoji = get_emoji(g_filets, weekly_goal_list[5])
-        block_text += f"\n{emoji} Grilled Filets: {g_filets} lbs. (Goal: {'{:.2f}'.format(weekly_goal_list[5])} lbs.)"
+        block_text += (f"\n{emoji} Grilled Filets: {'{:.2f}'.format(g_filets)} lbs. "
+                       f"(Goal: {'{:.2f}'.format(weekly_goal_list[5])} lbs.)")
     if g_nuggets:
         emoji = get_emoji(g_nuggets, weekly_goal_list[6])
-        block_text += f"\n{emoji} Grilled Nuggets: {g_nuggets} lbs. (Goal: {'{:.2f}'.format(weekly_goal_list[6])} lbs.)"
+        block_text += (f"\n{emoji} Grilled Nuggets: {'{:.2f}'.format(g_nuggets)} lbs. "
+                       f"(Goal: {'{:.2f}'.format(weekly_goal_list[6])} lbs.)")
     if b_filets:
         emoji = get_emoji(b_filets, weekly_goal_list[7])
-        block_text += f"\n{emoji} Breakfast Filets: {b_filets} lbs. (Goal: {'{:.2f}'.format(weekly_goal_list[7])} lbs.)"
+        block_text += (f"\n{emoji} Breakfast Filets: {'{:.2f}'.format(b_filets)} lbs. "
+                       f"(Goal: {'{:.2f}'.format(weekly_goal_list[7])} lbs.)")
     if gb_filets:
         emoji = get_emoji(gb_filets, weekly_goal_list[8])
-        block_text += f"\n{emoji} Grilled Breakfast: {gb_filets} lbs. (Goal: {'{:.2f}'.format(weekly_goal_list[8])} lbs.)"
+        block_text += (f"\n{emoji} Grilled Breakfast: {'{:.2f}'.format(gb_filets)} lbs. "
+                       f"(Goal: {'{:.2f}'.format(weekly_goal_list[8])} lbs.)")
     if sb_filets:
         emoji = get_emoji(sb_filets, goal_list[9])
-        block_text += f"\n{emoji} Spicy Breakfast: {sb_filets} lbs. (Goal: {'{:.2f}'.format(weekly_goal_list[9])} lbs.)"
+        block_text += (f"\n{emoji} Spicy Breakfast: {'{:.2f}'.format(sb_filets)} lbs. "
+                       f"(Goal: {'{:.2f}'.format(weekly_goal_list[9])} lbs.)")
 
     blocks = [
         {
@@ -198,31 +207,36 @@ def daily():
     block_text = ""
     if filets:
         emoji = get_emoji(filets, goal_list[1])
-        block_text += f"\n{emoji} Filets: {filets} lbs. (Goal: {'{:.2f}'.format(goal_list[1])} lbs.)"
+        block_text += f"\n{emoji} Filets: {'{:.2f}'.format(filets)} lbs. (Goal: {'{:.2f}'.format(goal_list[1])} lbs.)"
     if spicy:
         emoji = get_emoji(spicy, goal_list[2])
-        block_text += f"\n{emoji} Spicy: {spicy} lbs. (Goal: {'{:.2f}'.format(goal_list[2])} lbs.)"
+        block_text += f"\n{emoji} Spicy: {'{:.2f}'.format(spicy)} lbs. (Goal: {'{:.2f}'.format(goal_list[2])} lbs.)"
     if nuggets:
         emoji = get_emoji(nuggets, goal_list[3])
-        block_text += f"\n{emoji} Nuggets: {nuggets} lbs. (Goal: {'{:.2f}'.format(goal_list[3])} lbs.)"
+        block_text += f"\n{emoji} Nuggets: {'{:.2f}'.format(nuggets)} lbs. (Goal: {'{:.2f}'.format(goal_list[3])} lbs.)"
     if strips:
         emoji = get_emoji(strips, goal_list[4])
-        block_text += f"\n{emoji} Strips: {strips} lbs. (Goal: {'{:.2f}'.format(goal_list[4])} lbs.)"
+        block_text += f"\n{emoji} Strips: {'{:.2f}'.format(strips)} lbs. (Goal: {'{:.2f}'.format(goal_list[4])} lbs.)"
     if g_filets:
         emoji = get_emoji(g_filets, goal_list[5])
-        block_text += f"\n{emoji} Grilled Filets: {g_filets} lbs. (Goal: {'{:.2f}'.format(goal_list[5])} lbs.)"
+        block_text += (f"\n{emoji} Grilled Filets: {'{:.2f}'.format(g_filets)} lbs. "
+                       f"(Goal: {'{:.2f}'.format(goal_list[5])} lbs.)")
     if g_nuggets:
         emoji = get_emoji(g_nuggets, goal_list[6])
-        block_text += f"\n{emoji} Grilled Nuggets: {g_nuggets} lbs. (Goal: {'{:.2f}'.format(goal_list[6])} lbs.)"
+        block_text += (f"\n{emoji} Grilled Nuggets: {'{:.2f}'.format(g_nuggets)} lbs. "
+                       f"(Goal: {'{:.2f}'.format(goal_list[6])} lbs.)")
     if b_filets:
         emoji = get_emoji(b_filets, goal_list[7])
-        block_text += f"\n{emoji} Breakfast Filets: {b_filets} lbs. (Goal: {'{:.2f}'.format(goal_list[7])} lbs.)"
+        block_text += (f"\n{emoji} Breakfast Filets: {'{:.2f}'.format(b_filets)} lbs. "
+                       f"(Goal: {'{:.2f}'.format(goal_list[7])} lbs.)")
     if gb_filets:
         emoji = get_emoji(gb_filets, goal_list[8])
-        block_text += f"\n{emoji} Grilled Breakfast: {gb_filets} lbs. (Goal: {'{:.2f}'.format(goal_list[8])} lbs.)"
+        block_text += (f"\n{emoji} Grilled Breakfast: {'{:.2f}'.format(gb_filets)} lbs. "
+                       f"(Goal: {'{:.2f}'.format(goal_list[8])} lbs.)")
     if sb_filets:
         emoji = get_emoji(sb_filets, goal_list[9])
-        block_text += f"\n{emoji} Spicy Breakfast: {sb_filets} lbs. (Goal: {'{:.2f}'.format(goal_list[9])} lbs.)"
+        block_text += (f"\n{emoji} Spicy Breakfast: {'{:.2f}'.format(sb_filets)} lbs. "
+                       f"(Goal: {'{:.2f}'.format(goal_list[9])} lbs.)")
 
     blocks = [
         {
