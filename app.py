@@ -739,11 +739,11 @@ async def get_bag_status():
 
 
 @app.command("/tms")
-async def tms(ack, client, body, say):
+async def tms(ack, client, body):
     """This command opens the form for tracking TMS bags."""
     await ack()
-    if body['channel_id'] != creds.cater_channel:
-        return await say(f"Please use this command in <#{creds.cater_channel}> only.")
+    # if body['channel_id'] != creds.cater_channel:
+    #     return await say(f"Please use this command in <#{creds.cater_channel}> only.")
     blocks = [
         {
             "type": "section",
@@ -793,7 +793,7 @@ async def tms(ack, client, body, say):
             ]
         }
     ]
-    await client.chat_postEphemeral(channel=creds.cater_channel,
+    await client.chat_postEphemeral(channel=body['channel_id'],
                                     blocks=blocks,
                                     text="TMS Tracking",
                                     user=body['user_id']
@@ -805,14 +805,16 @@ async def tms_req_status(ack, respond, body, client):
     """After a user issues /tms and responds with the status button, this view is triggered."""
     await ack()
     await respond({"delete_original": True})
+    logger.info(body)
+    channel_id = body['channel']['id']
     blocks, any_checked_out = await get_bag_status()
     if any_checked_out:
-        await client.chat_postEphemeral(channel=creds.cater_channel,
+        await client.chat_postEphemeral(channel=channel_id,
                                         blocks=blocks,
                                         text="TMS Bag Status",
                                         user=body['user']['id'])
     else:
-        await client.chat_postEphemeral(channel=creds.cater_channel,
+        await client.chat_postEphemeral(channel=channel_id,
                                         text="There are no bags checked out at this time.",
                                         user=body['user']['id']
                                         )
@@ -823,7 +825,7 @@ async def handle_req_check_in(ack, respond, client, body):
     """Handle button clicks from TMS Status Request"""
     logger.info("Process Check in from TMS Status")
     await ack()
-    channel_id = body['container']['channel_id']
+    # channel_id = body['container']['channel_id']
     value = body['actions'][0]['value']
     sh = gc.open_by_key(creds.tms_id)
     sheet = sh.get_worksheet(0)
@@ -837,13 +839,13 @@ async def handle_req_check_in(ack, respond, client, body):
                 "blocks": blocks
             }
         )
-        await client.chat_postEphemeral(channel=channel_id,
-                                        text=f"TMS Bag #{value} has been marked as returned.",
-                                        user=body['user']['id'])
+        await client.chat_postMessage(channel=creds.cater_channel,
+                                      text=f"TMS Bag #{value} has been marked as returned.",
+                                      user=body['user']['id'])
     else:
-        await client.chat_postEphemeral(channel=channel_id,
-                                        text=f"TMS Bag #{value} has been marked as returned.",
-                                        user=body['user']['id'])
+        await client.chat_postMessage(channel=creds.cater_channel,
+                                      text=f"TMS Bag #{value} has been marked as returned.",
+                                      user=body['user']['id'])
         await respond(
             {
                 "delete_original": True,
@@ -985,7 +987,6 @@ async def handle_tms_check_out_view(ack, client, view):
     location = view['state']['values']['input_business']['business_name']['value']
     contact_name = view['state']['values']['input_contact']['contact_name']['value']
     contact_number = view['state']['values']['input_phone']['contact_number']['value']
-    channel_id = view['blocks'][-2]['elements'][0]['text']
     user_id = view['blocks'][-1]['elements'][0]['text']
     errors = {}
     regex = r"^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$"
@@ -1003,9 +1004,9 @@ async def handle_tms_check_out_view(ack, client, view):
     sheet.update_cell(cell.row, 5, contact_name)
     sheet.update_cell(cell.row, 6, contact_number)
     await ack()
-    await client.chat_postEphemeral(channel=channel_id,
-                                    text=f"TMS Bag#{value} has been checked out by {name}.",
-                                    user=user_id)
+    await client.chat_postMessage(channel=creds.cater_channel,
+                                  text=f"TMS Bag#{value} has been checked out by {name}.",
+                                  user=user_id)
 
 
 @app.block_action("tms_in")
@@ -1093,17 +1094,16 @@ async def handle_tms_check_in_view(ack, client, view):
     """Processes input from TMS Check In View."""
     logger.info("Processing TMS Check In...")
     value = view['state']['values']['bag_num']['bag_num_action']['selected_option']['value']
-    channel_id = view['blocks'][-2]['elements'][0]['text']
     user_id = view['blocks'][-1]['elements'][0]['text']
     sh = gc.open_by_key(creds.tms_id)
     sheet = sh.get_worksheet(0)
     cell = sheet.find(value)
     sheet.batch_clear([f"B{cell.row}:F{cell.row}"])
     await ack()
-    await client.chat_postEphemeral(channel=channel_id,
-                                    text=f"TMS Bag #{value} has been marked as returned.",
-                                    user=user_id
-                                    )
+    await client.chat_postMessage(channel=creds.cater_channel,
+                                  text=f"TMS Bag #{value} has been marked as returned.",
+                                  user=user_id
+                                  )
 
 
 @app.command("/discipline")
@@ -1136,7 +1136,7 @@ async def discipline(ack, body, client):
     discipline_types = []
     method_types = []
     method_values = ["Email", "Face-to-Face"]
-    discipline_values = ["Verbal", "Written", "Final", "Suspension", "Termination"]
+    discipline_values = ["Verbal", "Written", "PIP", "Final", "Suspension", "Termination"]
     for name in discipline_values:
         discipline_types.append(
             {
