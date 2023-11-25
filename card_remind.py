@@ -10,6 +10,7 @@ from operator import itemgetter
 gc = gspread.service_account(filename=creds.gspread)
 spreadsheet = gc.open_by_key(creds.card_id)
 sheet = spreadsheet.get_worksheet(0)
+sheet.sort((3, "asc"), range="A2:C200")
 
 now_str = datetime.today().strftime("%m/%d/%Y")
 now = datetime.today()
@@ -20,30 +21,44 @@ webhook_url = creds.webhook_test
 def main():
     """Notifications for soon to expire food handlers cards"""
     data = sheet.get_all_values()
-    about_to_expire = []
+    about_to_expire = {}
+    already_expired = {}
     for row in data[1:]:
         try:
             expires = datetime.strptime(row[2], "%m/%d/%Y")
-            if expires < then:
-                about_to_expire.append([row[0], expires])
+            if expires < now:
+                if not already_expired[expires]:
+                    already_expired[expires] = [row[0]]
+                else:
+                    already_expired[expires].append(row[0])
+            elif expires < then:
+                if not about_to_expire[expires]:
+                    about_to_expire[expires] = [row[0]]
+                else:
+                    about_to_expire[expires].append(row[0])
         except ValueError:
             pass
-    data = sorted(data, key=itemgetter(1))
-    data_dict = {}
-    for row in data:
-        if row[2] in data_dict.keys():
-            data_dict[row[2]].append(row[0])
-        else:
-            data_dict[row[2]] = [row[0]]
-    if not data_dict:
-        return
     blocks = [
+        {
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": "*Food Handler Cards*\nExpired"}
+        }
+    ]
+    for key, value in already_expired.items():
+        names = "\n".join(value)
+        blocks.append(
+            {
+                "type": "section",
+                "text": {"type": "mrkdwn", "text": f"*{key}*\n{names}"}
+            }
+        )
+    blocks.append(
         {
             "type": "section",
             "text": {"type": "mrkdwn", "text": "*Food Handler Cards*\nExpiring in the next 30 days"}
         }
-    ]
-    for key, value in data_dict.items():
+    )
+    for key, value in about_to_expire.items():
         names = "\n".join(value)
         blocks.append(
             {
