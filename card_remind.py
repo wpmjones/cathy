@@ -26,7 +26,6 @@ def main():
     for row in data[1:]:
         try:
             expires = datetime.strptime(row[2], "%m/%d/%Y")
-            # new_key = f"{expires.month}{expires.day}"
             if expires < now:
                 if expires in already_expired:
                     already_expired[expires].append(row[0])
@@ -67,8 +66,6 @@ def main():
                 "text": {"type": "mrkdwn", "text": f"*{key.strftime('%m/%d/%Y')}*\n{names}"}
             }
         )
-
-    logger.info(blocks)
 
     payload = {
         "text": "Expiring Food Handler Cards",
