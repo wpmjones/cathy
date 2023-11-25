@@ -582,6 +582,31 @@ async def add_trello(ack, body, client):
                     }
                 },
                 {
+                    "type": "input",
+                    "block_id": "input_d",
+                    "label": {"type": "plain-text", "text": "Food Card Number:"},
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "food_card_number",
+                        "multiline": False
+                    },
+                    "optional": True
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_e",
+                    "label": {"type": "plain_text", "text": "Food Card Expiration:"},
+                    "element": {
+                        "type": "datepicker",
+                        "action_id": "food_card_date",
+                        "initial_date": str(date.today() + timedelta(weeks=150)),
+                        "placeholder": {
+                            "type": "plain_text",
+                            "text": "Expiration date"
+                        }
+                    }
+                },
+                {
                     "type": "context",
                     "block_id": "context_a",
                     "elements": [
@@ -604,6 +629,8 @@ async def handle_add_view(ack, body, client, view):
     location = view['state']['values']['input_a']['select_1']['selected_option']['value']
     name = view['state']['values']['input_b']['full_name']['value']
     start_date = view['state']['values']['input_c']['start_date']['selected_date']
+    food_card_number = view['state']['values']['input_d']['food_card_number']['value']
+    food_card_expiration = view['state']['values']['input_d']['food_card_date']['selected_date']
     channel_id = view['blocks'][3]['elements'][0]['text']
     # Get user name from body
     user = await client.users_info(user=body['user']['id'])
@@ -688,11 +715,14 @@ async def handle_add_view(ack, body, client, view):
     to_post = [name, "Team Member", "", start_date]
     pay_sheet.append_row(to_post, value_input_option="USER_ENTERED")
     pay_sheet.sort([1, "asc"])
-    r = await client.conversations_open(users=creds.jj_user_id)
-    dm_id = r['channel']['id']
-    await client.chat_postMessage(channel=dm_id,
-                                  text=f"{name} was added to Pay Scale Tracking as a Team Member. If they are "
-                                       f"anything other than a Team Member, please manually update their title.")
+    # add user to Food Handlers Card Sheet
+    sh = gc.open_by_key(creds.card_id)
+    card_sheet = sh.worksheet("Sheet1")
+    name_list = name.split(" ")
+    reverse_name = ", ".join([name_list[1], name_list[0]])
+    to_post = [reverse_name, food_card_number, food_card_expiration]
+    card_sheet.append_row(to_post, value_input_option="USER_ENTERED")
+    card_sheet.sort([3, "asc"])
 
 
 async def get_bag_status():
