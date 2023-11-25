@@ -630,7 +630,7 @@ async def handle_add_view(ack, body, client, view):
     name = view['state']['values']['input_b']['full_name']['value']
     start_date = view['state']['values']['input_c']['start_date']['selected_date']
     food_card_number = view['state']['values']['input_d']['food_card_number']['value']
-    food_card_expiration = view['state']['values']['input_d']['food_card_date']['selected_date']
+    food_card_expiration = view['state']['values']['input_e']['food_card_date']['selected_date']
     channel_id = view['blocks'][-1]['elements'][0]['text']
     # Get user name from body
     user = await client.users_info(user=body['user']['id'])
