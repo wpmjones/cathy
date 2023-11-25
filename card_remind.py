@@ -42,7 +42,7 @@ def main():
     blocks = [
         {
             "type": "section",
-            "text": {"type": "mrkdwn", "text": "*Food Handler Cards*\nExpired"}
+            "text": {"type": "mrkdwn", "text": "Food Handler Cards - *Expired*"}
         }
     ]
     for key, value in already_expired.items():
@@ -50,13 +50,13 @@ def main():
         blocks.append(
             {
                 "type": "section",
-                "text": {"type": "mrkdwn", "text": f"*{key}*\n{names}"}
+                "text": {"type": "mrkdwn", "text": f"*{key.strftime('%m/%d/%Y')}*\n{names}"}
             }
         )
     blocks.append(
         {
             "type": "section",
-            "text": {"type": "mrkdwn", "text": "*Food Handler Cards*\nExpiring in the next 30 days"}
+            "text": {"type": "mrkdwn", "text": "Food Handler Cards - Expiring in the next 30 days"}
         }
     )
     for key, value in about_to_expire.items():
@@ -64,7 +64,7 @@ def main():
         blocks.append(
             {
                 "type": "section",
-                "text": {"type": "mrkdwn", "text": f"*{key}*\n{names}"}
+                "text": {"type": "mrkdwn", "text": f"*{key.strftime('%m/%d/%Y')}*\n{names}"}
             }
         )
 
