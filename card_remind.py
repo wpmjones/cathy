@@ -38,34 +38,37 @@ def main():
                     about_to_expire[expires] = [row[0]]
         except ValueError:
             pass
-    blocks = [
-        {
-            "type": "section",
-            "text": {"type": "mrkdwn", "text": "Food Handler Cards - *Expired*"}
-        }
-    ]
-    for key, value in already_expired.items():
-        names = "\n".join(value)
+    blocks = []
+    if already_expired:
         blocks.append(
             {
                 "type": "section",
-                "text": {"type": "mrkdwn", "text": f"*{key.strftime('%m/%d/%Y')}*\n{names}"}
+                "text": {"type": "mrkdwn", "text": "Food Handler Cards - *Expired*"}
             }
         )
-    blocks.append(
-        {
-            "type": "section",
-            "text": {"type": "mrkdwn", "text": "Food Handler Cards - Expiring in the next 30 days"}
-        }
-    )
-    for key, value in about_to_expire.items():
-        names = "\n".join(value)
+        for key, value in already_expired.items():
+            names = "\n".join(value)
+            blocks.append(
+                {
+                    "type": "section",
+                    "text": {"type": "mrkdwn", "text": f"   *{key.strftime('%m/%d/%Y')}*\n   {names}"}
+                }
+            )
+    if about_to_expire:
         blocks.append(
             {
                 "type": "section",
-                "text": {"type": "mrkdwn", "text": f"*{key.strftime('%m/%d/%Y')}*\n{names}"}
+                "text": {"type": "mrkdwn", "text": "Food Handler Cards - Expiring in the next 30 days"}
             }
         )
+        for key, value in about_to_expire.items():
+            names = "\n".join(value)
+            blocks.append(
+                {
+                    "type": "section",
+                    "text": {"type": "mrkdwn", "text": f"   *{key.strftime('%m/%d/%Y')}*\n   {names}"}
+                }
+            )
 
     payload = {
         "text": "Expiring Food Handler Cards",
