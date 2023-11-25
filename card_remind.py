@@ -27,15 +27,15 @@ def main():
         try:
             expires = datetime.strptime(row[2], "%m/%d/%Y")
             if expires < now:
-                if not already_expired[expires]:
-                    already_expired[expires] = [row[0]]
+                if not already_expired[row[2]]:
+                    already_expired[row[2]] = [row[0]]
                 else:
-                    already_expired[expires].append(row[0])
+                    already_expired[row[2]].append(row[0])
             elif expires < then:
-                if not about_to_expire[expires]:
-                    about_to_expire[expires] = [row[0]]
+                if not about_to_expire[row[2]]:
+                    about_to_expire[row[2]] = [row[0]]
                 else:
-                    about_to_expire[expires].append(row[0])
+                    about_to_expire[row[2]].append(row[0])
         except ValueError:
             pass
     blocks = [
