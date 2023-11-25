@@ -67,7 +67,6 @@ def check_cem():
     # find percentages in body
     if body:
         if "**" not in body:
-            logger.info(body)
             for j in range(7):
                 start = find_nth(body, "%", j + 1) - 3
                 end = start + 4
@@ -75,7 +74,6 @@ def check_cem():
                 # catch the colon in case where response is 0% (e.g. ": 0%")
                 if ":" in score_dict[categories[j]]:
                     score_dict[categories[j]] = score_dict[categories[j]].replace(": ", "")
-            logger.info(score_dict)
             # find number of respondents
             start = body.find("n:") + 3
             end = start + 3

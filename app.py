@@ -584,7 +584,7 @@ async def add_trello(ack, body, client):
                 {
                     "type": "input",
                     "block_id": "input_d",
-                    "label": {"type": "plain-text", "text": "Food Card Number:"},
+                    "label": {"type": "plain_text", "text": "Food Card Number:"},
                     "element": {
                         "type": "plain_text_input",
                         "action_id": "food_card_number",
@@ -631,7 +631,7 @@ async def handle_add_view(ack, body, client, view):
     start_date = view['state']['values']['input_c']['start_date']['selected_date']
     food_card_number = view['state']['values']['input_d']['food_card_number']['value']
     food_card_expiration = view['state']['values']['input_d']['food_card_date']['selected_date']
-    channel_id = view['blocks'][3]['elements'][0]['text']
+    channel_id = view['blocks'][-1]['elements'][0]['text']
     # Get user name from body
     user = await client.users_info(user=body['user']['id'])
     user_name = user['user']['real_name']
