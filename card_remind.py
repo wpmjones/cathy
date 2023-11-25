@@ -26,16 +26,17 @@ def main():
     for row in data[1:]:
         try:
             expires = datetime.strptime(row[2], "%m/%d/%Y")
+            new_key = f"{expires.month}{expires.day}"
             if expires < now:
-                if not already_expired[row[2]]:
-                    already_expired[row[2]] = [row[0]]
+                if not already_expired[new_key]:
+                    already_expired[new_key] = [row[0]]
                 else:
-                    already_expired[row[2]].append(row[0])
+                    already_expired[new_key].append(row[0])
             elif expires < then:
-                if not about_to_expire[row[2]]:
-                    about_to_expire[row[2]] = [row[0]]
+                if not about_to_expire[new_key]:
+                    about_to_expire[new_key] = [row[0]]
                 else:
-                    about_to_expire[row[2]].append(row[0])
+                    about_to_expire[new_key].append(row[0])
         except ValueError:
             pass
     blocks = [
