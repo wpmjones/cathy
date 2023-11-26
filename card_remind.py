@@ -15,7 +15,7 @@ sheet.sort((3, "asc"), range="A2:C200")
 now_str = datetime.today().strftime("%m/%d/%Y")
 now = datetime.today()
 then = datetime.today() + timedelta(days=30)
-webhook_url = creds.webhook_all
+webhook_url = creds.webhook_test
 
 
 def main():
