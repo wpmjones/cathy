@@ -66,7 +66,7 @@ def morning():
                     ]
                 }
             )
-        if values_list[2] == "PICKUP":
+        elif values_list[2] == "PICKUP":
             blocks.append(
                 {
                     "type": "header",
