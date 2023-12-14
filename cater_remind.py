@@ -11,7 +11,7 @@ spreadsheet = gc.open_by_key(creds.cater_id)
 sheet1 = spreadsheet.worksheet("Sheet1")
 sheet2 = spreadsheet.worksheet("Sheet2")
 
-now_str = datetime.today().strftime("%m/%d/%Y")
+now_str = datetime.today().strftime("12/14/2023")
 now = datetime.today()
 then = datetime.today() + timedelta(days=7)
 maps_url_base = "https://www.google.com/maps/search/?api=1&query="
@@ -165,7 +165,7 @@ def evening():
             if row[2] == "ADP":
                 driver_tag = get_driver(row[3].strip())
             else:
-                driver_tag = row[2].strip()
+                driver_tag = get_driver(row[2].strip())
             if driver_tag:
                 list_of_deliveries.append(f"{row[0]} - {row[1]} - {driver_tag}")
     new_line = "\n"
