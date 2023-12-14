@@ -9,12 +9,24 @@ from datetime import datetime, timedelta
 gc = gspread.service_account(filename=creds.gspread)
 spreadsheet = gc.open_by_key(creds.cater_id)
 sheet1 = spreadsheet.worksheet("Sheet1")
+sheet2 = spreadsheet.worksheet("Sheet2")
 
 now_str = datetime.today().strftime("%m/%d/%Y")
 now = datetime.today()
 then = datetime.today() + timedelta(days=7)
 maps_url_base = "https://www.google.com/maps/search/?api=1&query="
-webhook_url = creds.webhook_cater
+webhook_url = creds.webhook_test
+
+
+def get_driver(driver_name):
+    driver_list = sheet2.get_all_values()
+    for driver in driver_list:
+        if driver[0] == driver_name:
+            driver_tag = f"<@{driver[1]}>"
+            break
+    else:
+        driver_tag = driver_name
+    return driver_tag
 
 
 def morning():
@@ -28,7 +40,32 @@ def morning():
     for row in list_of_rows:
         values_list = sheet1.row_values(row)
         if values_list[2] == "ADP":
-            continue
+            driver_tag = get_driver(values_list[3].strip())
+            blocks.append(
+                {
+                    "type": "header",
+                    "text": {"type": "plain_text", "text": "ADP Delivery"}
+                }
+            )
+            blocks.append(
+                {
+                    "type": "section",
+                    "fields": [
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*Time:*\n{values_list[1]}"
+                        },
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*Driver:*\n{driver_tag}"
+                        },
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*Destination:*\n{values_list[4]}"
+                        }
+                    ]
+                }
+            )
         if values_list[2] == "PICKUP":
             blocks.append(
                 {
@@ -61,15 +98,7 @@ def morning():
                 }
             )
         else:
-            sheet2 = spreadsheet.worksheet("Sheet2")
-            driver_list = sheet2.get_all_values()
-            driver_name = values_list[2].strip()
-            for driver in driver_list:
-                if driver[0] == driver_name:
-                    driver_tag = f"<@{driver[1]}>"
-                    break
-            else:
-                driver_tag = driver_name
+            driver_tag = get_driver(values_list[2].strip())
             blocks.append(
                 {
                     "type": "header",
@@ -132,16 +161,11 @@ def evening():
         }
     ]
     for row in list_of_rows:
-        if now < datetime.strptime(row[0], "%m/%d/%Y") < then and row[2] not in ["PICKUP", "ADP"]:
-            sheet2 = spreadsheet.worksheet("Sheet2")
-            driver_list = sheet2.get_all_values()
-            driver_name = row[2].strip()
-            for driver in driver_list:
-                if driver[0] == driver_name:
-                    driver_tag = f"<@{driver[1]}>"
-                    break
+        if now < datetime.strptime(row[0], "%m/%d/%Y") < then and row[2] != "PICKUP":
+            if row[2] == "ADP":
+                driver_tag = get_driver(row[3].strip())
             else:
-                driver_tag = driver_name
+                driver_tag = row[2].strip()
             if driver_tag:
                 list_of_deliveries.append(f"{row[0]} - {row[1]} - {driver_tag}")
     new_line = "\n"
