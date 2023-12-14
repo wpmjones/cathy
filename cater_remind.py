@@ -15,7 +15,7 @@ now_str = datetime.today().strftime("12/14/2023")
 now = datetime.today()
 then = datetime.today() + timedelta(days=7)
 maps_url_base = "https://www.google.com/maps/search/?api=1&query="
-webhook_url = creds.webhook_test
+webhook_url = creds.webhook_cater
 
 
 def get_driver(driver_name):
@@ -64,6 +64,11 @@ def morning():
                             "text": f"*Destination:*\n{values_list[4]}"
                         }
                     ]
+                }
+            )
+            blocks.append(
+                {
+                    "type": "divider"
                 }
             )
         elif values_list[2] == "PICKUP":
