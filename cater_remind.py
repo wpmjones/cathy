@@ -4,6 +4,7 @@ import requests
 import sys
 
 from datetime import datetime, timedelta
+from loguru import logger
 
 # Connect to Google Sheets
 gc = gspread.service_account(filename=creds.gspread)
@@ -11,8 +12,9 @@ spreadsheet = gc.open_by_key(creds.cater_id)
 sheet1 = spreadsheet.worksheet("Sheet1")
 sheet2 = spreadsheet.worksheet("Sheet2")
 
-now_str = datetime.today().strftime("12/14/2023")
+now_str = datetime.today().strftime("%m/%d/%Y")
 now = datetime.today()
+logger.info(f"Today is set as {now}.")
 then = datetime.today() + timedelta(days=7)
 maps_url_base = "https://www.google.com/maps/search/?api=1&query="
 webhook_url = creds.webhook_cater
