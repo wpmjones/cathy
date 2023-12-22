@@ -44,7 +44,7 @@ def weekly():
     for row in values:
         if datetime.strptime(row[0], "%Y-%m-%d %H:%M:%S") > then:
             # If there is an index error, it's only because there is no value in that cell toward
-            # the end of that row. It will probably never trigger before strips, but lets be safe and
+            # the end of that row. It will probably never trigger before strips, but let's be safe and
             # catch them all.  Hmm.  Sounds like Pokemon.
             try:
                 filets += float(row[1])
@@ -203,36 +203,36 @@ def daily():
     block_text = ""
     if filets:
         emoji = get_emoji(filets, goal_list[1])
-        block_text += f"\n{emoji} Filets: {'{:.2f}'.format(filets)} lbs. (Goal: {'{:.2f}'.format(goal_list[1])} lbs.)"
+        block_text += f"\n{emoji} Filets: {'{:.2f}'.format(filets)} lbs. (Goal: {'{:.2f}'.format(goal_list[0])} lbs.)"
     if spicy:
         emoji = get_emoji(spicy, goal_list[2])
-        block_text += f"\n{emoji} Spicy: {'{:.2f}'.format(spicy)} lbs. (Goal: {'{:.2f}'.format(goal_list[2])} lbs.)"
+        block_text += f"\n{emoji} Spicy: {'{:.2f}'.format(spicy)} lbs. (Goal: {'{:.2f}'.format(goal_list[1])} lbs.)"
     if nuggets:
         emoji = get_emoji(nuggets, goal_list[3])
-        block_text += f"\n{emoji} Nuggets: {'{:.2f}'.format(nuggets)} lbs. (Goal: {'{:.2f}'.format(goal_list[3])} lbs.)"
+        block_text += f"\n{emoji} Nuggets: {'{:.2f}'.format(nuggets)} lbs. (Goal: {'{:.2f}'.format(goal_list[2])} lbs.)"
     if strips:
         emoji = get_emoji(strips, goal_list[4])
-        block_text += f"\n{emoji} Strips: {'{:.2f}'.format(strips)} lbs. (Goal: {'{:.2f}'.format(goal_list[4])} lbs.)"
+        block_text += f"\n{emoji} Strips: {'{:.2f}'.format(strips)} lbs. (Goal: {'{:.2f}'.format(goal_list[3])} lbs.)"
     if g_filets:
         emoji = get_emoji(g_filets, goal_list[5])
         block_text += (f"\n{emoji} Grilled Filets: {'{:.2f}'.format(g_filets)} lbs. "
-                       f"(Goal: {'{:.2f}'.format(goal_list[5])} lbs.)")
+                       f"(Goal: {'{:.2f}'.format(goal_list[4])} lbs.)")
     if g_nuggets:
         emoji = get_emoji(g_nuggets, goal_list[6])
         block_text += (f"\n{emoji} Grilled Nuggets: {'{:.2f}'.format(g_nuggets)} lbs. "
-                       f"(Goal: {'{:.2f}'.format(goal_list[6])} lbs.)")
+                       f"(Goal: {'{:.2f}'.format(goal_list[5])} lbs.)")
     if b_filets:
         emoji = get_emoji(b_filets, goal_list[7])
         block_text += (f"\n{emoji} Breakfast Filets: {'{:.2f}'.format(b_filets)} lbs. "
-                       f"(Goal: {'{:.2f}'.format(goal_list[7])} lbs.)")
+                       f"(Goal: {'{:.2f}'.format(goal_list[6])} lbs.)")
     if gb_filets:
         emoji = get_emoji(gb_filets, goal_list[8])
         block_text += (f"\n{emoji} Grilled Breakfast: {'{:.2f}'.format(gb_filets)} lbs. "
-                       f"(Goal: {'{:.2f}'.format(goal_list[8])} lbs.)")
+                       f"(Goal: {'{:.2f}'.format(goal_list[7])} lbs.)")
     if sb_filets:
         emoji = get_emoji(sb_filets, goal_list[9])
         block_text += (f"\n{emoji} Spicy Breakfast: {'{:.2f}'.format(sb_filets)} lbs. "
-                       f"(Goal: {'{:.2f}'.format(goal_list[9])} lbs.)")
+                       f"(Goal: {'{:.2f}'.format(goal_list[8])} lbs.)")
 
     blocks = [
         {
