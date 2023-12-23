@@ -1532,6 +1532,7 @@ async def new_waste(ack, body, client):
     """This is not a command!  waste_remind.py is the script that posts a reminder in Slack at determined
     times. That reminder has a button to Record Waste.  That button initiates this modal."""
     await ack()
+    logger.info(body)
     # Create blocks for Chicken Temps
     blocks = [
         {
