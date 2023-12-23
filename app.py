@@ -1613,17 +1613,17 @@ async def handle_new_waste_view_one(ack, body, client, view):
     logger.info("Processing chicken temp info...")
     # Check for errors in data input
     errors = {}
-    if (view['state']['values']['input_a']['input_cfa']['values'] < 100 or
-            view['state']['values']['input_a']['input_cfa']['values'] > 250):
+    if (view['state']['values']['input_a']['input_cfa']['value'] < 100 or
+            view['state']['values']['input_a']['input_cfa']['value'] > 250):
         errors['input_a'] = "This does not appear to be a valid temperature."
-    if (view['state']['values']['input_b']['input_spicy']['values'] < 100 or
-            view['state']['values']['input_b']['input_spicy']['values'] > 250):
+    if (view['state']['values']['input_b']['input_spicy']['value'] < 100 or
+            view['state']['values']['input_b']['input_spicy']['value'] > 250):
         errors['input_a'] = "This does not appear to be a valid temperature."
-    if (view['state']['values']['input_c']['input_nuggets']['values'] < 100 or
-            view['state']['values']['input_c']['input_nuggets']['values'] > 250):
+    if (view['state']['values']['input_c']['input_nuggets']['value'] < 100 or
+            view['state']['values']['input_c']['input_nuggets']['value'] > 250):
         errors['input_a'] = "This does not appear to be a valid temperature."
-    if (view['state']['values']['input_d']['input_strips']['values'] < 100 or
-            view['state']['values']['input_d']['input_strips']['values'] > 250):
+    if (view['state']['values']['input_d']['input_strips']['value'] < 100 or
+            view['state']['values']['input_d']['input_strips']['value'] > 250):
         errors['input_a'] = "This does not appear to be a valid temperature."
     if len(errors) > 0:
         return await ack(response_action="errors", errors=errors)
