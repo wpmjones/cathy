@@ -1539,8 +1539,7 @@ async def new_waste(ack, body, client):
             "text": {
                 "type": "mrkdwn",
                 "text": "Please record temps for each of the four types of breaded chicken, fresh out of the fryer."
-            },
-            "optional": False
+            }
         },
         {
             "type": "divider"
@@ -1582,7 +1581,8 @@ async def new_waste(ack, body, client):
             "element": {
                 "type": "plain_text_input",
                 "action_id": "input_strips"
-            }
+            },
+            "optional": False
         },
         # {
         #     "type": "context",
