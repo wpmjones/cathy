@@ -1638,7 +1638,14 @@ async def handle_new_waste_view_one(ack, body, client, view):
     leader_options = []
     for row in sheet_values:
         if row[4] == "BOH":
-            leader_options.append(row[0])
+            leader_options.append(
+                {
+                    "text": {
+                        "type": "plain_text",
+                        "text": row[0]
+                    }
+                }
+            )
     # Assign time options
     time_options = []
     for _time in creds.times:
