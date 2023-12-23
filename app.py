@@ -1624,11 +1624,11 @@ async def handle_new_waste_view_one(ack, body, client, view):
     if cfa < 100 or cfa:
         errors['input_a'] = "This does not appear to be a valid temperature."
     if spicy < 100 or spicy > 250:
-        errors['input_a'] = "This does not appear to be a valid temperature."
+        errors['input_b'] = "This does not appear to be a valid temperature."
     if nuggets < 100 or nuggets > 250:
-        errors['input_a'] = "This does not appear to be a valid temperature."
+        errors['input_c'] = "This does not appear to be a valid temperature."
     if strips < 100 or strips > 250:
-        errors['input_a'] = "This does not appear to be a valid temperature."
+        errors['input_d'] = "This does not appear to be a valid temperature."
     if len(errors) > 0:
         return await ack(response_action="errors", errors=errors)
     await ack()
