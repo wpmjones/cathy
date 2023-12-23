@@ -1621,7 +1621,7 @@ async def handle_new_waste_view_one(ack, body, client, view):
     except ValueError:
         errors['input_a'] = "Please use numbers only"
         return await ack(response_action="errors", errors=errors)
-    if cfa < 100 or cfa:
+    if cfa < 100 or cfa > 250:
         errors['input_a'] = "This does not appear to be a valid temperature."
     if spicy < 100 or spicy > 250:
         errors['input_b'] = "This does not appear to be a valid temperature."
