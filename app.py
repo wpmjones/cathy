@@ -1539,37 +1539,45 @@ async def new_waste(ack, body, client):
             "text": {
                 "type": "mrkdwn",
                 "text": "Please record temps for each of the four types of breaded chicken, fresh out of the fryer."
-            }
+            },
+            "optional": False
         },
         {
             "type": "divider"
         },
         {
             "type": "input",
+            "block_id": "input_a",
             "label": {"type": "plain_text", "text": "Regular"},
             "element": {
                 "type": "plain_text_input",
                 "action_id": "input_cfa"
-            }
+            },
+            "optional": False
         },
         {
             "type": "input",
+            "block_id": "input_b",
             "label": {"type": "plain_text", "text": "Spicy"},
             "element": {
                 "type": "plain_text_input",
                 "action_id": "input_spicy"
-            }
+            },
+            "optional": False
         },
         {
             "type": "input",
+            "block_id": "input_c",
             "label": {"type": "plain_text", "text": "Nuggets"},
             "element": {
                 "type": "plain_text_input",
                 "action_id": "input_nuggets"
-            }
+            },
+            "optional": False
         },
         {
             "type": "input",
+            "block_id": "input_d",
             "label": {"type": "plain_text", "text": "Strips"},
             "element": {
                 "type": "plain_text_input",
@@ -1601,7 +1609,25 @@ async def new_waste(ack, body, client):
 
 @app.view("new_waste_view")
 async def handle_new_waste_view_one(ack, body, client, view):
-    """Discard info from chicken temp form. Open the actual waste view."""
+    """Check info from chicken temp form. Open the actual waste view."""
+    logger.info("Processing chicken temp info...")
+    # Check for errors in data input
+    errors = {}
+    if (view['state']['values']['input_a']['input_cfa']['values'] < 100 or
+            view['state']['values']['input_a']['input_cfa']['values'] > 250):
+        errors['input_a'] = "This does not appear to be a valid temperature."
+    if (view['state']['values']['input_b']['input_spicy']['values'] < 100 or
+            view['state']['values']['input_b']['input_spicy']['values'] > 250):
+        errors['input_a'] = "This does not appear to be a valid temperature."
+    if (view['state']['values']['input_c']['input_nuggets']['values'] < 100 or
+            view['state']['values']['input_c']['input_nuggets']['values'] > 250):
+        errors['input_a'] = "This does not appear to be a valid temperature."
+    if (view['state']['values']['input_d']['input_strips']['values'] < 100 or
+            view['state']['values']['input_d']['input_strips']['values'] > 250):
+        errors['input_a'] = "This does not appear to be a valid temperature."
+    if len(errors) > 0:
+        return await ack(response_action="errors", errors=errors)
+    await ack()
     # Retrieve leaders from Staff Google Sheet
     sheet = staff_spreadsheet.worksheet("Leaders")
     sheet_values = sheet.get_all_values()
