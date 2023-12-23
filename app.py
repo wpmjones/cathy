@@ -1651,6 +1651,8 @@ async def handle_new_waste_view_one(ack, body, client, view):
                 "value": _time
             }
         )
+    logger.info(leader_options)
+    logger.info(time_options)
     blocks = [
         {
             "type": "input",
