@@ -1584,16 +1584,16 @@ async def waste(ack, body, client):
             },
             "optional": False
         },
-        # {
-        #     "type": "context",
-        #     "block_id": "context_a",
-        #     "elements": [
-        #         {
-        #             "type": "plain_text",
-        #             "text": body['container']['message_ts']
-        #         }
-        #     ]
-        # }
+        {
+            "type": "context",
+            "block_id": "context_a",
+            "elements": [
+                {
+                    "type": "plain_text",
+                    "text": body['container']['message_ts']
+                }
+            ]
+        }
     ]
     await client.views_open(
         trigger_id=body['trigger_id'],
@@ -1813,18 +1813,7 @@ async def handle_new_waste_view_one(ack, body, client, view):
             "optional": True
         }
     )
-    # blocks.append(
-    #     {
-    #         "type": "context",
-    #         "block_id": "context_a",
-    #         "elements": [
-    #             {
-    #                 "type": "plain_text",
-    #                 "text": body['container']['message_ts']
-    #             }
-    #         ]
-    #     }
-    # )
+    blocks.append(view['blocks'][-1]['elements'][0])
     await client.views_open(
         trigger_id=body['trigger_id'],
         view={
