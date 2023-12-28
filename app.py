@@ -2048,6 +2048,7 @@ async def handle_waste_view(ack, body, client, view):
     you provide in the form and processes it."""
     logger.info("Processing waste input...")
     raw_leaders = view['state']['values']['input_a']['leader_names']['selected_options']
+    logger.info(raw_leaders)
     leader_list = [" - " + n['value'] for n in raw_leaders]
     raw_times = view['state']['values']['input_a2']['times']['selected_options']
     time_list = [" - " + n['value'] for n in raw_times]
