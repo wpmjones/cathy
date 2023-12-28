@@ -1643,7 +1643,8 @@ async def handle_new_waste_view_one(ack, body, client, view):
                     "text": {
                         "type": "plain_text",
                         "text": row[0]
-                    }
+                    },
+                    "value": row[0]
                 }
             )
     # Assign time options
