@@ -1527,8 +1527,8 @@ async def no_waste(ack, body, client):
         logger.exception(f"Message deletion failed: {e}")
 
 
-@app.command("/new_waste")
-async def new_waste(ack, body, client):
+@app.block_action("waste_tracking_form")
+async def waste(ack, body, client):
     """This is not a command!  waste_remind.py is the script that posts a reminder in Slack at determined
     times. That reminder has a button to Record Waste.  That button initiates this modal."""
     await ack()
@@ -1836,8 +1836,7 @@ async def handle_new_waste_view_one(ack, body, client, view):
     )
 
 
-@app.block_action("waste_tracking_form")
-async def waste(ack, body, client):
+async def old_waste(ack, body, client):
     """This is not a command!  waste_remind.py is the script that posts a reminder in Slack at determined
     times. That reminder has a button to Record Waste.  That button initiates this modal."""
     await ack()
