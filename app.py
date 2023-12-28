@@ -1632,6 +1632,7 @@ async def handle_new_waste_view_one(ack, body, client, view):
     if len(errors) > 0:
         return await ack(response_action="errors", errors=errors)
     await ack()
+    message_ts = view['blocks'][-1]['elements'][0]['text']
     # Retrieve leaders from Staff Google Sheet
     sheet = staff_spreadsheet.worksheet("Leaders")
     sheet_values = sheet.get_all_values()
@@ -1659,8 +1660,6 @@ async def handle_new_waste_view_one(ack, body, client, view):
                 "value": _time
             }
         )
-    logger.info(leader_options)
-    logger.info(time_options)
     blocks = [
         {
             "type": "input",
@@ -1813,7 +1812,18 @@ async def handle_new_waste_view_one(ack, body, client, view):
             "optional": True
         }
     )
-    blocks.append(view['blocks'][-1]['elements'][0])
+    blocks.append(
+        {
+            "type": "context",
+            "block_id": "context_a",
+            "elements": [
+                {
+                    "type": "plain_text",
+                    "text": message_ts
+                }
+            ]
+        }
+    )
     await client.views_open(
         trigger_id=body['trigger_id'],
         view={
