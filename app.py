@@ -903,14 +903,14 @@ async def handle_remove_view(ack, body, client, view):
     staff_sheet = staff_spreadsheet.get_worksheet(0)
     cell = staff_sheet.find(name)
     staff_sheet.update_cell(cell.row, cell.col, "")
-    staff_sheet.sort(1)
+    staff_sheet.sort([1, "asc"])
     # Remove name from Pay Scale Tracking
     payscale_spreadsheet = gc.open_by_key(creds.pay_scale_id)
     payscale_sheet = payscale_spreadsheet.get_worksheet(0)
     cell = payscale_sheet.find(name)
     range = f"A{cell.row}:G{cell.row}"
     payscale_sheet.update(range, ["", "", "", "", "", "", ""])
-    payscale_sheet.sort(1)
+    payscale_sheet.sort([1, "asc"])
     # respond just so that the user knows it worked
     blocks = [
         {
