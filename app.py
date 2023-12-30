@@ -802,10 +802,13 @@ async def remove_tm(ack, body, client):
                     "block_id": "input_c",
                     "element": {
                         "type": "static_select",
-                        "placeholder": {
-                            "type": "plain_text",
-                            "text": "Yes",
-                            "emoji": True
+                        "initial_option": {
+                            "text": {
+                                "type": "plain_text",
+                                "text": "Yes",
+                                "emoji": True
+                            },
+                            "value": "Yes"
                         },
                         "options": [
                             {
