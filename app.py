@@ -725,6 +725,26 @@ async def handle_add_view(ack, body, client, view):
     card_sheet.sort([3, "asc"])
 
 
+async def depart_tm(now_str, name, last_date, rehire, reason):
+    """Removes TM from CFA Staff and PAy Scale sheets and adds their info to CFA Departures"""
+    # Add info to CFA Departures
+    departure_spreadsheet = gc.open_by_key(creds.departure_id)
+    departure_sheet = departure_spreadsheet.worksheet("Departures")
+    to_post = [now_str, name, last_date, rehire, reason]
+    departure_sheet.append_row(to_post, value_input_option='USER_ENTERED')
+    # Remove name from CFA Staff
+    # Since the name was selected from CFA Staff, there shouldn't be any problem finding it
+    staff_sheet = staff_spreadsheet.get_worksheet(0)
+    cell = staff_sheet.find(name)
+    staff_sheet.update_cell(cell.row, cell.col, "")
+    staff_sheet.sort([1, "asc"])
+    # Remove name from Pay Scale Tracking
+    payscale_spreadsheet = gc.open_by_key(creds.pay_scale_id)
+    payscale_sheet = payscale_spreadsheet.get_worksheet(0)
+    cell = payscale_sheet.find(name)
+    payscale_sheet.delete_rows(cell.row)
+
+
 @app.command("/depart")
 async def remove_tm(ack, body, client):
     """This command will update the Google Sheet CFA Departures with the necessary info and remove the
@@ -893,22 +913,7 @@ async def handle_remove_view(ack, body, client, view):
     user = await client.users_info(user=body['user']['id'])
     user_name = user['user']['real_name']
     await ack()
-    # Add info to CFA Departures
-    departure_spreadsheet = gc.open_by_key(creds.departure_id)
-    departure_sheet = departure_spreadsheet.worksheet("Departures")
-    to_post = [now_str, name, last_date, rehire, reason]
-    departure_sheet.append_row(to_post, value_input_option='USER_ENTERED')
-    # Remove name from CFA Staff
-    # Since the name was selected from CFA Staff, there shouldn't be any problem finding it
-    staff_sheet = staff_spreadsheet.get_worksheet(0)
-    cell = staff_sheet.find(name)
-    staff_sheet.update_cell(cell.row, cell.col, "")
-    staff_sheet.sort([1, "asc"])
-    # Remove name from Pay Scale Tracking
-    payscale_spreadsheet = gc.open_by_key(creds.pay_scale_id)
-    payscale_sheet = payscale_spreadsheet.get_worksheet(0)
-    cell = payscale_sheet.find(name)
-    payscale_sheet.delete_rows(cell.row)
+    await depart_tm(now_str, name, last_date, rehire, reason)
     # respond just so that the user knows it worked
     blocks = [
         {
@@ -1497,6 +1502,10 @@ async def handle_discipline_view(ack, body, client, view):
     if other:
         block_text += f"*Other notes*: {other}"
     await ack()
+    if discipline_type == "Termination":
+        # Remove info from Sheets and add to CFA Departures
+        now_str = str(date.today())
+        await depart_tm(now_str, name, now_str, "No", reason)
     # Send data to Google Sheet
     try:
         sh = gc.open_by_key(creds.sick_log_id)
