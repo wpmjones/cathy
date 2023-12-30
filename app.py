@@ -908,8 +908,8 @@ async def handle_remove_view(ack, body, client, view):
     payscale_spreadsheet = gc.open_by_key(creds.pay_scale_id)
     payscale_sheet = payscale_spreadsheet.get_worksheet(0)
     cell = payscale_sheet.find(name)
-    range = f"A{cell.row}:G{cell.row}"
-    payscale_sheet.update(range, ["", "", "", "", "", "", ""])
+    range = f"'Champs Info'!A{cell.row}:G{cell.row}"
+    payscale_spreadsheet.values_clear(range)
     payscale_sheet.sort([1, "asc"])
     # respond just so that the user knows it worked
     blocks = [
