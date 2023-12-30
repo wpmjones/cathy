@@ -725,7 +725,7 @@ async def handle_add_view(ack, body, client, view):
     card_sheet.sort([3, "asc"])
 
 
-@app.command("/remove")
+@app.command("/depart")
 async def remove_tm(ack, body, client):
     """This command will update the Google Sheet CFA Departures with the necessary info and remove the
     name from CFA Staff (/sick command) and Payscale Tracking"""
