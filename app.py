@@ -899,7 +899,7 @@ async def handle_remove_view(ack, body, client, view):
     # Since the name was selected from CFA Staff, there shouldn't be any problem finding it
     staff_sheet = staff_spreadsheet.get_worksheet(0)
     cell = staff_sheet.find(name)
-    staff_sheet.update(cell.row, cell.col, "")
+    staff_sheet.update_cell(cell.row, cell.col, "")
     staff_sheet.sort(1)
     # Remove name from Pay Scale Tracking
     payscale_spreadsheet = gc.open_by_key(creds.pay_scale_id)
