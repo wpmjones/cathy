@@ -725,6 +725,215 @@ async def handle_add_view(ack, body, client, view):
     card_sheet.sort([3, "asc"])
 
 
+@app.command("/remove")
+async def remove_tm(ack, body, client):
+    """This command will update the Google Sheet CFA Departures with the necessary info and remove the
+    name from CFA Staff (/sick command) and Payscale Tracking"""
+    await ack()
+    # Create options for select menu
+    worksheet = staff_spreadsheet.get_worksheet(0)
+    values = worksheet.col_values(1)
+    if len(values) > 100:
+        await client.chat_postMessage(channel=creds.pj_user_id,
+                                      text="The CFA Staff list is full. Time for a purge.")
+        return await client.chat_postMessage(channel=body['channel_id'],
+                                             text="The list of staff members has exceed 100 names, preventing "
+                                                  "/sick from working properly. Patrick has been notified and "
+                                                  "will correct the issue shortly.")
+    options = []
+    for name in values:
+        options.append(
+            {
+                "text": {
+                    "type": "plain_text",
+                    "text": name
+                },
+                "value": name
+            }
+        )
+    await client.views_open(
+        trigger_id=body['trigger_id'],
+        view={
+            "type": "modal",
+            "callback_id": "remove_view",
+            "title": {"type": "plain_text", "text": "Remove Team Member"},
+            "submit": {"type": "plain_text", "text": "Submit"},
+            "blocks": [
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": ("This form is for handling the removal of a team member from the Slack ecosystem. "
+                                 "You should not use this form until *after* the team member has completed their "
+                                 "final day. If their last day is in the future, you can use `/remind` to set a "
+                                 "reminder for yourself to run this command after their last day.")
+                    }
+                },
+                {
+                    "type": "divider"
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_a",
+                    "label": {"type": "plain_text", "text": "Name"},
+                    "element": {
+                        "type": "static_select",
+                        "action_id": "tm_name",
+                        "placeholder": {"type": "plain_text", "text": "Select a name"},
+                        "options": options
+                    }
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_b",
+                    "label": {"type": "plain_text", "text": "Last Date Worked:"},
+                    "element": {
+                        "type": "datepicker",
+                        "action_id": "last_date",
+                        "initial_date": str(date.today()),
+                        "placeholder": {
+                            "type": "plain_text",
+                            "text": "Last Day"
+                        }
+                    }
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_c",
+                    "element": {
+                        "type": "static_select",
+                        "placeholder": {
+                            "type": "plain_text",
+                            "text": "Yes",
+                            "emoji": True
+                        },
+                        "options": [
+                            {
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "Yes",
+                                    "emoji": True
+                                },
+                                "value": "Yes"
+                            },
+                            {
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "No",
+                                    "emoji": True
+                                },
+                                "value": "No"
+                            },
+                            {
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "Maybe",
+                                    "emoji": True
+                                },
+                                "value": "Maybe"
+                            }
+                        ],
+                        "action_id": "rehire_status"
+                    },
+                    "label": {
+                        "type": "plain_text",
+                        "text": "Would you rehire this Team Member?",
+                        "emoji": True
+                    }
+                },
+                {
+                    "type": "input",
+                    "block_id": "input_d",
+                    "label": {"type": "plain_text", "text": "Reason for Departure:"},
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "reason",
+                        "multiline": False
+                    },
+                    "optional": False
+                },
+                {
+                    "type": "context",
+                    "block_id": "context_a",
+                    "elements": [
+                        {
+                            "type": "plain_text",
+                            "text": body['channel_id']
+                        }
+                    ]
+                }
+            ]
+        }
+    )
+
+
+@app.view("remove_view")
+async def handle_remove_view(ack, body, client, view):
+    """Process info from remove form. This is a view handler for the previous function. It takes inforation
+    you provide in the form and processes it."""
+    logger.info("Processing remove input...")
+    now_str = str(date.today())
+    name = view['state']['values']['input_a']['tm_name']['selected_option']['value']
+    last_date = view['state']['values']['input_b']['last_date']['selected_date']
+    rehire = view['state']['values']['input_c']['rehire_status']['selected_option']['value']
+    reason = view['state']['values']['input_d']['reason']['value']
+    channel_id = view['blocks'][-1]['elements'][0]['text']
+    # check that last_date is today or greater
+    errors = {}
+    now = datetime.now()
+    midnight = datetime.combine(now.date(), datetime.max.time())
+    if datetime.strptime(last_date, "%Y-%m-%d") > midnight:
+        errors['input_b'] = "The date needs to be today or in the past."
+    if len(errors) > 0:
+        return await ack(response_action="errors", errors=errors)
+    # Get user name from body
+    user = await client.users_info(user=body['user']['id'])
+    user_name = user['user']['real_name']
+    await ack()
+    # Add info to CFA Departures
+    departure_spreadsheet = gc.open_by_key(creds.departure_id)
+    departure_sheet = departure_spreadsheet.worksheet("Departures")
+    to_post = [now_str, name, last_date, rehire, reason]
+    departure_sheet.append_row(to_post, value_input_option='USER_ENTERED')
+    # Remove name from CFA Staff
+    # Since the name was selected from CFA Staff, there shouldn't be any problem finding it
+    staff_sheet = staff_spreadsheet.get_worksheet(0)
+    cell = staff_sheet.find(name)
+    staff_sheet.update(cell.row, cell.col, "")
+    staff_sheet.sort(1)
+    # Remove name from Pay Scale Tracking
+    payscale_spreadsheet = gc.open_by_key(creds.pay_scale_id)
+    payscale_sheet = payscale_spreadsheet.get_worksheet(0)
+    cell = payscale_sheet.find(name)
+    range = f"A{cell.row}:G{cell.row}"
+    payscale_sheet.update(range, ["", "", "", "", "", "", ""])
+    payscale_sheet.sort(1)
+    # respond just so that the user knows it worked
+    blocks = [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": f"{name} has been removed from the staff list and added to the Departures sheet."
+            }
+        },
+        {
+            "type": "context",
+            "elements": [
+                {
+                    "type": "plain_text",
+                    "text": f"Submitted by: {user_name}"
+                }
+            ]
+        }
+    ]
+    await client.chat_postEphemeral(channel=channel_id,
+                                    blocks=blocks,
+                                    text=f"{name} has been removed from the system.",
+                                    user=body['user']['id'])
+
+
+
 async def get_bag_status():
     """This pulls TMS bag status from Google Sheets"""
     sh = gc.open_by_key(creds.tms_id)
