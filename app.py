@@ -76,6 +76,16 @@ async def cathy_help(ack, say):
               "`/help` List these commands")
 
 
+@app.command("/loomis")
+async def loomis(ack, body, say):
+    """Notifies the team that a manual deposit is prepared for Loomis."""
+    await ack()
+    if body['channel_id'] != creds.all_channel:
+        return await say(f"Please use this command in <#{creds.all_channel}> only.")
+    await say("There is a manual deposit prepped and ready to go.  If you see Loomis, please make sure they get"
+              " the deposit.  Thank you.")
+
+
 async def pull_cater(user_first):
     # Look for and add catering deliveries if they exist
     spreadsheet = gc.open_by_key(creds.cater_id)
