@@ -1246,7 +1246,7 @@ async def handle_tms_check_out_view(ack, client, view):
     errors = {}
     regex = r"^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$"
     if not re.match(regex, contact_number):
-        errors['input_contact'] = "Please enter a valid, 10 digit phone number"
+        errors['input_phone'] = "Please enter a valid, 10 digit phone number"
     if len(errors) > 0:
         return await ack(response_action="errors", errors=errors)
     # Update sheet with new info
