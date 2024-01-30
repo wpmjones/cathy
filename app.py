@@ -919,10 +919,10 @@ async def handle_remove_view(ack, body, client, view):
         errors['input_b'] = "The date needs to be today or in the past."
     if len(errors) > 0:
         return await ack(response_action="errors", errors=errors)
+    await ack()
     # Get user name from body
     user = await client.users_info(user=body['user']['id'])
     user_name = user['user']['real_name']
-    await ack()
     await depart_tm(now_str, name, last_date, rehire, reason)
     # respond just so that the user knows it worked
     blocks = [
