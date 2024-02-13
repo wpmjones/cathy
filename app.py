@@ -746,13 +746,17 @@ async def depart_tm(now_str, name, last_date, rehire, reason):
     # Since the name was selected from CFA Staff, there shouldn't be any problem finding it
     staff_sheet = staff_spreadsheet.get_worksheet(0)
     cell = staff_sheet.find(name)
-    staff_sheet.update_cell(cell.row, cell.col, "")
-    staff_sheet.sort([1, "asc"])
+    if cell:
+        staff_sheet.update_cell(cell.row, cell.col, "")
+        staff_sheet.sort([1, "asc"])
     # Remove name from Pay Scale Tracking
     payscale_spreadsheet = gc.open_by_key(creds.pay_scale_id)
     payscale_sheet = payscale_spreadsheet.get_worksheet(0)
     cell = payscale_sheet.find(name)
-    payscale_sheet.delete_rows(cell.row)
+    try:
+        payscale_sheet.delete_rows(cell.row)
+    except AttributeError:
+        pass
 
 
 @app.command("/depart")
