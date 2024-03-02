@@ -1865,6 +1865,7 @@ async def handle_new_waste_view_one(ack, body, client, view):
     if len(errors) > 0:
         return await ack(response_action="errors", errors=errors)
     await ack()
+    logger.info("Temp info approved. Start waste view process...")
     message_ts = view['blocks'][-1]['elements'][0]['text']
     # Retrieve leaders from Staff Google Sheet
     sheet = staff_spreadsheet.worksheet("Leaders")
@@ -2057,6 +2058,7 @@ async def handle_new_waste_view_one(ack, body, client, view):
             ]
         }
     )
+    logger.info("Blocks ready. Open view.")
     await client.views_open(
         trigger_id=body['trigger_id'],
         view={
