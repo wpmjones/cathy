@@ -2059,16 +2059,19 @@ async def handle_new_waste_view_one(ack, body, client, view):
         }
     )
     logger.info("Blocks ready. Open view.")
-    await client.views_open(
-        trigger_id=body['trigger_id'],
-        view={
-            "type": "modal",
-            "callback_id": "waste_view",
-            "title": {"type": "plain_text", "text": "Waste Form"},
-            "submit": {"type": "plain_text", "text": "Submit"},
-            "blocks": blocks
-        }
-    )
+    try:
+        await client.views_open(
+            trigger_id=body['trigger_id'],
+            view={
+                "type": "modal",
+                "callback_id": "waste_view",
+                "title": {"type": "plain_text", "text": "Waste Form"},
+                "submit": {"type": "plain_text", "text": "Submit"},
+                "blocks": blocks
+            }
+        )
+    except Exception as e:
+        logger.error(f"Error: {e}")
 
 
 async def old_waste(ack, body, client):
