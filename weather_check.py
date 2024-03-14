@@ -1,7 +1,7 @@
 import creds
 import requests
 
-# from loguru import logger
+from loguru import logger
 
 lat = "36.06302829757474"
 lon = "-115.17006319892765"
@@ -18,6 +18,8 @@ def main():
     current_temp = data['main']['temp']
     feels_like = data['main']['feels_like']
     wind_speed = data['main']['wind_speed']
+    logger.info(f"Weather\nCurrent Temp: {current_temp}\nFeels Like: {feels_like}\n"
+                f"Current wind speed: {wind_speed}")
     if current_temp > 100 or feels_like > 100:
         content = f"The current outside temperature is {current_temp} and it feels like {feels_like}."
         payload = {
