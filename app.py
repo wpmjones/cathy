@@ -1945,113 +1945,114 @@ async def no_waste(ack, body, client):
         logger.exception(f"Message deletion failed: {e}")
 
 
+# @app.block_action("waste_tracking_form")
+# async def waste(ack, body, client):
+#     """This is not a command!  waste_remind.py is the script that posts a reminder in Slack at determined
+#     times. That reminder has a button to Record Waste.  That button initiates this modal."""
+#     await ack()
+#     # Create blocks for Chicken Temps
+#     blocks = [
+#         {
+#             "type": "section",
+#             "text": {
+#                 "type": "mrkdwn",
+#                 "text": "Please record temps for each of the four types of breaded chicken, fresh out of the fryer."
+#             }
+#         },
+#         {
+#             "type": "divider"
+#         },
+#         {
+#             "type": "input",
+#             "block_id": "input_a",
+#             "label": {"type": "plain_text", "text": "Regular"},
+#             "element": {
+#                 "type": "plain_text_input",
+#                 "action_id": "input_cfa"
+#             },
+#             "optional": False
+#         },
+#         {
+#             "type": "input",
+#             "block_id": "input_b",
+#             "label": {"type": "plain_text", "text": "Spicy"},
+#             "element": {
+#                 "type": "plain_text_input",
+#                 "action_id": "input_spicy"
+#             },
+#             "optional": False
+#         },
+#         {
+#             "type": "input",
+#             "block_id": "input_c",
+#             "label": {"type": "plain_text", "text": "Nuggets"},
+#             "element": {
+#                 "type": "plain_text_input",
+#                 "action_id": "input_nuggets"
+#             },
+#             "optional": False
+#         },
+#         {
+#             "type": "input",
+#             "block_id": "input_d",
+#             "label": {"type": "plain_text", "text": "Strips"},
+#             "element": {
+#                 "type": "plain_text_input",
+#                 "action_id": "input_strips"
+#             },
+#             "optional": False
+#         },
+#         {
+#             "type": "context",
+#             "block_id": "context_a",
+#             "elements": [
+#                 {
+#                     "type": "plain_text",
+#                     "text": body['container']['message_ts']
+#                 }
+#             ]
+#         }
+#     ]
+#     await client.views_open(
+#         trigger_id=body['trigger_id'],
+#         view={
+#             "type": "modal",
+#             "callback_id": "new_waste_view",
+#             "title": {"type": "plain_text", "text": "Chicken Temps"},
+#             "submit": {"type": "plain_text", "text": "Submit"},
+#             "blocks": blocks
+#         }
+#     )
+
+
+# @app.view("new_waste_view")
 @app.block_action("waste_tracking_form")
-async def waste(ack, body, client):
-    """This is not a command!  waste_remind.py is the script that posts a reminder in Slack at determined
-    times. That reminder has a button to Record Waste.  That button initiates this modal."""
-    await ack()
-    # Create blocks for Chicken Temps
-    blocks = [
-        {
-            "type": "section",
-            "text": {
-                "type": "mrkdwn",
-                "text": "Please record temps for each of the four types of breaded chicken, fresh out of the fryer."
-            }
-        },
-        {
-            "type": "divider"
-        },
-        {
-            "type": "input",
-            "block_id": "input_a",
-            "label": {"type": "plain_text", "text": "Regular"},
-            "element": {
-                "type": "plain_text_input",
-                "action_id": "input_cfa"
-            },
-            "optional": False
-        },
-        {
-            "type": "input",
-            "block_id": "input_b",
-            "label": {"type": "plain_text", "text": "Spicy"},
-            "element": {
-                "type": "plain_text_input",
-                "action_id": "input_spicy"
-            },
-            "optional": False
-        },
-        {
-            "type": "input",
-            "block_id": "input_c",
-            "label": {"type": "plain_text", "text": "Nuggets"},
-            "element": {
-                "type": "plain_text_input",
-                "action_id": "input_nuggets"
-            },
-            "optional": False
-        },
-        {
-            "type": "input",
-            "block_id": "input_d",
-            "label": {"type": "plain_text", "text": "Strips"},
-            "element": {
-                "type": "plain_text_input",
-                "action_id": "input_strips"
-            },
-            "optional": False
-        },
-        {
-            "type": "context",
-            "block_id": "context_a",
-            "elements": [
-                {
-                    "type": "plain_text",
-                    "text": body['container']['message_ts']
-                }
-            ]
-        }
-    ]
-    await client.views_open(
-        trigger_id=body['trigger_id'],
-        view={
-            "type": "modal",
-            "callback_id": "new_waste_view",
-            "title": {"type": "plain_text", "text": "Chicken Temps"},
-            "submit": {"type": "plain_text", "text": "Submit"},
-            "blocks": blocks
-        }
-    )
-
-
-@app.view("new_waste_view")
 async def handle_new_waste_view_one(ack, body, client, view):
     """Check info from chicken temp form. Open the actual waste view."""
-    logger.info("Processing chicken temp info...")
-    # Check for errors in data input
-    errors = {}
-    try:
-        cfa = float(view['state']['values']['input_a']['input_cfa']['value'])
-        spicy = float(view['state']['values']['input_b']['input_spicy']['value'])
-        nuggets = float(view['state']['values']['input_c']['input_nuggets']['value'])
-        strips = float(view['state']['values']['input_d']['input_strips']['value'])
-    except ValueError:
-        errors['input_a'] = "Please use numbers only"
-        return await ack(response_action="errors", errors=errors)
-    if cfa < 100 or cfa > 250:
-        errors['input_a'] = "This does not appear to be a valid temperature."
-    if spicy < 100 or spicy > 250:
-        errors['input_b'] = "This does not appear to be a valid temperature."
-    if nuggets < 100 or nuggets > 250:
-        errors['input_c'] = "This does not appear to be a valid temperature."
-    if strips < 100 or strips > 250:
-        errors['input_d'] = "This does not appear to be a valid temperature."
-    if len(errors) > 0:
-        return await ack(response_action="errors", errors=errors)
+    # logger.info("Processing chicken temp info...")
+    # # Check for errors in data input
+    # errors = {}
+    # try:
+    #     cfa = float(view['state']['values']['input_a']['input_cfa']['value'])
+    #     spicy = float(view['state']['values']['input_b']['input_spicy']['value'])
+    #     nuggets = float(view['state']['values']['input_c']['input_nuggets']['value'])
+    #     strips = float(view['state']['values']['input_d']['input_strips']['value'])
+    # except ValueError:
+    #     errors['input_a'] = "Please use numbers only"
+    #     return await ack(response_action="errors", errors=errors)
+    # if cfa < 100 or cfa > 250:
+    #     errors['input_a'] = "This does not appear to be a valid temperature."
+    # if spicy < 100 or spicy > 250:
+    #     errors['input_b'] = "This does not appear to be a valid temperature."
+    # if nuggets < 100 or nuggets > 250:
+    #     errors['input_c'] = "This does not appear to be a valid temperature."
+    # if strips < 100 or strips > 250:
+    #     errors['input_d'] = "This does not appear to be a valid temperature."
+    # if len(errors) > 0:
+    #     return await ack(response_action="errors", errors=errors)
     await ack()
-    logger.info("Temp info approved. Start waste view process...")
-    message_ts = view['blocks'][-1]['elements'][0]['text']
+    # logger.info("Temp info approved. Start waste view process...")
+    # message_ts = view['blocks'][-1]['elements'][0]['text']
     # Retrieve leaders from Staff Google Sheet
     sheet = staff_spreadsheet.worksheet("Leaders")
     sheet_values = sheet.get_all_values()
@@ -2231,18 +2232,18 @@ async def handle_new_waste_view_one(ack, body, client, view):
             "optional": True
         }
     )
-    blocks.append(
-        {
-            "type": "context",
-            "block_id": "context_a",
-            "elements": [
-                {
-                    "type": "plain_text",
-                    "text": message_ts
-                }
-            ]
-        }
-    )
+    # blocks.append(
+    #     {
+    #         "type": "context",
+    #         "block_id": "context_a",
+    #         "elements": [
+    #             {
+    #                 "type": "plain_text",
+    #                 "text": message_ts
+    #             }
+    #         ]
+    #     }
+    # )
     logger.info("Blocks ready. Open view.")
     try:
         await client.views_open(
