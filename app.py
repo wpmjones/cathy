@@ -1520,22 +1520,22 @@ async def handle_discipline_view(ack, body, client, view):
         # Remove info from Sheets and add to CFA Departures
         now_str = str(date.today())
         await depart_tm(now_str, name, now_str, "No", reason)
-    # Send data to Google Sheet
-    try:
-        sh = gc.open_by_key(creds.sick_log_id)
-        sheet = sh.get_worksheet(1)
-        now = str(datetime.date(datetime.today()))
-        to_post = [now, name, discipline_type, reason, leader, method_value, other]
-        sheet.append_row(to_post)
-    except gspread.exceptions.GSpreadException as e:
-        return await client.chat_postMessage(channel=body['user']['id'],
-                                             text=e)
-    except Exception as e:
-        await client.chat_postMessage(channel=body['user']['id'],
-                                      text=f"There was an error while storing the message to the Google Sheet.\n{e}")
-        await client.chat_postMessage(channel=creds.pj_user_id,
-                                      text=f"There was an error while storing the message to the Google Sheet.\n{e}")
-        return
+    else:
+        # Send data to Google Sheet
+        try:
+            sh = gc.open_by_key(creds.sick_log_id)
+            sheet = sh.get_worksheet(1)
+            now = str(datetime.date(datetime.today()))
+            to_post = [now, name, discipline_type, reason, leader, method_value, other]
+            sheet.append_row(to_post)
+        except gspread.exceptions.GSpreadException as e:
+            return await client.chat_postMessage(channel=body['user']['id'], text=e)
+        except Exception as e:
+            await client.chat_postMessage(channel=body['user']['id'],
+                                          text=f"There was an error while storing the message to the Google Sheet.\n{e}")
+            await client.chat_postMessage(channel=creds.pj_user_id,
+                                          text=f"There was an error while storing the message to the Google Sheet.\n{e}")
+            return
     user = await client.users_info(user=body['user']['id'])
     user_name = user['user']['real_name']
     blocks = [
@@ -1732,191 +1732,6 @@ async def handle_sick_input(ack, body, client, view):
     await client.chat_postMessage(channel=creds.sick_channel,
                                   blocks=blocks,
                                   text=f"New callout for {name}.  Review the sheet <{creds.sick_log_link}|here>.")
-
-
-@app.view("train_view")
-async def train(ack, body, client):
-    """Handle all requests for training tracking and information
-    /train opens a form where the user can select from the following:
-    add - add info on a training session
-    status - asks for team member name and replies with their training status
-    position - asks for a position and replies with everyone that is checked off for that position"""
-    await ack()
-    blocks = [
-        {
-            "type": "section",
-            "text": {
-                "type": "mrkdwn",
-                "text": "Thank you for using Training Tracking.\n\nAre we..."
-            },
-            "accessory": {
-                "type": "image",
-                "image_url": "http://mayodev.com/images/train.jpg",
-                "alt_text": "Training Logo"
-            }
-        },
-        {
-            "type": "actions",
-            "elements": [
-                {
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "emoji": True,
-                        "text": "Add training"
-                    },
-                    "value": "add_training",
-                    "action_id": "add_training"
-                },
-                {
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "emoji": True,
-                        "text": "TM Status"
-                    },
-                    "value": "tm_status",
-                    "action_id": "tm_status"
-                },
-                {
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "emoji": True,
-                        "text": "Position List"
-                    },
-                    "value": "pos_list",
-                    "action_id": "pos_list"
-                }
-            ]
-        }
-    ]
-    await client.chat_postEphemeral(channel=body['channel_id'],
-                                    blocks=blocks,
-                                    text="Training Tracking",
-                                    user=body['user_id']
-                                    )
-
-
-@app.block_action("add_training")
-async def train_add_training(ack, respond, body, client):
-    """After a user issues /train and responds with the add button, this view is triggered"""
-    await ack()
-    await respond({"delete_original": True})
-    logger.info(body)
-    channel_id = body['channel']['id']
-    # collect TM names
-    worksheet = staff_spreadsheet.worksheet("Staff")
-    values = worksheet.col_values(1)
-    if len(values) > 100:
-        await client.chat_postMessage(channel=creds.pj_user_id,
-                                      text="The CFA Staff list is full. Time for a purge.")
-        return await client.chat_postMessage(channel=creds.sick_channel,
-                                             text="The list of staff members has exceed 100 names, preventing "
-                                                  "/sick from working properly. Patrick has been notified and "
-                                                  "will correct the issue shortly.")
-    tm_options = []
-    for name in values:
-        tm_options.append(
-            {
-                "text": {
-                    "type": "plain_text",
-                    "text": name
-                },
-                "value": name
-            }
-        )
-    worksheet = staff_spreadsheet.worksheet("Position")
-    values = worksheet.col_values(4)
-    pos_options = []
-    for pos in values:
-        pos_options.append(
-            {
-                "text": {
-                    "type": "plain_text",
-                    "text": pos
-                },
-                "value": pos
-            }
-        )
-    # open the view
-    await client.views_open(
-        trigger_id=body['trigger_id'],
-        view={
-            "type": "modal",
-            "callback_id": "add_train_view",
-            "title": {"type": "plain_text", "text": "Add Training Info"},
-            "submit": {"type": "plain_text", "text": "Submit"},
-            "blocks": [
-                {
-                    "type": "input",
-                    "block_id": "input_a",
-                    "label": {"type": "plain_text", "text": "Name"},
-                    "element": {
-                        "type": "static_select",
-                        "action_id": "tm_name",
-                        "placeholder": {"type": "plain_text", "text": "Select a name"},
-                        "options": tm_options
-                    }
-                },
-                {
-                    "type": "input",
-                    "block_id": "input_b",
-                    "label": {"type": "plain_text", "text": "Position"},
-                    "element": {
-                        "type": "static_select",
-                        "action_id": "position",
-                        "placeholder": {"type": "plain_text", "text": "Select a position"},
-                        "options": pos_options
-                    }
-                },
-                {
-                    "type": "input",
-                    "block_id": "input_c",
-                    "label": {
-                        "type": "plain_text",
-                        "text": "Is training complete?",
-                        "emoji": True
-                    },
-                    "element": {
-                        "type": "radio_buttons",
-                        "options": [
-                            {
-                                "text": {"type": "plain_text", "text": "Yes", "emoji": True},
-                                "value": "Yes"
-                            },
-                            {
-                                "text": {"type": "plain_text", "text": "No", "emoji": True},
-                                "value": "No"
-                            }
-                        ],
-                        "action_id": "radio_buttons"
-                    }
-                },
-                {
-                    "type": "input",
-                    "block_id": "input_d",
-                    "element": {
-                        "type": "plain_text_input",
-                        "multiline": True,
-                        "action_id": "plain_text_input"
-                    },
-                    "label": {"type": "plain_text", "text": "Comments:", "emoji": True}
-                }
-            ]
-        }
-    )
-
-
-@app.view("add_training_view")
-async def handle_add_training_view(ack, client, view):
-    """Processes input from Add Training view."""
-    logger.info("Processing Add Training view")
-    now = str(datetime.date(datetime.today()))
-    tm_name = view['state']['values']['input_a']['tm_name']['selected_option']['value']
-    position = view['state']['values']['input_b']['position']['value']
-    completion = view['state']['values']['input_c']['radio_buttons']['selected_option']['value']
-    comments = view['state']['values']['input_d']['plain_text_input']['value']
 
 
 @app.block_action("waste_sheet")
