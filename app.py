@@ -2232,18 +2232,18 @@ async def handle_new_waste_view_one(ack, body, client, view):
             "optional": True
         }
     )
-    # blocks.append(
-    #     {
-    #         "type": "context",
-    #         "block_id": "context_a",
-    #         "elements": [
-    #             {
-    #                 "type": "plain_text",
-    #                 "text": message_ts
-    #             }
-    #         ]
-    #     }
-    # )
+    blocks.append(
+        {
+            "type": "context",
+            "block_id": "context_a",
+            "elements": [
+                {
+                    "type": "plain_text",
+                    "text": body['container']['message_ts']
+                }
+            ]
+        }
+    )
     logger.info("Blocks ready. Open view.")
     try:
         await client.views_open(
@@ -2476,7 +2476,7 @@ async def handle_waste_view(ack, body, client, view):
     leader_list = [" - " + n['value'] for n in raw_leaders]
     raw_times = view['state']['values']['input_a2']['times']['selected_options']
     time_list = [" - " + n['value'] for n in raw_times]
-    message_ts = view['blocks'][-1]['elements'][0]['text']
+    # message_ts = view['blocks'][-1]['elements'][0]['text']
     errors = {}
     text_error = "Must be a decimal number with no text"
     try:
