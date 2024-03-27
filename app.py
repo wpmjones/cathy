@@ -1842,7 +1842,7 @@ async def no_waste(ack, body, client):
 
 # @app.view("new_waste_view")
 @app.block_action("waste_tracking_form")
-async def handle_new_waste_view_one(ack, body, client, view):
+async def handle_new_waste_view_one(ack, body, client):
     """Check info from chicken temp form. Open the actual waste view."""
     # logger.info("Processing chicken temp info...")
     # # Check for errors in data input
@@ -2291,7 +2291,7 @@ async def handle_waste_view(ack, body, client, view):
     leader_list = [" - " + n['value'] for n in raw_leaders]
     raw_times = view['state']['values']['input_a2']['times']['selected_options']
     time_list = [" - " + n['value'] for n in raw_times]
-    # message_ts = view['blocks'][-1]['elements'][0]['text']
+    message_ts = view['blocks'][-1]['elements'][0]['text']
     errors = {}
     text_error = "Must be a decimal number with no text"
     try:
