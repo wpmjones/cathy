@@ -289,7 +289,7 @@ async def initiate_home_tab(client, event):
 async def home_swap_notes(ack, body, client):
     """"Update the Home tab following a button click by the user"""
     await ack()
-    blocks = body['view']['blocks']
+    # blocks = body['view']['blocks']
     # update blocks
     user_loc = body['view']['blocks'][-1]['elements'][0]['elements'][0]['text'][:3]
     logger.info(user_loc)
@@ -299,14 +299,14 @@ async def home_swap_notes(ack, body, client):
     else:
         # Swap to BOH
         notes_blocks = await pull_notes("BOH")
-    blocks = blocks[:-3] + notes_blocks
+    # blocks = blocks[:-3] + notes_blocks
     # Publish view to home tab
     await client.views_publish(
         user_id=body['user']['id'],
         view={
             "type": "home",
             "callback_id": "home_view",
-            "blocks": blocks
+            "blocks": notes_blocks
         }
     )
 
