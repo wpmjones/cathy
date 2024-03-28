@@ -127,10 +127,12 @@ async def pull_cater(user_first):
 async def pull_notes(user_loc):
     notes_sheet = staff_spreadsheet.worksheet("Shift Notes")
     all_values = notes_sheet.get_all_values()
-    leader_text = f"{user_loc} Leadership"
-    all_text = f"{user_loc} All"
+    leader_text = "Leadership Notes"
+    all_text = "All Store Notes"
+    area_text = f"{user_loc} Notes"
     leader_elements = []
     all_elements = []
+    area_elements = []
     temp_blocks = []
     for row in all_values:
         if row[0] == leader_text:
@@ -149,6 +151,14 @@ async def pull_notes(user_loc):
                     "elements": [{"type": "text", "text": value}]
                 }
             )
+        if row[0] == area_text:
+            value = row[1]
+            area_elements.append(
+                {
+                    "type": "rich_text_section",
+                    "elements": [{"type": "text", "text": value}]
+                }
+            )
     temp_blocks.append(
         {
             "type": "rich_text",
@@ -158,7 +168,7 @@ async def pull_notes(user_loc):
                     "elements": [
                         {
                             "type": "text",
-                            "text": f"{user_loc} Leadership Notes\n"
+                            "text": "Leadership Notes\n"
                         }
                     ]
                 },
@@ -180,7 +190,7 @@ async def pull_notes(user_loc):
                     "elements": [
                         {
                             "type": "text",
-                            "text": f"{user_loc} All Notes\n"
+                            "text": "All Store Notes\n"
                         }
                     ]
                 },
@@ -188,6 +198,28 @@ async def pull_notes(user_loc):
                     "type": "rich_text_list",
                     "style": "bullet",
                     "elements": all_elements
+                }
+            ]
+        }
+    )
+    temp_blocks.append({"type": "divider"})
+    temp_blocks.append(
+        {
+            "type": "rich_text",
+            "elements": [
+                {
+                    "type": "rich_text_section",
+                    "elements": [
+                        {
+                            "type": "text",
+                            "text": f"{user_loc} Notes\n"
+                        }
+                    ]
+                },
+                {
+                    "type": "rich_text_list",
+                    "style": "bullet",
+                    "elements": area_elements
                 }
             ]
         }
