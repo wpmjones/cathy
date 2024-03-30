@@ -728,8 +728,8 @@ async def cater_add(ack, body, client, view):
     """Handle the addition of a new catering order"""
     # TODO add code
     logger.info("Processing catering add info...")
-    cater_date = view['state']['values']['block_date']['input_date']['value']
-    cater_time = view['state']['values']['block_time']['input_time']['value']
+    cater_date = view['state']['values']['block_date']['input_date']['selected_date']
+    cater_time = view['state']['values']['block_time']['input_time']['selected_time']
     cater_type = view['state']['values']['block_type']['input_type']['selected_option']['value']
     cater_driver = view['state']['values']['block_driver']['input_driver']['value']
     cater_guest = view['state']['values']['block_customer']['input_customer']['value']
