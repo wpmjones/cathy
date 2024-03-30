@@ -3,8 +3,8 @@ import gspread
 import requests
 
 from datetime import datetime, timedelta
-from loguru import logger
-from operator import itemgetter
+# from loguru import logger
+# from operator import itemgetter
 
 # Connect to Google Sheets
 gc = gspread.service_account(filename=creds.gspread)
@@ -51,7 +51,7 @@ def main():
             blocks.append(
                 {
                     "type": "section",
-                    "text": {"type": "mrkdwn", "text": f"   *{key.strftime('%m/%d/%Y')}*\n   {names}"}
+                    "text": {"type": "mrkdwn", "text": f"   *{key.strftime('%m/%d/%Y')}*\n{names}"}
                 }
             )
     if about_to_expire:
@@ -66,7 +66,7 @@ def main():
             blocks.append(
                 {
                     "type": "section",
-                    "text": {"type": "mrkdwn", "text": f"   *{key.strftime('%m/%d/%Y')}*\n   {names}"}
+                    "text": {"type": "mrkdwn", "text": f"   *{key.strftime('%m/%d/%Y')}*\n{names}"}
                 }
             )
 
