@@ -581,7 +581,7 @@ async def cater(ack, command, body, client):
             trigger_id=trigger_id,
             view={
                 "type": "modal",
-                "callback_id": "cater_add_view",
+                "callback_id": "cater_remove_view",
                 "title": {"type": "plain_text", "text": "Remove Catering Order"},
                 "submit": {"type": "plain_text", "text": "Submit"},
                 "blocks": [
@@ -624,7 +624,7 @@ async def cater(ack, command, body, client):
             trigger_id=trigger_id,
             view={
                 "type": "modal",
-                "callback_id": "cater_remove_view",
+                "callback_id": "cater_add_view",
                 "title": {"type": "plain_text", "text": "Add Catering Order"},
                 "submit": {"type": "plain_text", "text": "Submit"},
                 "blocks": [
@@ -697,6 +697,7 @@ async def cater(ack, command, body, client):
                     },
                     {
                         "type": "input",
+                        "optional": True,
                         "block_id": "block_address",
                         "element": {"type": "plain_text_input", "action_id": "input_address"},
                         "label": {"type": "plain_text", "text": "Address"}
