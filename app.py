@@ -766,7 +766,7 @@ async def cater_remove(ack, body, client, view):
     """Handle the removal of a catering order"""
     # TODO add code
     logger.info("Processing catering remove info...")
-    cater_row = view['state']['values']['block_order']['input_order']['value']
+    cater_row = view['state']['values']['block_order']['input_order']['selected_option']['value']
     channel_id = view['blocks'][-1]['elements'][0]['text']
     # Delete specified row
     spreadsheet = gc.open_by_key(creds.cater_id)
