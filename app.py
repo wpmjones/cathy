@@ -751,7 +751,7 @@ async def cater_add(ack, body, client, view):
     else:
         to_post = [cater_date, cater_time, cater_driver, cater_guest, cater_address, cater_phone]
     sheet.append_row(to_post, value_input_option="USER_ENTERED")
-    sheet.sort((0, "asc"), (1, "asc"))
+    sheet.sort((1, "asc"), (2, "asc"))
     # Notify user of completion
     confirm = await client.chat_postMessage(channel=channel_id,
                                             text="New order has been added to the spreadsheet.")
