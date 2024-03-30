@@ -751,6 +751,8 @@ async def cater_add(ack, body, client, view):
     else:
         to_post = [cater_date, cater_time, cater_driver, cater_guest, cater_address, cater_phone]
     sheet.append_row(to_post, value_input_option="USER_ENTERED")
+    last_row = sheet.row_count()
+    logger.info(f"Last row is {last_row}")
     sheet.sort((1, "asc"), (2, "asc"))
     # Notify user of completion
     confirm = await client.chat_postMessage(channel=channel_id,
