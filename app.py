@@ -649,7 +649,7 @@ async def cater(ack, command, body, client):
                         "element": {
                             "type": "timepicker",
                             "action_id": "cater_time",
-                            "initial_date": "11:15 AM",
+                            "initial_time": "11:15 AM",
                             "placeholder": {
                                 "type": "plain_text",
                                 "text": "Select time..."
