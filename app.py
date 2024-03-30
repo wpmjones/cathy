@@ -731,7 +731,7 @@ async def cater_add(ack, body, client, view):
     cater_date = view['state']['values']['block_date']['input_date']['selected_date']
     cater_time = view['state']['values']['block_time']['input_time']['selected_time']
     cater_type = view['state']['values']['block_type']['input_type']['selected_option']['value']
-    cater_driver = view['state']['values']['block_driver']['input_driver']['value']
+    cater_driver = view['state']['values']['block_driver']['input_driver']['selected_option']['value']
     cater_guest = view['state']['values']['block_customer']['input_customer']['value']
     cater_address = view['state']['values']['block_address']['input_address']['value']
     cater_phone = view['state']['values']['block_phone']['input_phone']['value']
