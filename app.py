@@ -664,7 +664,7 @@ async def cater(ack, command, body, client):
                             "type": "radio_buttons",
                             "options": [
                                 {
-                                    "text": {"type": "plaint_text", "text": "Pickup"},
+                                    "text": {"type": "plain_text", "text": "Pickup"},
                                     "value": "pickup"
                                 },
                                 {
