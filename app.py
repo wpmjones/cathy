@@ -588,10 +588,9 @@ async def cater(ack, command, body, client):
                     {
                         "type": "input",
                         "block_id": "block_order",
-                        # "label": {"type": "plain_text", "text": "Order to remove:"},
+                        "label": {"type": "plain_text", "text": "Order to remove:"},
                         "element": {
                             "type": "static_select",
-                            "label": {"type": "plain_text", "text": "Select an order"},
                             "placeholder": {"type": "plain_text", "text": "Select an order"},
                             "options": order_options,
                             "action_id": "input_order"
