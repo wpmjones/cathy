@@ -634,7 +634,7 @@ async def cater(ack, command, body, client):
                         "label": {"type": "plain_text", "text": "Date:"},
                         "element": {
                             "type": "datepicker",
-                            "action_id": "cater_date",
+                            "action_id": "input_date",
                             "initial_date": str(date.today()),
                             "placeholder": {
                                 "type": "plain_text",
@@ -648,7 +648,7 @@ async def cater(ack, command, body, client):
                         "label": {"type": "plain_text", "text": "Time:"},
                         "element": {
                             "type": "timepicker",
-                            "action_id": "cater_time",
+                            "action_id": "input_time",
                             "initial_time": "11:15",
                             "placeholder": {
                                 "type": "plain_text",
