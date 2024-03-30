@@ -693,7 +693,7 @@ async def cater(ack, command, body, client):
                             "placeholder": {"type": "plain_text", "text": "Select a driver"},
                             "options": driver_options,
                             "action_id": "input_driver",
-                            "initial_option": {"text": {"type": "plain_text", "text": "None"}}
+                            "initial_option": {"text": {"type": "plain_text", "text": "None"}, "value": "None"}
                             }
                     },
                     {
