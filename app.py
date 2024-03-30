@@ -771,7 +771,7 @@ async def cater_remove(ack, body, client, view):
     # Delete specified row
     spreadsheet = gc.open_by_key(creds.cater_id)
     sheet = spreadsheet.worksheet("Sheet1")
-    sheet.delete_row(cater_row)
+    sheet.delete_row(int(cater_row))
     # Notify user of completion
     confirm = await client.chat_postMessage(channel=channel_id,
                                             text="The specified order has been removed from the spreadsheet.")
