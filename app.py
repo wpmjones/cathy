@@ -685,9 +685,9 @@ async def cater(ack, command, body, client):
                         "accessory": {
                             "type": "static_select",
                             "placeholder": {"type": "plain_text", "text": "Select a driver"},
-                            "options": driver_options
-                        },
-                        "action_id": "input_driver"
+                            "options": driver_options,
+                            "action_id": "input_driver"
+                        }
                     },
                     {
                         "type": "input",
