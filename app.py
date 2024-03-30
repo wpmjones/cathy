@@ -620,6 +620,12 @@ async def cater(ack, command, body, client):
                     "value": row[0]
                 }
             )
+        driver_options.append(
+            {
+                "text": {"type": "plain_text", "text": "None"},
+                "value": "None"
+            }
+        )
         await client.views_open(
             trigger_id=trigger_id,
             view={
