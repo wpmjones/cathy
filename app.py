@@ -347,6 +347,7 @@ async def tardy(ack, body, say, client):
     Example usage:
     /tardy First Last
     """
+    # TODO Use fuzzy to check name and ask user 'Did you mean?'
     await ack()
     try:
         sh = gc.open_by_key(creds.pay_scale_id)
@@ -546,6 +547,226 @@ async def handle_add_injury_view(ack, body, client, view):
     await client.chat_postMessage(channel=CHANNEL_SEDGWICK,
                                   blocks=blocks,
                                   text="New Sedgwick claim posted.")
+
+
+@app.command("/cater")
+async def cater(ack, command, body, client):
+    """This command allows the user to add or remove an upcoming catering order.  Dates must be in the future.
+
+    Example usage:
+    /cater add
+    /cater remove
+    /cater delete
+    """
+    await ack()
+    cater_sheet = gc.open_by_key(creds.cater_id)
+    trigger_id = body['trigger_id']
+    cmd = command['text']
+    if cmd in ("remove", "delete"):
+        orders_sheet = cater_sheet.worksheet("Sheet1")
+        list_of_rows = orders_sheet.get_values("A2:F")
+        order_options = []
+        now = datetime.today()
+        counter = 2
+        for row in list_of_rows:
+            if datetime.strptime(row[0], "%m/%d/%Y") >= now:
+                order_options.append(
+                    {
+                        "text": {"type": "plain_text", "text": f"{row[3]} ({row[0]} at {row[1]})"},
+                        "value": str(counter)
+                    }
+                )
+            counter += 1
+        await client.views_open(
+            trigger_id=trigger_id,
+            view={
+                "type": "modal",
+                "callback_id": "cater_add_view",
+                "title": {"type": "plain_text", "text": "Remove Catering Order"},
+                "submit": {"type": "plain_text", "text": "Submit"},
+                "blocks": [
+                    {
+                        "type": "input",
+                        "block_id": "block_order",
+                        "element": {
+                            "type": "static_select",
+                            "label": {"type": "plain_text", "text": "Select an order"}
+                            "placeholder": {"type": "plain_text", "text": "Select an order"},
+                            "options": order_options,
+                            "action_id": "input_order"
+                        }
+                    },
+                    {
+                        "type": "context",
+                        "block_id": "block_channel",
+                        "elements": [
+                            {
+                                "type": "plain_text",
+                                "text": body['channel_id']
+                            }
+                        ]
+                    }
+                ]
+            }
+        )
+    else:
+        drivers_sheet = cater_sheet.worksheet("Sheet2")
+        list_of_rows = drivers_sheet.get_values("A2:B")
+        driver_options = []
+        for row in list_of_rows:
+            driver_options.append(
+                {
+                    "text": {"type": "plain_text", "text": row[0]},
+                    "value": row[0]
+                }
+            )
+        await client.views_open(
+            trigger_id=trigger_id,
+            view={
+                "type": "modal",
+                "callback_id": "cater_remove_view",
+                "title": {"type": "plain_text", "text": "Add Catering Order"},
+                "submit": {"type": "plain_text", "text": "Submit"},
+                "blocks": [
+                    {
+                        "type": "input",
+                        "block_id": "block_date",
+                        "label": {"type": "plain_text", "text": "Date:"},
+                        "element": {
+                            "type": "datepicker",
+                            "action_id": "cater_date",
+                            "initial_date": str(date.today()),
+                            "placeholder": {
+                                "type": "plain_text",
+                                "text": "Select date..."
+                            }
+                        }
+                    },
+                    {
+                        "type": "input",
+                        "block_id": "block_time",
+                        "label": {"type": "plain_text", "text": "Time:"},
+                        "element": {
+                            "type": "timepicker",
+                            "action_id": "cater_time",
+                            "initial_date": "11:15 AM",
+                            "placeholder": {
+                                "type": "plain_text",
+                                "text": "Select time..."
+                            }
+                        }
+                    },
+                    {
+                        "type": "input",
+                        "block_id": "block_type",
+                        "label": {"type": "plain_text", "text": "Type:"},
+                        "element": {
+                            "type": "radio_buttons",
+                            "options": [
+                                {
+                                    "text": {"type": "plaint_text", "text": "Pickup"},
+                                    "value": "pickup"
+                                },
+                                {
+                                    "text": {"type": "plain_text", "text": "Delivery"},
+                                    "value": "delivery"
+                                }
+                            ],
+                            "action_id": "input_type"
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "block_id": "block_driver",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "*Driver*\nDriver is not needed (and will be\nignored) for pickup orders."
+                        },
+                        "accessory": {
+                            "type": "static_select",
+                            "placeholder": {"type": "plain_text", "text": "Select a driver"},
+                            "options": driver_options
+                        },
+                        "action_id": "input_driver"
+                    },
+                    {
+                        "type": "input",
+                        "block_id": "block_customer",
+                        "element": {"type": "plain_text_input", "action_id": "input_customer"},
+                        "label": {"type": "plain_text", "text": "Customer Name"}
+                    },
+                    {
+                        "type": "input",
+                        "block_id": "block_address",
+                        "element": {"type": "plain_text_input", "action_id": "input_address"},
+                        "label": {"type": "plain_text", "text": "Address"}
+                    },
+                    {
+                        "type": "input",
+                        "block_id": "block_phone",
+                        "element": {"type": "plain_text_input", "action_id": "input_phone"},
+                        "label": {"type": "plain_text", "text": "Phone Number"}
+                    },
+                    {
+                        "type": "context",
+                        "block_id": "block_channel",
+                        "elements": [
+                            {
+                                "type": "plain_text",
+                                "text": body['channel_id']
+                            }
+                        ]
+                    }
+                ]
+            }
+        )
+
+
+@app.view("cater_add_view")
+async def cater_add(ack, body, client, view):
+    """Handle the addition of a new catering order"""
+    # TODO add code
+    logger.info("Processing catering add info...")
+    cater_date = view['state']['values']['block_date']['input_date']['value']
+    cater_time = view['state']['values']['block_time']['input_time']['value']
+    cater_type = view['state']['values']['block_type']['input_type']['selected_option']['value']
+    cater_driver = view['state']['values']['block_driver']['input_driver']['value']
+    cater_guest = view['state']['values']['block_customer']['input_customer']['value']
+    cater_address = view['state']['values']['block_address']['input_address']['value']
+    cater_phone = view['state']['values']['block_phone']['input_phone']['value']
+    channel_id = view['blocks'][-1]['elements'][0]['text']
+    # Add new data to spreadsheet
+    spreadsheet = gc.open_by_key(creds.cater_id)
+    sheet = spreadsheet.worksheet("Sheet1")
+    if cater_type == "pickup":
+        to_post = [cater_date, cater_time, "PICKUP", cater_guest, "", cater_phone]
+    else:
+        to_post = [cater_date, cater_time, cater_driver, cater_guest, cater_address, cater_phone]
+    sheet.append_row(to_post, value_input_option="USER_ENTERED")
+    sheet.sort((0, "asc"), (1, "asc"), range="A2:H")
+    # Notify user of completion
+    confirm = await client.chat_postMessage(channel=channel_id,
+                                            text="New order has been added to the spreadsheet.")
+    await asyncio.sleep(15)
+    await client.chat_delete(channel=channel_id, ts=confirm['ts'])
+
+
+@app.view("cater_remove_view")
+async def cater_remove(ack, body, client, view):
+    """Handle the removal of a catering order"""
+    # TODO add code
+    logger.info("Processing catering remove info...")
+    cater_row = view['state']['values']['block_order']['input_order']['value']
+    channel_id = view['blocks'][-1]['elements'][0]['text']
+    # Delete specified row
+    spreadsheet = gc.open_by_key(creds.cater_id)
+    sheet = spreadsheet.worksheet("Sheet1")
+    sheet.delete_row(cater_row)
+    # Notify user of completion
+    confirm = await client.chat_postMessage(channel=channel_id,
+                                            text="The specified order has been removed from the spreadsheet.")
+    await asyncio.sleep(15)
+    await client.chat_delete(channel=channel_id, ts=confirm['ts'])
 
 
 @app.command("/add")
