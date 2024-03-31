@@ -733,7 +733,6 @@ async def cater(ack, command, body, client):
 @app.view("cater_add_view")
 async def cater_add(ack, body, client, view):
     """Handle the addition of a new catering order"""
-    # TODO add code
     logger.info("Processing catering add info...")
     cater_date = view['state']['values']['block_date']['input_date']['selected_date']
     cater_time = view['state']['values']['block_time']['input_time']['selected_time']
@@ -751,7 +750,7 @@ async def cater_add(ack, body, client, view):
     else:
         to_post = [cater_date, cater_time, cater_driver, cater_guest, cater_address, cater_phone]
     sheet.append_row(to_post, value_input_option="USER_ENTERED")
-    last_row = sheet.row_count()
+    last_row = sheet.row_count
     logger.info(f"Last row is {last_row}")
     sheet.sort((1, "asc"), (2, "asc"))
     # Notify user of completion
@@ -764,14 +763,13 @@ async def cater_add(ack, body, client, view):
 @app.view("cater_remove_view")
 async def cater_remove(ack, body, client, view):
     """Handle the removal of a catering order"""
-    # TODO add code
     logger.info("Processing catering remove info...")
     cater_row = view['state']['values']['block_order']['input_order']['selected_option']['value']
     channel_id = view['blocks'][-1]['elements'][0]['text']
     # Delete specified row
     spreadsheet = gc.open_by_key(creds.cater_id)
     sheet = spreadsheet.worksheet("Sheet1")
-    sheet.delete_row(int(cater_row))
+    sheet.delete_rows(int(cater_row))
     # Notify user of completion
     confirm = await client.chat_postMessage(channel=channel_id,
                                             text="The specified order has been removed from the spreadsheet.")
