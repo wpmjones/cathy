@@ -747,6 +747,7 @@ async def cater_add(ack, body, client, view):
     cater_address = view['state']['values']['block_address']['input_address']['value']
     cater_phone = view['state']['values']['block_phone']['input_phone']['value']
     channel_id = view['blocks'][-1]['elements'][0]['text']
+    await ack()
     # Add new data to spreadsheet
     spreadsheet = gc.open_by_key(creds.cater_id)
     sheet = spreadsheet.worksheet("Sheet1")
@@ -775,6 +776,7 @@ async def cater_remove(ack, body, client, view):
     logger.info("Processing catering remove info...")
     cater_row = view['state']['values']['block_order']['input_order']['selected_option']['value']
     channel_id = view['blocks'][-1]['elements'][0]['text']
+    await ack()
     # Delete specified row
     spreadsheet = gc.open_by_key(creds.cater_id)
     sheet = spreadsheet.worksheet("Sheet1")
