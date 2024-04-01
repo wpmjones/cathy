@@ -730,6 +730,11 @@ async def cater(ack, command, body, client):
         )
 
 
+@app.block_action("block_driver")
+async def action_block_driver(ack):
+    await ack()
+
+
 @app.view("cater_add_view")
 async def cater_add(ack, body, client, view):
     """Handle the addition of a new catering order"""
