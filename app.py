@@ -730,7 +730,7 @@ async def cater(ack, command, body, client):
         )
 
 
-@app.block_action("block_driver")
+@app.block_action("input_driver")
 async def action_block_driver(ack):
     await ack()
 
@@ -758,9 +758,9 @@ async def cater_add(ack, body, client, view):
     last_row = int(new_row['updates']['updatedRange'][-4:])
     # Copy formulas for columns G & H
     copy_from = sheet.acell(f"G{last_row - 1}", value_render_option="FORMULA").value
-    sheet.update(f"G{last_row}", copy_from)
+    sheet.update(f"G{last_row}", copy_from, value_input_option="USER_ENTERED")
     copy_from = sheet.acell(f"H{last_row - 1}", value_render_option="FORMULA").value
-    sheet.update(f"H{last_row}", copy_from)
+    sheet.update(f"H{last_row}", copy_from, value_input_option="USER_ENTERED")
     sheet.sort((1, "asc"), (2, "asc"))
     # Notify user of completion
     confirm = await client.chat_postMessage(channel=channel_id,
