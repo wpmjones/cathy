@@ -851,12 +851,8 @@ async def cater_add(ack, body, client, view):
         to_post = [cater_date, cater_time, cater_driver, cater_guest, cater_address, cater_phone]
     new_row = sheet.append_row(to_post, value_input_option="USER_ENTERED")
     last_row = int(new_row['updates']['updatedRange'][-3:])
-    logger.info(f"Last row is {last_row}")
-    # Copy formulas for columns G & H
-    copy_from = sheet.acell(f"G{last_row - 1}", value_render_option="FORMULA").value
-    sheet.update(f"G{last_row}", copy_from, value_input_option="USER_ENTERED")
-    copy_from = sheet.acell(f"H{last_row - 1}", value_render_option="FORMULA").value
-    sheet.update(f"H{last_row}", copy_from, value_input_option="USER_ENTERED")
+    # Copy formulas for columns G & H - then sort
+    sheet.copy_range(f"G{last_row - 1}:H{last_row - 1}", f"G{last_row}:H{last_row}", paste_type="PASTE_FORMULA")
     sheet.sort((1, "asc"), (2, "asc"))
     # Notify user of completion
     await client.chat_postEphemeral(channel=channel_id,
