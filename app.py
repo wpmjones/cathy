@@ -318,7 +318,7 @@ async def home_swap_notes(ack, body, client):
 async def clear_messages(ack, body, say, client):
     """Clear the specified number of messages in the channel that called the command"""
     await ack()
-    if body['user_id'] not in [creds.pj_user_id, creds.hc_user_id, creds.jc_user_id, creds.pr_user_id]:
+    if body['user_id'] not in [creds.pj_user_id, creds.hc_user_id, creds.jc_user_id, creds.pr_user_id, creds.jg_user_id]:
         return await say("I'm sorry. Only admins can clear messages.")
     result = await client.conversations_history(channel=body['channel_id'], limit=int(body['text']))
     channel_history = result['messages']
@@ -916,10 +916,14 @@ async def cater_add(ack, body, client, view):
     sheet.copy_range(f"G{last_row - 1}:H{last_row - 1}", f"G{last_row}:H{last_row}", paste_type="PASTE_FORMULA")
     sheet.sort((1, "asc"), (2, "asc"))
     # Notify user of completion
-    await client.chat_postMessage(channel=creds.cater_channel,
+    await client.chat_postMessage(channel=creds.test_channel,
                                   blocks=confirm_block,
                                   text=f"New {cater_type} order has been added to the Catering Sheet.",
                                   user=body['user']['id'])
+    # make sure the catering sheet isn't getting too long
+    # because of the last_row hack above, the new row has to be 3 digits (e.g. row 1000 is bad)
+    if last_row > 900:
+        sheet.delete_rows(2, 100)
 
 
 @app.view("cater_remove_view")
@@ -1374,7 +1378,6 @@ async def handle_remove_view(ack, body, client, view):
                                     blocks=blocks,
                                     text=f"{name} has been removed from the system.",
                                     user=body['user']['id'])
-
 
 
 async def get_bag_status():
