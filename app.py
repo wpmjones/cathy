@@ -735,7 +735,7 @@ async def update_modal(ack, body, view, client):
         }
     ]
     if cater_type['value'] == "pickup":
-        blocks.append(
+        blocks.extend(
             [
                 {
                     "type": "input",
@@ -773,7 +773,7 @@ async def update_modal(ack, body, view, client):
                     "value": row[0]
                 }
             )
-        blocks.append(
+        blocks.extend(
             [
                 {
                     "type": "section",
@@ -819,7 +819,6 @@ async def update_modal(ack, body, view, client):
                 }
             ]
         )
-    logger.info(blocks)
     await client.views_update(
         view_id=body['view']['id'],
         hash=body['view']['hash'],
