@@ -822,7 +822,7 @@ async def cater_add(ack, body, client, view):
     if datetime.strptime(cater_date, "%Y-%m-%d").strftime("%A") == "Sunday":
         errors['block_date'] = "Chick-fil-A is closed on Sunday!"
     cater_hour = int(cater_time[0:2])
-    if 6 > cater_hour >= 23:
+    if cater_hour < 6 or cater_hour >= 23:
         errors['block_time'] = "Time must be during business hours."
     regex = r"^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$"
     if not re.match(regex, cater_phone):
