@@ -845,19 +845,81 @@ async def cater_add(ack, body, client, view):
     sheet = spreadsheet.worksheet("Sheet1")
     if cater_type == "pickup":
         to_post = [cater_date, cater_time, "PICKUP", cater_guest, "", cater_phone]
+        confirm_block = [
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"New Delivery Order has been added to the <{creds.cater_link}|Catering Sheet>."
+                }
+            },
+            {
+                "type": "section",
+                "fields": [
+                    {
+                        "type": "mrkdwn",
+                        "text": f"*Guest Name:*\n{cater_guest}"
+                    },
+                    {
+                        "type": "mrkdwn",
+                        "text": f"*Date:*\n{cater_date}"
+                    },
+                    {
+                        "type": "mrkdwn",
+                        "text": f"*Time:*\n{cater_time}"
+                    }
+                ]
+            }
+        ]
     else:
         cater_driver = view['state']['values']['block_driver']['input_driver']['selected_option']['value']
         cater_address = view['state']['values']['block_address']['input_address']['value']
         to_post = [cater_date, cater_time, cater_driver, cater_guest, cater_address, cater_phone]
+        confirm_block = [
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"New Delivery Order has been added to the <{creds.cater_link}|Catering Sheet>."
+                }
+            },
+            {
+                "type": "section",
+                "fields": [
+                    {
+                        "type": "mrkdwn",
+                        "text": f"*Guest Name:*\n{cater_guest}"
+                    },
+                    {
+                        "type": "mrkdwn",
+                        "text": f"*Date:*\n{cater_date}"
+                    },
+                    {
+                        "type": "mrkdwn",
+                        "text": f"*Time:*\n{cater_time}"
+                    }
+                ]
+            },
+            {
+                "type": "section",
+                "fields": [
+                    {
+                        "type": "mrkdwn",
+                        "text": f"*Driver:*\n{cater_driver}"
+                    }
+                ]
+            }
+        ]
     new_row = sheet.append_row(to_post, value_input_option="USER_ENTERED")
     last_row = int(new_row['updates']['updatedRange'][-3:])
     # Copy formulas for columns G & H - then sort
     sheet.copy_range(f"G{last_row - 1}:H{last_row - 1}", f"G{last_row}:H{last_row}", paste_type="PASTE_FORMULA")
     sheet.sort((1, "asc"), (2, "asc"))
     # Notify user of completion
-    await client.chat_postEphemeral(channel=channel_id,
-                                    text="New order has been added to the spreadsheet.",
-                                    user=body['user']['id'])
+    await client.chat_postMessage(channel=creds.cater_channel,
+                                  blocks=confirm_block,
+                                  text=f"New {cater_type} order has been added to the Catering Sheet.",
+                                  user=body['user']['id'])
 
 
 @app.view("cater_remove_view")
