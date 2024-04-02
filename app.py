@@ -819,6 +819,7 @@ async def update_modal(ack, body, view, client):
                 }
             ]
         )
+    logger.info(blocks)
     await client.views_update(
         view_id=body['view']['id'],
         hash=body['view']['hash'],
