@@ -840,7 +840,7 @@ async def cater_add(ack, body, client, view):
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"New Delivery Order has been added to the <{creds.cater_link}|Catering Sheet>."
+                    "text": f"New Pickup Order has been added to the <{creds.cater_link}|Catering Sheet>."
                 }
             },
             {
