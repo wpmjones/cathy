@@ -907,7 +907,7 @@ async def cater_add(ack, body, client, view):
     sheet.copy_range(f"G{last_row - 1}:H{last_row - 1}", f"G{last_row}:H{last_row}", paste_type="PASTE_FORMULA")
     sheet.sort((1, "asc"), (2, "asc"))
     # Notify user of completion
-    await client.chat_postMessage(channel=creds.test_channel,
+    await client.chat_postMessage(channel=creds.cater_channel,
                                   blocks=confirm_block,
                                   text=f"New {cater_type} order has been added to the Catering Sheet.",
                                   user=body['user']['id'])
