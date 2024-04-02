@@ -840,13 +840,17 @@ async def cater_add(ack, body, client, view):
     cater_phone = view['state']['values']['block_phone']['input_phone']['value']
     # check that phone number is valid
     errors = {}
-    logger.info(cater_date)
+    if datetime.strptime(cater_date, "%Y-%m-%d").strftime("%A") == "Sunday":
+        errors['input_date'] = "Chick-fil-A is closed on Sunday!"
+    cater_hour = int(cater_time[0:2])
+    if 6 > cater_hour >= 23:
+        errors['input_time'] = "Time must be during business hours."
     logger.info(cater_time)
     regex = r"^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$"
     if not re.match(regex, cater_phone):
         errors['input_phone'] = "Please enter a valid, 10 digit phone number"
     if len(errors) > 0:
-        return await ack(response_actions="errors", errors=errors)
+        return await ack(response_action="errors", errors=errors)
     await ack()
     # Add new data to spreadsheet
     spreadsheet = gc.open_by_key(creds.cater_id)
