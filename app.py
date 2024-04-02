@@ -587,7 +587,7 @@ async def cater(ack, command, body, client):
                 "type": "modal",
                 "callback_id": "cater_remove_view",
                 "title": {"type": "plain_text", "text": "Remove Catering Order"},
-                "submit": {"type": "plain_text", "text": "Submit"},
+                "submit": {"type": "plain_text", "text": "Delete"},
                 "blocks": [
                     {
                         "type": "input",
@@ -621,7 +621,7 @@ async def cater(ack, command, body, client):
                 "type": "modal",
                 "callback_id": "cater_add_view",
                 "title": {"type": "plain_text", "text": "Add Catering Order"},
-                "submit": {"type": "plain_text", "text": "Submit"},
+                "submit": {"type": "plain_text", "text": "Add"},
                 "blocks": [
                     {
                         "type": "input",
@@ -686,7 +686,7 @@ async def cater(ack, command, body, client):
 
 
 @app.block_action("input_type")
-async def update_modal(ack, body, view, client):
+async def update_modal(ack, body, client):
     cater_date = body['view']['state']['values']['block_date']['input_date']['selected_date']
     cater_time = body['view']['state']['values']['block_time']['input_time']['selected_time']
     cater_type = body['view']['state']['values']['block_type']['input_type']['selected_option']
@@ -823,7 +823,7 @@ async def update_modal(ack, body, view, client):
             "type": "modal",
             "callback_id": "cater_add_view",
             "title": {"type": "plain_text", "text": "Add Catering Order"},
-            "submit": {"type": "plain_text", "text": "Submit"},
+            "submit": {"type": "plain_text", "text": "Add"},
             "blocks": blocks
         }
     )
@@ -850,7 +850,8 @@ async def cater_add(ack, body, client, view):
         cater_address = view['state']['values']['block_address']['input_address']['value']
         to_post = [cater_date, cater_time, cater_driver, cater_guest, cater_address, cater_phone]
     new_row = sheet.append_row(to_post, value_input_option="USER_ENTERED")
-    last_row = int(new_row['updates']['updatedRange'][-4:])
+    last_row = int(new_row['updates']['updatedRange'][-3:])
+    logger.info(f"Last row is {last_row}")
     # Copy formulas for columns G & H
     copy_from = sheet.acell(f"G{last_row - 1}", value_render_option="FORMULA").value
     sheet.update(f"G{last_row}", copy_from, value_input_option="USER_ENTERED")
