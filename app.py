@@ -680,7 +680,6 @@ async def update_modal(ack, body, client):
     cater_date = body['view']['state']['values']['block_date']['input_date']['selected_date']
     cater_time = body['view']['state']['values']['block_time']['input_time']['selected_time']
     cater_type = body['view']['state']['values']['block_type']['input_type']['selected_option']
-    channel_id = body['view']['blocks'][-1]['elements'][0]['text']
     await ack()
     blocks = [
         {
