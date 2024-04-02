@@ -778,8 +778,7 @@ async def update_modal(ack, body, view, client):
                 {
                     "type": "input",
                     "block_id": "block_driver",
-                    "label": {"type": "text", "text": "Driver:"
-                    },
+                    "label": {"type": "plain_text", "text": "Driver:"},
                     "element": {
                         "type": "static_select",
                         "placeholder": {"type": "plain_text", "text": "Select a driver"},
