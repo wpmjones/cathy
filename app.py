@@ -561,7 +561,7 @@ async def cater(ack, command, body, client):
     await ack()
     cater_sheet = gc.open_by_key(creds.cater_id)
     trigger_id = body['trigger_id']
-    if command['text']:
+    if "text" in command:
         cmd = command['text']
     else:
         cmd = "add"
