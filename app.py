@@ -840,9 +840,11 @@ async def cater_add(ack, body, client, view):
     cater_phone = view['state']['values']['block_phone']['input_phone']['value']
     # check that phone number is valid
     errors = {}
+    logger.info(datetime.strptime(cater_date, "%Y-%m-%d").strftime("%A"))
     if datetime.strptime(cater_date, "%Y-%m-%d").strftime("%A") == "Sunday":
         errors['input_date'] = "Chick-fil-A is closed on Sunday!"
     cater_hour = int(cater_time[0:2])
+    logger.info(cater_hour)
     if 6 > cater_hour >= 23:
         errors['input_time'] = "Time must be during business hours."
     logger.info(cater_time)
