@@ -838,7 +838,15 @@ async def cater_add(ack, body, client, view):
     cater_type = view['state']['values']['block_type']['input_type']['selected_option']['value']
     cater_guest = view['state']['values']['block_customer']['input_customer']['value']
     cater_phone = view['state']['values']['block_phone']['input_phone']['value']
-    channel_id = view['blocks'][-1]['elements'][0]['text']
+    # check that phone number is valid
+    errors = {}
+    logger.info(cater_date)
+    logger.info(cater_time)
+    regex = r"^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$"
+    if not re.match(regex, cater_phone):
+        errors['input_phone'] = "Please enter a valid, 10 digit phone number"
+    if len(errors) > 0:
+        return await ack(response_actions="errors", errors=errors)
     await ack()
     # Add new data to spreadsheet
     spreadsheet = gc.open_by_key(creds.cater_id)
@@ -911,6 +919,7 @@ async def cater_add(ack, body, client, view):
             }
         ]
     new_row = sheet.append_row(to_post, value_input_option="USER_ENTERED")
+    # This is a hack because gspread doesn't tell respond with the new row number as an int
     last_row = int(new_row['updates']['updatedRange'][-3:])
     # Copy formulas for columns G & H - then sort
     sheet.copy_range(f"G{last_row - 1}:H{last_row - 1}", f"G{last_row}:H{last_row}", paste_type="PASTE_FORMULA")
