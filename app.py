@@ -776,13 +776,11 @@ async def update_modal(ack, body, view, client):
         blocks.extend(
             [
                 {
-                    "type": "section",
+                    "type": "input",
                     "block_id": "block_driver",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "*Driver*\nDriver is not needed (and will be\nignored) for pickup orders."
+                    "label": {"type": "text", "text": "Driver:"
                     },
-                    "accessory": {
+                    "element": {
                         "type": "static_select",
                         "placeholder": {"type": "plain_text", "text": "Select a driver"},
                         "options": driver_options,
