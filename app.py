@@ -687,12 +687,10 @@ async def cater(ack, command, body, client):
 
 @app.block_action("input_type")
 async def update_modal(ack, body, view, client):
-    logger.info(body)
-    logger.info(view)
-    cater_date = view['state']['values']['block_date']['input_date']['selected_date']
-    cater_time = view['state']['values']['block_time']['input_time']['selected_time']
-    cater_type = view['state']['values']['block_type']['input_type']['selected_option']
-    channel_id = view['blocks'][-1]['elements'][0]['text']
+    cater_date = body['view']['state']['values']['block_date']['input_date']['selected_date']
+    cater_time = body['view']['state']['values']['block_time']['input_time']['selected_time']
+    cater_type = body['view']['state']['values']['block_type']['input_type']['selected_option']
+    channel_id = body['view']['blocks'][-1]['elements'][0]['text']
     await ack()
     blocks = [
         {
