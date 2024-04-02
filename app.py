@@ -669,16 +669,6 @@ async def cater(ack, command, body, client):
                             ],
                             "action_id": "input_type"
                         }
-                    },
-                    {
-                        "type": "context",
-                        "block_id": "block_channel",
-                        "elements": [
-                            {
-                                "type": "plain_text",
-                                "text": body['channel_id']
-                            }
-                        ]
                     }
                 ]
             }
@@ -748,16 +738,6 @@ async def update_modal(ack, body, client):
                     "block_id": "block_phone",
                     "element": {"type": "plain_text_input", "action_id": "input_phone"},
                     "label": {"type": "plain_text", "text": "Phone Number"}
-                },
-                {
-                    "type": "context",
-                    "block_id": "block_channel",
-                    "elements": [
-                        {
-                            "type": "plain_text",
-                            "text": channel_id
-                        }
-                    ]
                 }
             ]
         )
@@ -852,6 +832,7 @@ async def cater_add(ack, body, client, view):
     if not re.match(regex, cater_phone):
         errors['input_phone'] = "Please enter a valid, 10 digit phone number"
     if len(errors) > 0:
+        logger.info(errors)
         return await ack(response_action="errors", errors=errors)
     await ack()
     # Add new data to spreadsheet
