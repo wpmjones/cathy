@@ -782,16 +782,6 @@ async def update_modal(ack, body, client):
                     "block_id": "block_phone",
                     "element": {"type": "plain_text_input", "action_id": "input_phone"},
                     "label": {"type": "plain_text", "text": "Phone Number"}
-                },
-                {
-                    "type": "context",
-                    "block_id": "block_channel",
-                    "elements": [
-                        {
-                            "type": "plain_text",
-                            "text": channel_id
-                        }
-                    ]
                 }
             ]
         )
