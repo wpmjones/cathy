@@ -15,7 +15,6 @@ def main():
     webhook_url = creds.webhook_foh
     response = requests.get(weather_url)
     data = response.json()
-    logger.info(data)
     current_temp = data['main']['temp']
     feels_like = data['main']['feels_like']
     wind_speed = data['wind']['speed']
