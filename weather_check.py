@@ -11,7 +11,7 @@ weather_url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={l
 def main():
     """Notify team when temps are over 100 degrees"""
     with open("temp.txt", "r") as f:
-        last_temp = int(f.readline())
+        last_temp = int(float(f.readline()))
     webhook_url = creds.webhook_foh
     response = requests.get(weather_url)
     data = response.json()
