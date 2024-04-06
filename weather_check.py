@@ -62,7 +62,7 @@ def main():
     """Notify team if temps are low enough for heaters"""
     content = ""
     with open("wind.txt", "r") as f:
-        last_wind = int(f.readline())
+        last_wind = int(float(f.readline()))
     if last_wind < 28 and wind_speed < 28:
         if 45 < current_temp <= 55:
             content = "The current outside temperature is below 55. Please consider turning on the heaters."
