@@ -7,8 +7,8 @@ import imaplib
 import matplotlib.pyplot as plt
 import pandas as pd
 import quopri
+import re
 import requests
-import time
 
 from loguru import logger
 
@@ -38,6 +38,107 @@ def find_nth(content, search_string, n):
         start = content.find(search_string, start + len(search_string))
         n -= 1
     return start
+
+
+def check_cater():
+    """Look at gmail to find catering emails and update Catering sheet"""
+    search_date = datetime.date.today()  # - datetime.timedelta(days=1)
+    tfmt = search_date.strftime('%d-%b-%Y')
+    _, sdata = mail.search(None, f'(FROM "one@chick-fil-a.com" SINCE {tfmt})')
+    mail_ids = sdata[0]
+    id_list = mail_ids.split()
+    score_dict = {}
+    body = ""
+    for i in id_list:
+        typ, data = mail.fetch(i, "(RFC822)")
+        raw = data[0][1]
+        raw_str = raw.decode("utf-8")
+        msg = email.message_from_string(raw_str)
+        if msg.is_multipart():
+            for part in msg.walk():
+                part_type = part.get_content_type()
+                if part_type == "text/plain" and "attachment" not in part:
+                    body = part.get_payload(decode=True).decode("utf-8")
+                if part.get("Content-Disposition") is None:
+                    pass
+        else:
+            body = msg.get_payload(decode=True).decode("utf-8")
+    # find percentages in body
+    if body:
+        re_phone = r"(\+1)?[\s]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4}"
+        logger.info(f"Catering order:\n{body}")
+        if "Pickup Order" in body:
+            cater_type = "PICKUP"
+        else:
+            cater_type = "DELIVERY"
+        cur_year = datetime.datetime.today().year
+        start = body.find(f"{cater_type.title()} Time")
+        date_start = body.find("day", start) + 4
+        date_end = body.find(str(cur_year), date_start) + 4
+        cater_date_str = body[date_start:date_end]
+        time_start = body.find("at ", date_end) + 3
+        time_end = body.find("m", time_start) + 1
+        cater_time_str = body[time_start:time_end]
+        if cater_type == "DELIVERY":
+            add_start = body.find("Delivery Address") + 16
+            add_end = body.find("Customer Information")
+            cater_address = body[add_start:add_end]
+            if "Las Vegas" in cater_address:
+                div = cater_address.find("Las Vegas, NV")
+                cater_address = cater_address[:div] + ", " + cater_address[div:]
+            elif "Henderson" in cater_address:
+                div = cater_address.find("Henderson")
+                cater_address = cater_address[:div] + ", " + cater_address[div:]
+        re_match = re.search(re_phone, body)
+        cust_start = body.find("Information", time_end) + 11
+        cust_end = re_match.span()[0]
+        cater_guest = body[cust_start:cust_end]
+        phone_start = re_match.span()[0]
+        phone_end = re_match.span()[1]
+        cater_phone = body[phone_start:phone_end].replace("+1", "").replace(" ", "")
+        if len(cater_phone) == 10:
+            cater_phone = cater_phone[:3] + "-" + cater_phone[3:6] + "-" + cater_phone[6:]
+        # Prepare content for Slack
+        payload = {
+            "blocks": [
+                {
+                    "type": "section",
+                    "text": {"type": "mrkdwn", "text": f"New {cater_type.title()} Order"}
+                },
+                {
+                    "type": "section",
+                    "fields": [
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*Guest Name:*\n{cater_guest}"
+                        },
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*Phone:*\n{cater_phone}"
+                        },
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*Date:*\n{cater_date_str}"
+                        },
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*Time:*\n{cater_time_str}"
+                        }
+                    ]
+                }
+            ]
+        }
+        if cater_type == "DELIVERY":
+            payload['blocks'][1]['fields'].append(
+                {
+                    "type": "mrkdwn",
+                    "text": f"*Address:*\n{cater_address}"
+                }
+            )
+        r = requests.post(creds.webhook_test, json=payload)
+        if r.status_code != 200:
+            raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
+                             f"The response is: {r.text}")
 
 
 def check_cem():
@@ -264,6 +365,7 @@ def post_symbol_goal():
 
 
 if __name__ == "__main__":
-    check_cem()
+    # check_cem()
+    check_cater()
     # check_oos()
     # check_allocation()
