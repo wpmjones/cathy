@@ -365,7 +365,7 @@ def post_symbol_goal():
 
 
 if __name__ == "__main__":
-    # check_cem()
-    check_cater()
+    check_cem()
+    # check_cater()
     # check_oos()
     # check_allocation()
