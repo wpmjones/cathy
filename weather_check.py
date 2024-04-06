@@ -18,7 +18,7 @@ def main():
     logger.info(data)
     current_temp = data['main']['temp']
     feels_like = data['main']['feels_like']
-    wind_speed = data['main']['wind']['speed']
+    wind_speed = data['wind']['speed']
     logger.info(f"Weather\nCurrent Temp: {current_temp}\nFeels Like: {feels_like}\n"
                 f"Current wind speed: {wind_speed}")
     if current_temp > 100 or feels_like > 100:
