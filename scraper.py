@@ -144,7 +144,7 @@ def check_cater():
 def check_cem():
     """Look at gmail to find CEM email and report findings"""
     # Scrap email
-    search_date = datetime.date.today()  # - datetime.timedelta(days=1)
+    search_date = datetime.date.today() - datetime.timedelta(days=1)
     tfmt = search_date.strftime('%d-%b-%Y')
     _, sdata = mail.search(None, f'(FROM "SMGMailMgr@whysmg.com" SINCE {tfmt})')
     mail_ids = sdata[0]
