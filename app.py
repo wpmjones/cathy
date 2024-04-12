@@ -1135,7 +1135,7 @@ async def handle_add_view(ack, body, client, view):
     pay_sheet.sort([1, "asc"])
     # add user to Food Handlers Card Sheet
     sh = gc.open_by_key(creds.card_id)
-    card_sheet = sh.worksheet("Sheet1")
+    card_sheet = sh.worksheet("Food handler cards")
     name_list = name.split(" ")
     reverse_name = ", ".join([name_list[1], name_list[0]])
     to_post = [reverse_name, food_card_number, food_card_expiration]
