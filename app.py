@@ -1119,7 +1119,7 @@ async def handle_add_view(ack, body, client, view):
         await client.chat_postMessage(channel=creds.pj_user_id,
                                       text=f"There was an error while adding {name} to {location} Trello board.")
     # add user to CFA Staff spreadsheet (for use in /sick dropdown list)
-    staff_sheet = staff_spreadsheet.worksheet("Sheet1")
+    staff_sheet = staff_spreadsheet.worksheet("Staff")
     staff_sheet.append_row([name], value_input_option="USER_ENTERED")
     staff_sheet.sort([1, "asc"])
     # if staff_sheet.row_count > 100:
