@@ -19,6 +19,7 @@ import string
 from datetime import datetime, date, timedelta
 from fuzzywuzzy import fuzz
 from loguru import logger
+from pytz import timezone
 from slack_bolt.async_app import AsyncApp
 from slack_sdk.web import WebClient
 from slack_bolt.error import BoltError
@@ -225,6 +226,45 @@ async def pull_notes(user_loc):
         }
     )
     return temp_blocks
+
+
+@app.event({
+    "type": "message",
+    "subtype": "message_deleted"
+})
+async def log_message_delete(event):
+    logger.info(event)
+    user_id, channel_id, msg = event['user'], event['channel'], event['text']
+    if user_id == creds.cathy_user_id:
+        return
+    time_format = "%m/%d/%Y at %H:%M:%S"
+    del_time = event['deleted_ts'].astimezone(timezone("America/Los_Angeles"))
+    formatted_time = del_time.strftime(time_format)
+    content = (f"*User:* {user_id}\n"
+               f"*Channel:* {channel_id}\n"
+               f"*Time Deleted:* {formatted_time}\n"
+               f"*Message:* {msg}")
+    blocks = [
+        {
+            "type": "header",
+            "text": {"type": "plain_text", "text": "Message Deleted"}
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": content
+            }
+        }
+    ]
+    payload = {
+        "text": "Message Deleted",
+        "blocks": blocks
+    }
+    r = requests.post(creds.webhook_test, json=payload)
+    if r.status_code != 200:
+        raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
+                         f"The response is: {r.text}")
 
 
 @app.event("app_home_opened")
