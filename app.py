@@ -228,12 +228,11 @@ async def pull_notes(user_loc):
     return temp_blocks
 
 
-@app.event({
-    "type": "message",
-    "subtype": "message_deleted"
-})
+@app.message()
 async def log_message_delete(event):
     logger.info(event)
+    if event['subtype'] != "message_deleted":
+        return
     user_id, channel_id, msg = event['user'], event['channel'], event['text']
     if user_id == creds.cathy_user_id:
         return
