@@ -60,6 +60,27 @@ def next_monday():
     return now + timedelta(days_ahead)
 
 
+# Listener middleware to collect names of current staff and include in context
+def collect_staff():
+    worksheet = staff_spreadsheet.get_worksheet(0)
+    values = worksheet.col_values(1)
+    if len(values) > 100:
+        await client.chat_postMessage(channel=creds.pj_user_id,
+                                      text="The CFA Staff list is full. Time for a purge.")
+    options = []
+    for name in values:
+        options.append(
+            {
+                "text": {
+                    "type": "plain_text",
+                    "text": name
+                },
+                "value": name
+            }
+        )
+    return options
+
+
 # It's poor design to hard code your help command since it won't update itself when you add/change commands,
 # but here it is.  I told you I wasn't a pro!  haha
 @app.command("/help")
@@ -382,45 +403,81 @@ async def tardy(ack, body, say, client):
     tardiness also affects one's ability to get a pay raise.
 
     Example usage:
-    /tardy First Last
+    /tardy
     """
-    # TODO Use fuzzy to check name and ask user 'Did you mean?'
     await ack()
+    options = collect_staff()
+    if options > 100:
+        return await client.chat_postMessage(channel=creds.sick_channel,
+                                             text="The list of staff members has exceed 100 names, preventing "
+                                                  "/tardy from working properly. Patrick has been notified and "
+                                                  "will correct the issue shortly.")
+    await client.views_open(
+        trigger_id=body['trigger_id'],
+        view={
+            "type": "modal",
+            "callback_id": "tardy_view",
+            "title": {"type": "plain_text", "text": "Record Tardy"},
+            "submit": {"type": "plain_text", "text": "Submit"},
+            "blocks": [
+                {
+                    "type": "input",
+                    "block_id": "input_a",
+                    "label": {"type": "plain_text", "text": "Name"},
+                    "element": {
+                        "type": "static_select",
+                        "action_id": "tm_name",
+                        "placeholder": {"type": "plain_text", "text": "Select a name"},
+                        "options": options
+                    }
+                }
+            ]
+        }
+    )
+
+
+@app.view("tardy_view")
+async def handle_tardy_view(ack, body, client, view):
+    """Process input from tardy form. This is a view handler for the previous function."""
+    logger.info("Processing tardy info...")
+    name = view['state']['values']['input_a']['tm_name']['selected_option']['value']
+    await ack()
+    # Send data to Google Sheet
     try:
         sh = gc.open_by_key(creds.pay_scale_id)
-        sheet = sh.worksheet("Tardy")
-        now = date.strftime(date.today(), "%m/%d/%Y")
-        logger.info(f"{now} - {body['text']} was tardy")
-        to_post = [body['text'], now]
-        sheet.append_row(to_post, value_input_option='USER_ENTERED')
-        blocks = [
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": f"Tardy record added for {body['text']}. No meal credit today ({now})."
-                }
-            },
-            {
-                "type": "context",
-                "elements": [
-                    {
-                        "type": "plain_text",
-                        "text": f"Submitted by: {body['user_name']}"
-                    }
-                ]
-            }
-        ]
-        await client.chat_postMessage(channel=creds.sick_channel,
-                                      blocks=blocks,
-                                      text=f"{body['text']} was tardy on {now}.")
+        sheet = sh.get_worksheet(2)
+        now = str(datetime.date(datetime.today()))
+        to_post = [name, now]
+        sheet.append_row(to_post
     except gspread.exceptions.GSpreadException as e:
-        await client.chat_postMessage(channel=body['user']['id'], text=e)
+        return await client.chat_postMessage(channel=body['user']['id'],
+                                             text=e)
     except Exception as e:
         await client.chat_postMessage(channel=body['user']['id'],
                                       text=f"There was an error while storing the message to the Google Sheet.\n{e}")
         await client.chat_postMessage(channel=creds.pj_user_id,
                                       text=f"There was an error while storing the message to the Google Sheet.\n{e}")
+        return
+    user = await client.users_info(user=body['user']['id'])
+    user_name = user['user']['real_name']
+    blocks = [
+        {
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": f"Tardy record added for {name}. No meal credit today ({now})."}
+        },
+        {
+            "type": "context",
+            "elements": [
+                {
+                    "type": "plain_text",
+                    "text": f"Submitted by: {user_name}"
+                }
+            ]
+        }
+    ]
+    await client.chat_postMessage(channel=creds.sick_channel,
+                                  blocks=blocks,
+                                  text=f"{name} was tardy on {now}.")
 
 
 @app.command("/injury")
@@ -3058,13 +3115,36 @@ async def handle_sales_input(ack, body, client, view):
 @app.command("/find")
 async def find_names(ack, body, client):
     """Find matching names from Sick & Discipline Logs. This reports on both absences and tardies for the name
-    provided. Fuzzy is a great tool that allows for misspellings and such as long as it's 'close'.
+    provided.
 
     Example usage:
     /find first last
     """
     await ack()
     fuzzy_number = 78
+    # Pull all TM names from the Staff sheet and confirm the correct name
+    sh = gc.open_by_key(creds.staff_id)
+    sheet = sh.worksheet("Staff")
+    data = sheet.get_all_values()
+    input_name = body['text']
+    list_of_names = []
+    for row in data:
+        ratio = fuzz.token_sort_ratio(input_name.lower(), row[0].lower())
+        if ratio > fuzzy_number:
+            list_of_names.append(row[0])
+    if len(list_of_names) == 0:
+        # No match
+        return await client.chat_postEphemeral(channel=body['channel_id'],
+                                               user=body['user_id'],
+                                               text=f"No matches found. Please try again.")
+    elif len(list_of_names) > 1:
+        # More than one match. Need to clarify user's intent
+        # TODO respond with select box
+
+    else:
+        # This is where the real action takes place, once we know we have the right team member
+        # TODO add code for absence, tardy, and discipline
+
     # Collect sick records
     sh = gc.open_by_key(creds.sick_log_id)
     sheet = sh.worksheet("Form Responses 1")
