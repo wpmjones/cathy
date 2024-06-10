@@ -15,7 +15,7 @@ from loguru import logger
 logger.add("scraper.log", rotation="1 week")
 
 mail = imaplib.IMAP4_SSL("imap.gmail.com")
-mail.login(creds.gmail_u, creds.gmail_p)
+mail.login(creds.gmail_u, creds.gmail_app)
 mail.select("INBOX")
 today = datetime.date.today()
 
