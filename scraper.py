@@ -151,7 +151,11 @@ def check_cem():
     # post content to Slack
     content = f"*CEM Scores*\n```"
     for key, value in cem_data[-1].items():
-        content += f"{key}{' ' * (25 - len(key))}{' ' * (4 - len(value))}{value}\n"
+        if value < 100:
+            buffer = 2
+        else:
+            buffer = 1
+        content += f"{key}{' ' * (25 - len(key))}{' ' * buffer}{value}\n"
     content += "```"
     payload = {
         "blocks": [
