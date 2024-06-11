@@ -150,7 +150,10 @@ def check_cem():
         ftp.storbinary(f"STOR {filename}", file)
     # post content to Slack
     content = f"*CEM Scores*\n```"
-    for key, value in cem_data[-1].items():
+    cur_scores = cem_data[-1]
+    del cur_scores["Date"]
+    logger.info(cur_scores)
+    for key, value in cur_scores.items():
         if value < 100:
             buffer = 2
         else:
