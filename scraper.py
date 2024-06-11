@@ -137,7 +137,6 @@ def check_cem():
     sh = gc.open_by_key(creds.cem_id)
     daily = sh.worksheet("Daily")
     cem_data = daily.get_all_records()[-30:]
-    logger.info(cem_data)
     columns = ["Date", ]
     columns.extend(categories)
     data = pd.DataFrame(cem_data, columns=columns)
@@ -151,6 +150,7 @@ def check_cem():
         ftp.storbinary(f"STOR {filename}", file)
     # post content to Slack
     content = f"*CEM Scores*\n```"
+    logger.info(cem_data[-1])
     for key, value in cem_data[-1]:
         content += f"{key}{' ' * (25 - len(key))}{' ' * (4 - len(value))}{value}\n"
     content += "```"
