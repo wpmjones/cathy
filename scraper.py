@@ -3,7 +3,6 @@ import datetime
 import email
 import ftplib
 import gspread
-import imaplib
 import matplotlib.pyplot as plt
 import pandas as pd
 import quopri
@@ -14,9 +13,6 @@ from loguru import logger
 
 logger.add("scraper.log", rotation="1 week")
 
-mail = imaplib.IMAP4_SSL("imap.gmail.com")
-mail.login(creds.gmail_u, creds.gmail_app)
-mail.select("INBOX")
 today = datetime.date.today()
 
 gc = gspread.service_account(filename=creds.gspread)
@@ -30,14 +26,6 @@ categories = [
     "Taste",
     "Overall Satisfaction",
 ]
-
-
-def find_nth(content, search_string, n):
-    start = content.find(search_string)
-    while start >= 0 and n > 1:
-        start = content.find(search_string, start + len(search_string))
-        n -= 1
-    return start
 
 
 def check_cater():
@@ -143,92 +131,47 @@ def check_cater():
 
 def check_cem():
     """Look at gmail to find CEM email and report findings"""
-    # Scrap email
-    search_date = datetime.date.today() # - datetime.timedelta(days=1)
-    tfmt = search_date.strftime('%d-%b-%Y')
-    _, sdata = mail.search(None, f'(FROM "SMGMailMgr@whysmg.com" SINCE {tfmt})')
-    mail_ids = sdata[0]
-    id_list = mail_ids.split()
-    score_dict = {}
-    body = ""
-    for i in id_list:
-        typ, data = mail.fetch(i, "(RFC822)")
-        raw = data[0][1]
-        raw_str = raw.decode("utf-8")
-        msg = email.message_from_string(raw_str)
-        if msg.is_multipart():
-            for part in msg.walk():
-                part_type = part.get_content_type()
-                if part_type == "text/plain" and "attachment" not in part:
-                    body = part.get_payload(decode=True).decode("utf-8")
-                if part.get("Content-Disposition") is None:
-                    pass
-        else:
-            body = msg.get_payload(decode=True).decode("utf-8")
-    # find percentages in body
-    if body:
-        if "**" not in body:
-            for j in range(7):
-                start = find_nth(body, "%", j + 1) - 3
-                end = start + 4
-                score_dict[categories[j]] = body[start:end].strip()
-                # catch the colon in case where response is 0% (e.g. ": 0%")
-                if ":" in score_dict[categories[j]]:
-                    score_dict[categories[j]] = score_dict[categories[j]].replace(": ", "")
-            # find number of respondents
-            start = body.find("n:") + 3
-            end = start + 3
-            num_responses = body[start:end].strip()
-        else:
-            for j in range(7):
-                score_dict[categories[j]] = "100"
-            num_responses = 0
-        # Google Sheet work
-        sh = gc.open_by_key(creds.cem_id)
-        daily = sh.worksheet("Daily")
-        current_month = datetime.datetime.now().month
-        current_date = datetime.datetime.now().day
-        current_year = datetime.datetime.now().year
-        val_list = [f"{current_month}/{current_date}/{current_year}", ]
-        for key, value in score_dict.items():
-            val_list.append(value[:-1])
-        daily.append_row(val_list, value_input_option="USER_ENTERED")
-        columns = ["Date", ]
-        columns.extend(categories)
-        df = pd.DataFrame(daily.get_all_records(), columns=columns)
-        data = df.tail(30)
-        data.plot(x="Date", y=categories, title="CEM Scores (Last 30 days)", xlabel="Date")
-        plt.legend(categories, loc="upper left")
-        plt.savefig(fname="plot")
-        ftp = ftplib.FTP(creds.ftp_host, creds.ftp_user, creds.ftp_password)
-        ftp.encoding = "utf-8"
-        filename = f"images/plot_{current_month}_{current_date}.png"
-        with open("plot.png", "rb") as file:
-            ftp.storbinary(f"STOR {filename}", file)
-        # post content to Slack
-        content = (f"*Month to Date CEM Scores*\n"
-                   f"Out of {num_responses} responses\n```")
-        for key, value in score_dict.items():
-            content += f"{key}{' ' * (25 - len(key))}{' ' * (4 - len(value))}{value}\n"
-        content += "```"
-        payload = {
-            "blocks": [
-                {
-                    "type": "section",
-                    "text": {"type": "mrkdwn", "text": content}
-                },
-                {
-                    "type": "image",
-                    "title": {"type": "plain_text", "text": "CEM Update Chart"},
-                    "image_url": f"http://www.mayodev.com/images/plot_{current_month}_{current_date}.png",
-                    "alt_text": "CEM Update Chart"
-                }
-            ]
-        }
-        r = requests.post(creds.webhook_announce, json=payload)
-        if r.status_code != 200:
-            raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
-                             f"The response is: {r.text}")
+    current_month = datetime.datetime.now().month
+    current_date = datetime.datetime.now().day
+    # Google Sheet work
+    sh = gc.open_by_key(creds.cem_id)
+    daily = sh.worksheet("Daily")
+    cem_data = daily.get_all_records()[-30:]
+    logger.info(cem_data)
+    # columns = ["Date", ]
+    # columns.extend(categories)
+    # data = pd.DataFrame(cem_data, columns=columns)
+    # data.plot(x="Date", y=categories, title="CEM Scores (Last 30 days)", xlabel="Date")
+    # plt.legend(categories, loc="upper left")
+    # plt.savefig(fname="plot")
+    # ftp = ftplib.FTP(creds.ftp_host, creds.ftp_user, creds.ftp_password)
+    # ftp.encoding = "utf-8"
+    # filename = f"images/plot_{current_month}_{current_date}.png"
+    # with open("plot.png", "rb") as file:
+    #     ftp.storbinary(f"STOR {filename}", file)
+    # # post content to Slack
+    # content = f"*CEM Scores*\n```"
+    # for key, value in cem_data[-1]:
+    #     content += f"{key}{' ' * (25 - len(key))}{' ' * (4 - len(value))}{value}\n"
+    # content += "```"
+    # payload = {
+    #     "blocks": [
+    #         {
+    #             "type": "section",
+    #             "text": {"type": "mrkdwn", "text": content}
+    #         },
+    #         {
+    #             "type": "image",
+    #             "title": {"type": "plain_text", "text": "CEM Update Chart"},
+    #             "image_url": f"http://www.mayodev.com/images/plot_{current_month}_{current_date}.png",
+    #             "alt_text": "CEM Update Chart"
+    #         }
+    #     ]
+    # }
+    # r = requests.post(creds.webhook_announce, json=payload)
+    # if r.status_code != 200:
+    #     raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
+    #                      f"The response is: {r.text}")
 
 
 def check_allocation():
