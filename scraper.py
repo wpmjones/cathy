@@ -150,8 +150,7 @@ def check_cem():
         ftp.storbinary(f"STOR {filename}", file)
     # post content to Slack
     content = f"*CEM Scores*\n```"
-    logger.info(cem_data[-1])
-    for key, value in cem_data[-1]:
+    for key, value in cem_data[-1].items():
         content += f"{key}{' ' * (25 - len(key))}{' ' * (4 - len(value))}{value}\n"
     content += "```"
     payload = {
