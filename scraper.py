@@ -138,40 +138,40 @@ def check_cem():
     daily = sh.worksheet("Daily")
     cem_data = daily.get_all_records()[-30:]
     logger.info(cem_data)
-    # columns = ["Date", ]
-    # columns.extend(categories)
-    # data = pd.DataFrame(cem_data, columns=columns)
-    # data.plot(x="Date", y=categories, title="CEM Scores (Last 30 days)", xlabel="Date")
-    # plt.legend(categories, loc="upper left")
-    # plt.savefig(fname="plot")
-    # ftp = ftplib.FTP(creds.ftp_host, creds.ftp_user, creds.ftp_password)
-    # ftp.encoding = "utf-8"
-    # filename = f"images/plot_{current_month}_{current_date}.png"
-    # with open("plot.png", "rb") as file:
-    #     ftp.storbinary(f"STOR {filename}", file)
-    # # post content to Slack
-    # content = f"*CEM Scores*\n```"
-    # for key, value in cem_data[-1]:
-    #     content += f"{key}{' ' * (25 - len(key))}{' ' * (4 - len(value))}{value}\n"
-    # content += "```"
-    # payload = {
-    #     "blocks": [
-    #         {
-    #             "type": "section",
-    #             "text": {"type": "mrkdwn", "text": content}
-    #         },
-    #         {
-    #             "type": "image",
-    #             "title": {"type": "plain_text", "text": "CEM Update Chart"},
-    #             "image_url": f"http://www.mayodev.com/images/plot_{current_month}_{current_date}.png",
-    #             "alt_text": "CEM Update Chart"
-    #         }
-    #     ]
-    # }
-    # r = requests.post(creds.webhook_announce, json=payload)
-    # if r.status_code != 200:
-    #     raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
-    #                      f"The response is: {r.text}")
+    columns = ["Date", ]
+    columns.extend(categories)
+    data = pd.DataFrame(cem_data, columns=columns)
+    data.plot(x="Date", y=categories, title="CEM Scores (Last 30 days)", xlabel="Date")
+    plt.legend(categories, loc="upper left")
+    plt.savefig(fname="plot")
+    ftp = ftplib.FTP(creds.ftp_host, creds.ftp_user, creds.ftp_password)
+    ftp.encoding = "utf-8"
+    filename = f"images/plot_{current_month}_{current_date}.png"
+    with open("plot.png", "rb") as file:
+        ftp.storbinary(f"STOR {filename}", file)
+    # post content to Slack
+    content = f"*CEM Scores*\n```"
+    for key, value in cem_data[-1]:
+        content += f"{key}{' ' * (25 - len(key))}{' ' * (4 - len(value))}{value}\n"
+    content += "```"
+    payload = {
+        "blocks": [
+            {
+                "type": "section",
+                "text": {"type": "mrkdwn", "text": content}
+            },
+            {
+                "type": "image",
+                "title": {"type": "plain_text", "text": "CEM Update Chart"},
+                "image_url": f"http://www.mayodev.com/images/plot_{current_month}_{current_date}.png",
+                "alt_text": "CEM Update Chart"
+            }
+        ]
+    }
+    r = requests.post(creds.webhook_test, json=payload)
+    if r.status_code != 200:
+        raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
+                         f"The response is: {r.text}")
 
 
 def check_allocation():
