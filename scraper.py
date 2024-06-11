@@ -152,13 +152,12 @@ def check_cem():
     content = f"*CEM Scores*\n```"
     cur_scores = cem_data[-1]
     del cur_scores["Date"]
-    logger.info(cur_scores)
     for key, value in cur_scores.items():
         if value < 100:
             buffer = 2
         else:
             buffer = 1
-        content += f"{key}{' ' * (25 - len(key))}{' ' * buffer}{value}\n"
+        content += f"{key}{' ' * (25 - len(key))}{' ' * buffer}{value}%\n"
     content += "```"
     payload = {
         "blocks": [
@@ -174,7 +173,7 @@ def check_cem():
             }
         ]
     }
-    r = requests.post(creds.webhook_test, json=payload)
+    r = requests.post(creds.webhook_announce, json=payload)
     if r.status_code != 200:
         raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
                          f"The response is: {r.text}")
