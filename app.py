@@ -2808,10 +2808,11 @@ async def handle_waste_view(ack, body, client, view):
                 totals[row[0]] = float(row[1])
             for key in totals:
                 if key in goals:
-                    if totals[key] >= goals[key]:
-                        content += f"_{key}: {totals[key]}  Daily goal is {goals[key]}\n"
-                    else:
-                        content += f"{key}: {totals[key]}  Daily goal is {goals[key]}\n"
+                    if totals[key] > 0:
+                        if totals[key] >= goals[key]:
+                            content += f"_{key}: {totals[key]}  Daily goal is {goals[key]}_\n"
+                        else:
+                            content += f"{key}: {totals[key]}  Daily goal is {goals[key]}\n"
     except gspread.exceptions.GSpreadException as e:
         return await client.chat_postMessage(channel=body['user']['id'],
                                              text=e)
