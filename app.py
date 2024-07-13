@@ -2801,7 +2801,7 @@ async def handle_waste_view(ack, body, client, view):
         sheet = sh.worksheet("Daily Totals")
         # Filets, Spicy, Nuggets, Strips, Grilled Filets, Grilled Nuggets, Breakfast, Grilled B, Spicy B
         daily_totals = sheet.get_all_values()
-        if daily_totals[0][3] > 1:
+        if int(daily_totals[0][3]) > 1:
             content = "*Totals for today:*\n"
             totals = {}
             for row in daily_totals:
