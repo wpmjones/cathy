@@ -2204,89 +2204,190 @@ async def no_waste(ack, body, client):
         logger.exception(f"Message deletion failed: {e}")
 
 
-# @app.block_action("waste_tracking_form")
-# async def waste(ack, body, client):
-#     """This is not a command!  waste_remind.py is the script that posts a reminder in Slack at determined
-#     times. That reminder has a button to Record Waste.  That button initiates this modal."""
-#     await ack()
-#     # Create blocks for Chicken Temps
-#     blocks = [
-#         {
-#             "type": "section",
-#             "text": {
-#                 "type": "mrkdwn",
-#                 "text": "Please record temps for each of the four types of breaded chicken, fresh out of the fryer."
-#             }
-#         },
-#         {
-#             "type": "divider"
-#         },
-#         {
-#             "type": "input",
-#             "block_id": "input_a",
-#             "label": {"type": "plain_text", "text": "Regular"},
-#             "element": {
-#                 "type": "plain_text_input",
-#                 "action_id": "input_cfa"
-#             },
-#             "optional": False
-#         },
-#         {
-#             "type": "input",
-#             "block_id": "input_b",
-#             "label": {"type": "plain_text", "text": "Spicy"},
-#             "element": {
-#                 "type": "plain_text_input",
-#                 "action_id": "input_spicy"
-#             },
-#             "optional": False
-#         },
-#         {
-#             "type": "input",
-#             "block_id": "input_c",
-#             "label": {"type": "plain_text", "text": "Nuggets"},
-#             "element": {
-#                 "type": "plain_text_input",
-#                 "action_id": "input_nuggets"
-#             },
-#             "optional": False
-#         },
-#         {
-#             "type": "input",
-#             "block_id": "input_d",
-#             "label": {"type": "plain_text", "text": "Strips"},
-#             "element": {
-#                 "type": "plain_text_input",
-#                 "action_id": "input_strips"
-#             },
-#             "optional": False
-#         },
-#         {
-#             "type": "context",
-#             "block_id": "context_a",
-#             "elements": [
-#                 {
-#                     "type": "plain_text",
-#                     "text": body['container']['message_ts']
-#                 }
-#             ]
-#         }
-#     ]
-#     await client.views_open(
-#         trigger_id=body['trigger_id'],
-#         view={
-#             "type": "modal",
-#             "callback_id": "new_waste_view",
-#             "title": {"type": "plain_text", "text": "Chicken Temps"},
-#             "submit": {"type": "plain_text", "text": "Submit"},
-#             "blocks": blocks
-#         }
-#     )
+@app.command("/waste)")
+async def waste_command(ack, body, client):
+    """Allows for intermittent waste reports outside of designated times"""
+    await ack()
+    blocks = [
+        {
+            "type": "context",
+            "block_id": "input_a",
+            "element": {
+                "type": "plain_text",
+                "text": "leaders"
+            }
+        },
+        {
+            "type": "context",
+            "block_id": "input_a2",
+            "element": {
+                "type": "plain_text",
+                "text": "times"
+            }
+        },
+        {
+            "type": "section",
+            "block_id": "section_info",
+            "text": {
+                "type": "plain_text",
+                "text": "Please enter weight as a decimal. For example, 1.25 instead of 1lb 4oz."
+            }
+        },
+        {
+            "type": "input",
+            "block_id": "input_b",
+            "label": {"type": "plain_text", "text": "Regular Filets"},
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "regulars",
+                "initial_value": "0"
+            },
+            "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
+        },
+        {
+            "type": "input",
+            "block_id": "input_c",
+            "label": {"type": "plain_text", "text": "Spicy Filets"},
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "spicy",
+                "initial_value": "0"
+            },
+            "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
+        },
+        {
+            "type": "input",
+            "block_id": "input_d",
+            "label": {"type": "plain_text", "text": "Nuggets"},
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "nuggets",
+                "initial_value": "0"
+            },
+            "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
+        },
+        {
+            "type": "input",
+            "block_id": "input_e",
+            "label": {"type": "plain_text", "text": "Strips"},
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "strips",
+                "initial_value": "0"
+            },
+            "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
+        },
+        {
+            "type": "input",
+            "block_id": "input_f",
+            "label": {"type": "plain_text", "text": "Grilled Filets"},
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "grilled1",
+                "initial_value": "0"
+            },
+            "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
+        },
+        {
+            "type": "input",
+            "block_id": "input_g",
+            "label": {"type": "plain_text", "text": "Grilled Nuggets"},
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "grilled2",
+                "initial_value": "0"
+            },
+            "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
+        }
+    ]
+    # If it's before 1pm, include the breakfast meats as well.
+    if datetime.now().hour < 13:
+        blocks.append(
+            {
+                "type": "input",
+                "block_id": "input_h",
+                "label": {"type": "plain_text", "text": "Breakfast Filets"},
+                "element": {
+                    "type": "plain_text_input",
+                    "action_id": "breakfast",
+                    "initial_value": "0"
+                },
+                "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
+            }
+        )
+        blocks.append(
+            {
+                "type": "input",
+                "block_id": "input_k",
+                "label": {"type": "plain_text", "text": "Spicy Breakfast Filets"},
+                "element": {
+                    "type": "plain_text_input",
+                    "action_id": "spicy_breakfast",
+                    "initial_value": "0"
+                },
+                "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
+            }
+        )
+        blocks.append(
+            {
+                "type": "input",
+                "block_id": "input_i",
+                "label": {"type": "plain_text", "text": "Grilled Breakfast"},
+                "element": {
+                    "type": "plain_text_input",
+                    "action_id": "grilled3",
+                    "initial_value": "0"
+                },
+                "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
+            }
+        )
+    blocks.append(
+        {
+            "type": "input",
+            "block_id": "input_j",
+            "label": {"type": "plain_text", "text": "Additional Info"},
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "other",
+                "multiline": True
+            },
+            "optional": True
+        }
+    )
+    try:
+        msg_ts = body['container']['message_ts']
+    except KeyError:
+        msg_ts = "no_msg"
+    blocks.append(
+        {
+            "type": "context",
+            "block_id": "context_a",
+            "elements": [
+                {
+                    "type": "plain_text",
+                    "text": msg_ts
+                }
+            ]
+        }
+    )
+    logger.info("Blocks ready. Open view.")
+    try:
+        await client.views_open(
+            trigger_id=body['trigger_id'],
+            view={
+                "type": "modal",
+                "callback_id": "waste_view",
+                "title": {"type": "plain_text", "text": "Waste Form"},
+                "submit": {"type": "plain_text", "text": "Submit"},
+                "blocks": blocks
+            }
+        )
+    except Exception as e:
+        logger.error(f"Error: {e}")
 
 
-# @app.view("new_waste_view")
 @app.block_action("waste_tracking_form")
-async def handle_new_waste_view_one(ack, body, client):
+async def waste_view(ack, body, client):
     """Check info from chicken temp form. Open the actual waste view."""
     # logger.info("Processing chicken temp info...")
     # # Check for errors in data input
@@ -2519,222 +2620,23 @@ async def handle_new_waste_view_one(ack, body, client):
         logger.error(f"Error: {e}")
 
 
-async def old_waste(ack, body, client):
-    """This is not a command!  waste_remind.py is the script that posts a reminder in Slack at determined
-    times. That reminder has a button to Record Waste.  That button initiates this modal."""
-    await ack()
-    # I store my BOH leaders in creds.py.  I probably ought to keep them in the same Google Sheet as my Team
-    # Members, but again, I'm not a pro and I don't always do things the best way!  Having leaders names in a
-    # Google Sheet would allow others to update the list, but it changes infrequently enough that I don't mind
-    # being the only that can update it.
-    leader_options = []
-    time_options = []
-    for leader in creds.leaders:
-        leader_options.append(
-            {
-                "text": {
-                    "type": "plain_text",
-                    "text": leader
-                },
-                "value": leader
-            }
-        )
-    for _time in creds.times:
-        time_options.append(
-            {
-                "text": {
-                    "type": "plain_text",
-                    "text": _time
-                },
-                "value": _time
-            }
-        )
-    blocks = [
-        {
-            "type": "input",
-            "block_id": "input_a",
-            "label": {"type": "plain_text", "text": "Leaders on"},
-            "element": {
-                "type": "multi_static_select",
-                "action_id": "leader_names",
-                "placeholder": {"type": "plain_text", "text": "Select leaders"},
-                "options": leader_options
-            }
-        },
-        {
-            "type": "input",
-            "block_id": "input_a2",
-            "label": {"type": "plain_text", "text": "Report Time(s) Covered"},
-            "element": {
-                "type": "multi_static_select",
-                "action_id": "times",
-                "placeholder": {"type": "plain_text", "text": "Times covered"},
-                "options": time_options
-            }
-        },
-        {
-            "type": "section",
-            "block_id": "section_info",
-            "text": {
-                "type": "plain_text",
-                "text": "Please enter weight as a decimal. For example, 1.25 instead of 1lb 4oz."
-            }
-        },
-        {
-            "type": "input",
-            "block_id": "input_b",
-            "label": {"type": "plain_text", "text": "Regular Filets"},
-            "element": {
-                "type": "plain_text_input",
-                "action_id": "regulars",
-                "initial_value": "0"
-            },
-            "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
-        },
-        {
-            "type": "input",
-            "block_id": "input_c",
-            "label": {"type": "plain_text", "text": "Spicy Filets"},
-            "element": {
-                "type": "plain_text_input",
-                "action_id": "spicy",
-                "initial_value": "0"
-            },
-            "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
-        },
-        {
-            "type": "input",
-            "block_id": "input_d",
-            "label": {"type": "plain_text", "text": "Nuggets"},
-            "element": {
-                "type": "plain_text_input",
-                "action_id": "nuggets",
-                "initial_value": "0"
-            },
-            "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
-        },
-        {
-            "type": "input",
-            "block_id": "input_e",
-            "label": {"type": "plain_text", "text": "Strips"},
-            "element": {
-                "type": "plain_text_input",
-                "action_id": "strips",
-                "initial_value": "0"
-            },
-            "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
-        },
-        {
-            "type": "input",
-            "block_id": "input_f",
-            "label": {"type": "plain_text", "text": "Grilled Filets"},
-            "element": {
-                "type": "plain_text_input",
-                "action_id": "grilled1",
-                "initial_value": "0"
-            },
-            "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
-        },
-        {
-            "type": "input",
-            "block_id": "input_g",
-            "label": {"type": "plain_text", "text": "Grilled Nuggets"},
-            "element": {
-                "type": "plain_text_input",
-                "action_id": "grilled2",
-                "initial_value": "0"
-            },
-            "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
-        }
-    ]
-    # If it's before 1pm, include the breakfast meats as well.
-    if datetime.now().hour < 13:
-        blocks.append(
-            {
-                "type": "input",
-                "block_id": "input_h",
-                "label": {"type": "plain_text", "text": "Breakfast Filets"},
-                "element": {
-                    "type": "plain_text_input",
-                    "action_id": "breakfast",
-                    "initial_value": "0"
-                },
-                "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
-            }
-        )
-        blocks.append(
-            {
-                "type": "input",
-                "block_id": "input_k",
-                "label": {"type": "plain_text", "text": "Spicy Breakfast Filets"},
-                "element": {
-                    "type": "plain_text_input",
-                    "action_id": "spicy_breakfast",
-                    "initial_value": "0"
-                },
-                "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
-            }
-        )
-        blocks.append(
-            {
-                "type": "input",
-                "block_id": "input_i",
-                "label": {"type": "plain_text", "text": "Grilled Breakfast"},
-                "element": {
-                    "type": "plain_text_input",
-                    "action_id": "grilled3",
-                    "initial_value": "0"
-                },
-                "hint": {"type": "plain_text", "text": "Weight in decimal pounds"}
-            }
-        )
-    blocks.append(
-        {
-            "type": "input",
-            "block_id": "input_j",
-            "label": {"type": "plain_text", "text": "Additional Info"},
-            "element": {
-                "type": "plain_text_input",
-                "action_id": "other",
-                "multiline": True
-            },
-            "optional": True
-        }
-    )
-    blocks.append(
-        {
-            "type": "context",
-            "block_id": "context_a",
-            "elements": [
-                {
-                    "type": "plain_text",
-                    "text": body['container']['message_ts']
-                }
-            ]
-        }
-    )
-    await client.views_open(
-        trigger_id=body['trigger_id'],
-        view={
-            "type": "modal",
-            "callback_id": "waste_view",
-            "title": {"type": "plain_text", "text": "Waste Form"},
-            "submit": {"type": "plain_text", "text": "Submit"},
-            "blocks": blocks
-        }
-    )
-
-
 @app.view("waste_view")
 async def handle_waste_view(ack, body, client, view):
     """Process input from waste form. This is the view handler for the previous function.  It takes the information
     you provide in the form and processes it."""
     logger.info("Processing waste input...")
-    raw_leaders = view['state']['values']['input_a']['leader_names']['selected_options']
-    logger.info(raw_leaders)
-    leader_list = [" - " + n['value'] for n in raw_leaders]
-    raw_times = view['state']['values']['input_a2']['times']['selected_options']
-    time_list = [" - " + n['value'] for n in raw_times]
+    try:
+        raw_leaders = view['state']['values']['input_a']['leader_names']['selected_options']
+        leader_list = [" - " + n['value'] for n in raw_leaders]
+    except KeyError:
+        leader_list = ["N/A"]
+    try:
+        raw_times = view['state']['values']['input_a2']['times']['selected_options']
+        time_list = [" - " + n['value'] for n in raw_times]
+    except KeyError:
+        now = datetime.now()
+        formatted = now.strftime("%I:%M %p")
+        time_list = [formatted]
     message_ts = view['blocks'][-1]['elements'][0]['text']
     errors = {}
     text_error = "Must be a decimal number with no text"
@@ -2902,12 +2804,14 @@ async def handle_waste_view(ack, body, client, view):
                                   blocks=blocks,
                                   text="New waste report posted.")
     logger.info("Attempting to delete waste_remind message.")
-    try:
-        await client.chat_delete(channel=creds.boh_channel,
-                                 ts=message_ts,
-                                 token=creds.user_token)
-    except:
-        logger.exception("Message deletion failed:\n")
+    # If the mssage_ts is "no_msg" this came from a slash command and there is no message to delete
+    if message_ts != "no_msg":
+        try:
+            await client.chat_delete(channel=creds.boh_channel,
+                                     ts=message_ts,
+                                     token=creds.user_token)
+        except:
+            logger.exception("Message deletion failed:\n")
     if datetime.now().hour < 12:
         await asyncio.sleep(300)
         safe_url = "https://www.cfahome.com/go/appurl.go?app=ERQA"
