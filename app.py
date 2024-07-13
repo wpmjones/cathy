@@ -2212,18 +2212,18 @@ async def waste_command(ack, body, client):
         {
             "type": "context",
             "block_id": "input_a",
-            "elements": {
+            "elements": [{
                 "type": "plain_text",
                 "text": "leaders"
-            }
+            }]
         },
         {
             "type": "context",
             "block_id": "input_a2",
-            "elements": {
+            "elements": [{
                 "type": "plain_text",
                 "text": "times"
-            }
+            }]
         },
         {
             "type": "section",
