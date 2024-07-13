@@ -2214,7 +2214,7 @@ async def waste_command(ack, body, client):
             "block_id": "input_a",
             "elements": [{
                 "type": "plain_text",
-                "text": "leaders"
+                "text": "placeholder"
             }]
         },
         {
@@ -2222,7 +2222,7 @@ async def waste_command(ack, body, client):
             "block_id": "input_a2",
             "elements": [{
                 "type": "plain_text",
-                "text": "times"
+                "text": "placeholder"
             }]
         },
         {
@@ -2357,7 +2357,7 @@ async def waste_command(ack, body, client):
     try:
         msg_ts = body['container']['message_ts']
     except KeyError:
-        msg_ts = "no_msg"
+        msg_ts = "placeholder"
     blocks.append(
         {
             "type": "context",
