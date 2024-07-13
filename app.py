@@ -2204,10 +2204,9 @@ async def no_waste(ack, body, client):
         logger.exception(f"Message deletion failed: {e}")
 
 
-@app.command("/waste)")
+@app.command("/waste")
 async def waste_command(ack, body, client):
     """Allows for intermittent waste reports outside of designated times"""
-    logger.info("Processing /waste command...")
     await ack()
     blocks = [
         {
