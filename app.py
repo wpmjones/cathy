@@ -2684,10 +2684,27 @@ async def handle_waste_view(ack, body, client, view):
     if len(errors) > 0:
         return await ack(response_action="errors", errors=errors)
     await ack()
-    chicken_list = [regulars, spicy, nuggets, strips, g_filets, g_nuggets]
-    # Store data
-    total_weight = sum(chicken_list)
+    to_post = [str(datetime.now()), regulars, spicy, nuggets, strips, g_filets, g_nuggets]
+    if datetime.now().hour < 13:
+        to_post.append(breakfast)
+        to_post.append(g_breakfast)
+        to_post.append(s_breakfast)
+    # Send data to Google Sheet
     sh = gc.open_by_key(creds.waste_id)
+    try:
+        sheet = sh.worksheet("Data")
+        sheet.append_row(to_post, value_input_option='USER_ENTERED')
+    except gspread.exceptions.GSpreadException as e:
+        return await client.chat_postMessage(channel=body['user']['id'],
+                                             text=e)
+    except Exception as e:
+        await client.chat_postMessage(channel=body['user']['id'],
+                                      text=f"There was an error while storing the message to the Google Sheet.\n{e}")
+        await client.chat_postMessage(channel=creds.pj_user_id,
+                                      text=f"There was an error while storing the message to the Google Sheet.\n{e}")
+        return
+    chicken_list = [regulars, spicy, nuggets, strips, g_filets, g_nuggets]
+    total_weight = sum(chicken_list)
     goal_sheet = sh.worksheet("Goals")
     goal_values = goal_sheet.get_all_values()
     goals = {}
@@ -2749,12 +2766,8 @@ async def handle_waste_view(ack, body, client, view):
                 block4_text += f"_Grilled Nuggets: {g_nuggets} lbs._\n"
             else:
                 block4_text += f"Grilled Nuggets: {g_nuggets} lbs.\n"
-    to_post = [str(datetime.now()), regulars, spicy, nuggets, strips, g_filets, g_nuggets]
     # Handle breakfast items
     if datetime.now().hour < 13:
-        to_post.append(breakfast)
-        to_post.append(g_breakfast)
-        to_post.append(s_breakfast)
         if sum([breakfast, g_breakfast, s_breakfast]) > 0:
             total_weight += sum([breakfast, g_breakfast, s_breakfast])
             if breakfast:
@@ -2784,30 +2797,42 @@ async def handle_waste_view(ack, body, client, view):
             "text": {"type": "mrkdwn", "text": f"*Notes:*\n{other}"}
         }
         blocks.append(block4)
-    block5 = {
-        "type": "section",
-        "text": {"type": "mrkdwn", "text": ("Please remember:\n* Place stickers on all waste "
-                                            "containers\n* Swap all utensils")}
-    }
-    blocks.append(block5)
-    # Send data to Google Sheet
     try:
-        sheet = sh.worksheet("Data")
-        sheet.append_row(to_post, value_input_option='USER_ENTERED')
+        sheet = sh.worksheet("Daily Totals")
+        # Filets, Spicy, Nuggets, Strips, Grilled Filets, Grilled Nuggets, Breakfast, Grilled B, Spicy B
+        daily_totals = sheet.get_all_values()
+        if daily_totals[0][3] > 1:
+            content = "*Totals for today:*\n"
+            totals = {}
+            for row in daily_totals:
+                totals[row[0]] = float(row[1])
+            for key in totals:
+                if key in goals:
+                    if totals[key] >= goals[key]:
+                        content += f"_{key}: {totals[key]}  Daily goal is {goals[key]}\n"
+                    else:
+                        content += f"{key}: {totals[key]}  Daily goal is {goals[key]}\n"
     except gspread.exceptions.GSpreadException as e:
         return await client.chat_postMessage(channel=body['user']['id'],
                                              text=e)
-    except Exception as e:
-        await client.chat_postMessage(channel=body['user']['id'],
-                                      text=f"There was an error while storing the message to the Google Sheet.\n{e}")
-        await client.chat_postMessage(channel=creds.pj_user_id,
-                                      text=f"There was an error while storing the message to the Google Sheet.\n{e}")
-        return
+    if content:
+        block4a = {
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": content}
+        }
+        blocks.append(block4a)
+    block5 = {
+        "type": "section",
+        "text": {"type": "mrkdwn", "text": ("*Please remember:*\n* Place stickers on all waste "
+                                            "containers\n* Swap all utensils")}
+    }
+    blocks.append(block5)
+    # Post message to Slack
     await client.chat_postMessage(channel=creds.boh_channel,
                                   blocks=blocks,
                                   text="New waste report posted.")
     logger.info("Attempting to delete waste_remind message.")
-    # If the mssage_ts is "no_msg" this came from a slash command and there is no message to delete
+    # If the message_ts is "no_msg" this came from a slash command and there is no message to delete
     if message_ts != "no_msg":
         try:
             await client.chat_delete(channel=creds.boh_channel,
