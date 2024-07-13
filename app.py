@@ -2637,7 +2637,10 @@ async def handle_waste_view(ack, body, client, view):
         now = datetime.now()
         formatted = now.strftime("%I:%M %p")
         time_list = [formatted]
-    message_ts = view['blocks'][-1]['elements'][0]['text']
+    try:
+        message_ts = view['blocks'][-1]['elements'][0]['text']
+    except KeyError:
+        message_ts = "no_msg"
     errors = {}
     text_error = "Must be a decimal number with no text"
     try:
