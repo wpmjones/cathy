@@ -2810,7 +2810,7 @@ async def handle_waste_view(ack, body, client, view):
                 if key in goals:
                     if totals[key] > 0:
                         if totals[key] >= goals[key]:
-                            content += f"_{key}: {totals[key]}  Daily goal is {goals[key]}_\n"
+                            content += f"`{key}: {totals[key]}  Daily goal is {goals[key]}`\n"
                         else:
                             content += f"{key}: {totals[key]}  Daily goal is {goals[key]}\n"
     except gspread.exceptions.GSpreadException as e:
@@ -2822,12 +2822,13 @@ async def handle_waste_view(ack, body, client, view):
             "text": {"type": "mrkdwn", "text": content}
         }
         blocks.append(block4a)
-    block5 = {
-        "type": "section",
-        "text": {"type": "mrkdwn", "text": ("*Please remember:*\n* Place stickers on all waste "
-                                            "containers\n* Swap all utensils")}
-    }
-    blocks.append(block5)
+    if message_ts != "no_msg":
+        block5 = {
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": ("*Please remember:*\n* Place stickers on all waste "
+                                                "containers\n* Swap all utensils")}
+        }
+        blocks.append(block5)
     # Post message to Slack
     await client.chat_postMessage(channel=creds.boh_channel,
                                   blocks=blocks,
