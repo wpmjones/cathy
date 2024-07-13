@@ -2207,6 +2207,7 @@ async def no_waste(ack, body, client):
 @app.command("/waste)")
 async def waste_command(ack, body, client):
     """Allows for intermittent waste reports outside of designated times"""
+    logger.info("Processing /waste command...")
     await ack()
     blocks = [
         {
