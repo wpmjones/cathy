@@ -417,6 +417,7 @@ async def tardy(ack, body, client):
             "elements": elements
         }
     ]
+    logger.info(blocks)
     await client.chat_postEphemeral(channel=body['channel_id'],
                                     user=body['user_id'],
                                     blocks=blocks,
