@@ -423,6 +423,14 @@ async def tardy(ack, body, say, client):
                                       text=f"There was an error while storing the message to the Google Sheet.\n{e}")
 
 
+@app.action("tardy_id_0")
+async def tardy_action_0(ack, body, client):
+    """Respond to buttons in the /tardy comment. I don't want to repeat this function 5 times,
+    but I don't see a way for a single function to handle multiple action_id's"""
+    await ack()
+    logger.info(body)
+
+
 @app.command("/injury")
 async def add_injury(ack, body, client):
     """This ommand adds a report to the Sedgwick channel"""
@@ -3099,7 +3107,6 @@ async def bot_test(ack, body, client):
     sheet = sh.worksheet("Staff")
     data = sheet.col_values(1)
     name_options = process.extractBests(tm_name, data, limit=5)
-    logger.info(f"Test\nData is type: {type(data)}\nOptions: {name_options}")
     if not name_options:
         return await client.chat_postEphemeral(channel=body['channel_id'],
                                                user=body['user_id'],
@@ -3112,13 +3119,13 @@ async def bot_test(ack, body, client):
                     "type": "button",
                     "text": {"type": "plain_text", "text": option[0], "emoji": True},
                     "value": option[0],
-                    "action_id": f"action_id_{count}"
+                    "action_id": f"tardy_id_{count}"
                 }
             )
     blocks = [
         {
             "type": "section",
-            "text": {"type": "mrkdwn", "text": "Did you mean?"}
+            "text": {"type": "mrkdwn", "text": "For this tardy record, did you mean?"}
         },
         {
             "type": "actions",
