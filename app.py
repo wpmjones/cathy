@@ -376,7 +376,7 @@ async def clear_messages(ack, body, say, client):
 
 
 @app.command("/tardy")
-async def tardy(ack, body, say, client):
+async def tardy(ack, body, client):
     """Record when someone shows up late for their shift. We take away their meal credit when this happens
     which is why the response message is worded as such.  This updates our pay scale Google Sheet since
     tardiness also affects one's ability to get a pay raise.
@@ -384,43 +384,43 @@ async def tardy(ack, body, say, client):
     Example usage:
     /tardy First Last
     """
-    # TODO Use fuzzy to check name and ask user 'Did you mean?'
     await ack()
-    try:
-        sh = gc.open_by_key(creds.pay_scale_id)
-        sheet = sh.worksheet("Tardy")
-        now = date.strftime(date.today(), "%m/%d/%Y")
-        logger.info(f"{now} - {body['text']} was tardy")
-        to_post = [body['text'], now]
-        sheet.append_row(to_post, value_input_option='USER_ENTERED')
-        blocks = [
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": f"Tardy record added for {body['text']}. No meal credit today ({now})."
+    tm_name = body['text']
+    fuzzy_num = 70
+    # Collect TM names from Staff Sheet
+    sh = gc.open_by_key(creds.staff_id)
+    sheet = sh.worksheet("Staff")
+    data = sheet.col_values(1)
+    name_options = process.extractBests(tm_name, data, limit=5)
+    if not name_options:
+        return await client.chat_postEphemeral(channel=body['channel_id'],
+                                               user=body['user_id'],
+                                               text="No team members match this name. Please try again.")
+    elements = []
+    for count, option in enumerate(name_options):
+        if option[1] > fuzzy_num:
+            elements.append(
+                {
+                    "type": "button",
+                    "text": {"type": "plain_text", "text": option[0], "emoji": True},
+                    "value": option[0],
+                    "action_id": f"tardy_id_{count}"
                 }
-            },
-            {
-                "type": "context",
-                "elements": [
-                    {
-                        "type": "plain_text",
-                        "text": f"Submitted by: {body['user_name']}"
-                    }
-                ]
-            }
-        ]
-        await client.chat_postMessage(channel=creds.sick_channel,
-                                      blocks=blocks,
-                                      text=f"{body['text']} was tardy on {now}.")
-    except gspread.exceptions.GSpreadException as e:
-        await client.chat_postMessage(channel=body['user']['id'], text=e)
-    except Exception as e:
-        await client.chat_postMessage(channel=body['user']['id'],
-                                      text=f"There was an error while storing the message to the Google Sheet.\n{e}")
-        await client.chat_postMessage(channel=creds.pj_user_id,
-                                      text=f"There was an error while storing the message to the Google Sheet.\n{e}")
+            )
+    blocks = [
+        {
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": "For this tardy record, did you mean?"}
+        },
+        {
+            "type": "actions",
+            "elements": elements
+        }
+    ]
+    await client.chat_postEphemeral(channel=body['channel_id'],
+                                    user=body['user_id'],
+                                    blocks=blocks,
+                                    text="Name options for tardy selection.")
 
 
 @app.action("tardy_id_0")
