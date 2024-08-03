@@ -392,6 +392,7 @@ async def tardy(ack, body, client):
     sheet = sh.worksheet("Staff")
     data = sheet.col_values(1)
     name_options = process.extractBests(tm_name, data, limit=5)
+    logger.info(name_options)
     if not name_options:
         return await client.chat_postEphemeral(channel=body['channel_id'],
                                                user=body['user_id'],
