@@ -431,7 +431,7 @@ async def tardy_action_0(ack, body):
     tardy_tm = body['actions'][0]['value']
     user_id = body['user']['id']
     user_name = body['user']['name']
-    logger.info(f"Types:\nTM: {tardy_tm}\nID: {user_id}\nName: {user_name}")
+    logger.info(f"Types:\nTM: {type(tardy_tm)}\nID: {type(user_id)}\nName: {type(user_name)}")
     await process_tardy(tardy_tm, user_id, user_name)
 
 
