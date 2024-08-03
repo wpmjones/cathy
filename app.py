@@ -3110,8 +3110,8 @@ async def bot_test(ack, body, client):
             elements.append(
                 {
                     "type": "button",
-                    "text": {"type": "plain_text", "text": option[1], "emoji": True},
-                    "value": option,
+                    "text": {"type": "plain_text", "text": option[0], "emoji": True},
+                    "value": option[0],
                     "action_id": f"action_id_{count}"
                 }
             )
