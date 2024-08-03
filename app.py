@@ -3125,6 +3125,7 @@ async def bot_test(ack, body, client):
             "elements": elements
         }
     ]
+    logger.info(f"Blocks:\n{blocks}")
     await client.chat_postEphemeral(channel=body['channel_id'],
                                     user=body['user_id'],
                                     blocks=blocks,
