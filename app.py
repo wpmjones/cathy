@@ -429,7 +429,9 @@ async def tardy_action_0(ack, body):
     but I don't see a way for a single function to handle multiple action_id's"""
     await ack()
     tardy_tm = body['actions'][0]['value']
-    await process_tardy(tardy_tm, body['user']['id'], body['user']['name'])
+    user_id = body['user']['id']
+    user_name = body['user']['name']
+    await process_tardy(tardy_tm, user_id, user_name)
 
 
 @app.action("tardy_id_1")
@@ -438,7 +440,9 @@ async def tardy_action_1(ack, body):
     but I don't see a way for a single function to handle multiple action_id's"""
     await ack()
     tardy_tm = body['actions'][0]['value']
-    await process_tardy(tardy_tm, body['user']['id'], body['user']['name'])
+    user_id = body['user']['id']
+    user_name = body['user']['name']
+    await process_tardy(tardy_tm, user_id, user_name)
 
 
 @app.action("tardy_id_2")
@@ -447,7 +451,9 @@ async def tardy_action_2(ack, body):
     but I don't see a way for a single function to handle multiple action_id's"""
     await ack()
     tardy_tm = body['actions'][0]['value']
-    await process_tardy(tardy_tm, body['user']['id'], body['user']['name'])
+    user_id = body['user']['id']
+    user_name = body['user']['name']
+    await process_tardy(tardy_tm, user_id, user_name)
 
 
 @app.action("tardy_id_3")
@@ -456,7 +462,9 @@ async def tardy_action_3(ack, body):
     but I don't see a way for a single function to handle multiple action_id's"""
     await ack()
     tardy_tm = body['actions'][0]['value']
-    await process_tardy(tardy_tm, body['user']['id'], body['user']['name'])
+    user_id = body['user']['id']
+    user_name = body['user']['name']
+    await process_tardy(tardy_tm, user_id, user_name)
 
 
 @app.action("tardy_id_4")
@@ -465,7 +473,9 @@ async def tardy_action_4(ack, body):
     but I don't see a way for a single function to handle multiple action_id's"""
     await ack()
     tardy_tm = body['actions'][0]['value']
-    await process_tardy(tardy_tm, body['user']['id'], body['user']['name'])
+    user_id = body['user']['id']
+    user_name = body['user']['name']
+    await process_tardy(tardy_tm, user_id, user_name)
 
 
 async def process_tardy(tardy_name, user_id, user_name):
@@ -473,7 +483,6 @@ async def process_tardy(tardy_name, user_id, user_name):
         sh = gc.open_by_key(creds.pay_scale_id)
         sheet = sh.worksheet("Tardy")
         now = date.strftime(date.today(), "%m/%d/%Y")
-        logger.info(f"{now} - {tardy_name} was tardy")
         to_post = [tardy_name, now]
         sheet.append_row(to_post, value_input_option='USER_ENTERED')
         blocks = [
