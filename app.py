@@ -393,7 +393,7 @@ async def tardy(ack, body, client):
     data = sheet.col_values(1)
     name_options = process.extractBests(tm_name, data, limit=5)
     logger.info(name_options)
-    if not name_options:
+    if not name_options or name_options[0][1] < fuzzy_num:
         return await client.chat_postEphemeral(channel=body['channel_id'],
                                                user=body['user_id'],
                                                text="No team members match this name. Please try again.")
