@@ -3093,7 +3093,7 @@ async def bot_test(ack, body, client):
     """Testing various features"""
     await ack()
     tm_name = body['text']
-    fuzzy_num = 78
+    fuzzy_num = 70
     # Collect TM names from Staff Sheet
     sh = gc.open_by_key(creds.staff_id)
     sheet = sh.worksheet("Staff")
@@ -3106,14 +3106,15 @@ async def bot_test(ack, body, client):
                                                text="No team members match this name. Please try again.")
     elements = []
     for count, option in enumerate(name_options):
-        elements.append(
-            {
-                "type": "button",
-                "text": {"type": "plain_text", "text": option, "emoji": True},
-                "value": option,
-                "action_id": f"action_id_{count}"
-            }
-        )
+        if option[1] > fuzzy_num:
+            elements.append(
+                {
+                    "type": "button",
+                    "text": {"type": "plain_text", "text": option, "emoji": True},
+                    "value": option,
+                    "action_id": f"action_id_{count}"
+                }
+            )
     blocks = [
         {
             "type": "section",
