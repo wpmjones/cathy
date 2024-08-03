@@ -486,27 +486,6 @@ async def process_tardy(tardy_name, user_id, user_name):
         now = date.strftime(date.today(), "%m/%d/%Y")
         to_post = [tardy_name, now]
         sheet.append_row(to_post, value_input_option='USER_ENTERED')
-        blocks = [
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": f"Tardy record added for {tardy_name}. No meal credit today ({now})."
-                }
-            },
-            {
-                "type": "context",
-                "elements": [
-                    {
-                        "type": "plain_text",
-                        "text": f"Submitted by: {user_name}"
-                    }
-                ]
-            }
-        ]
-        await client.chat_postMessage(channel=creds.test_channel,
-                                      blocks=blocks,
-                                      text=f"{tardy_name} was tardy on {now}.")
     except gspread.exceptions.GSpreadException as e:
         await client.chat_postMessage(channel=user_id, text=e)
     except Exception as e:
@@ -514,6 +493,27 @@ async def process_tardy(tardy_name, user_id, user_name):
                                       text=f"There was an error while storing the message to the Google Sheet.\n{e}")
         await client.chat_postMessage(channel=creds.pj_user_id,
                                       text=f"There was an error while storing the message to the Google Sheet.\n{e}")
+    blocks = [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": f"Tardy record added for {tardy_name}. No meal credit today ({now})."
+            }
+        },
+        {
+            "type": "context",
+            "elements": [
+                {
+                    "type": "plain_text",
+                    "text": f"Submitted by: {user_name}"
+                }
+            ]
+        }
+    ]
+    await client.chat_postMessage(channel=creds.test_channel,
+                                  blocks=blocks,
+                                  text=f"{tardy_name} was tardy on {now}.")
 
 
 @app.command("/injury")
