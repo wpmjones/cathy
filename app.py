@@ -505,7 +505,7 @@ async def process_tardy(tardy_name, user_id, user_name):
             ]
         }
     ]
-    await client.chat_postMessage(channel=creds.test_channel,
+    await client.chat_postMessage(channel=creds.sick_channel,
                                   blocks=blocks,
                                   text=f"{tardy_name} was tardy on {now}.")
 
