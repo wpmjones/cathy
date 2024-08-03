@@ -429,6 +429,46 @@ async def tardy_action_0(ack, body, client):
     but I don't see a way for a single function to handle multiple action_id's"""
     await ack()
     logger.info(body)
+    tardy_tm = body['actions'][0]['value']
+    await process_tardy(tardy_tm, body['user_id'])
+
+
+async def process_tardy(tardy_name, user_id):
+    try:
+        sh = gc.open_by_key(creds.pay_scale_id)
+        sheet = sh.worksheet("Tardy")
+        now = date.strftime(date.today(), "%m/%d/%Y")
+        logger.info(f"{now} - {tardy_name} was tardy")
+        to_post = [tardy_name, now]
+        sheet.append_row(to_post, value_input_option='USER_ENTERED')
+        blocks = [
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"Tardy record added for {tardy_name}. No meal credit today ({now})."
+                }
+            },
+            {
+                "type": "context",
+                "elements": [
+                    {
+                        "type": "plain_text",
+                        "text": f"Submitted by: {tardy_name}"
+                    }
+                ]
+            }
+        ]
+        await client.chat_postMessage(channel=creds.sick_channel,
+                                      blocks=blocks,
+                                      text=f"{tardy_name} was tardy on {now}.")
+    except gspread.exceptions.GSpreadException as e:
+        await client.chat_postMessage(channel=user_id, text=e)
+    except Exception as e:
+        await client.chat_postMessage(channel=user_id,
+                                      text=f"There was an error while storing the message to the Google Sheet.\n{e}")
+        await client.chat_postMessage(channel=creds.pj_user_id,
+                                      text=f"There was an error while storing the message to the Google Sheet.\n{e}")
 
 
 @app.command("/injury")
@@ -3132,7 +3172,6 @@ async def bot_test(ack, body, client):
             "elements": elements
         }
     ]
-    logger.info(f"Blocks:\n{blocks}")
     await client.chat_postEphemeral(channel=body['channel_id'],
                                     user=body['user_id'],
                                     blocks=blocks,
