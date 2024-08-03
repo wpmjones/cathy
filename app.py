@@ -428,9 +428,8 @@ async def tardy_action_0(ack, body, client):
     """Respond to buttons in the /tardy comment. I don't want to repeat this function 5 times,
     but I don't see a way for a single function to handle multiple action_id's"""
     await ack()
-    logger.info(body)
     tardy_tm = body['actions'][0]['value']
-    await process_tardy(tardy_tm, body['user_id'])
+    await process_tardy(tardy_tm, body['user']['id'])
 
 
 async def process_tardy(tardy_name, user_id):
