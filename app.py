@@ -17,7 +17,7 @@ import requests
 import string
 
 from datetime import datetime, date, timedelta
-from fuzzywuzzy import fuzz
+from fuzzywuzzy import fuzz, process
 from loguru import logger
 from pytz import timezone
 from slack_bolt.async_app import AsyncApp
@@ -3092,14 +3092,42 @@ async def illness(ack, say):
 async def bot_test(ack, body, client):
     """Testing various features"""
     await ack()
-    response = await client.chat_postMessage(channel=creds.test_channel,
-                                             text="No waste for the most recent waste period.  Well done!")
-    logger.info(response)
-    logger.info(response['channel'])
-    logger.info(response['message']['ts'])
-    await client.reactions_add(name="thumbsup",
-                               channel=response['channel'],
-                               timestamp=response['message']['ts'])
+    tm_name = body['text']
+    fuzzy_num = 78
+    # Collect TM names from Staff Sheet
+    sh = gc.open_by_key(creds.staff_id)
+    sheet = sh.worksheet("Staff")
+    data = sheet.col_values(1)
+    name_options = process.extractBests(tm_name, data, limit=5)
+    logger.info(f"Test\nData is type: {type(data)}\nOptions: {name_options}")
+    if not name_options:
+        return await client.chat_postEphemeral(channel=body['channel_id'],
+                                               user=body['user_id'],
+                                               text="No team members match this name. Please try again.")
+    elements = []
+    for count, option in enumerate(name_options):
+        elements.append(
+            {
+                "type": "button",
+                "text": {"type": "plain_text", "text": option, "emoji": True},
+                "value": option,
+                "action_id": f"action_id_{count}"
+            }
+        )
+    blocks = [
+        {
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": "Did you mean?"}
+        },
+        {
+            "type": "actions",
+            "elements": elements
+        }
+    ]
+    await client.chat_postEphemeral(channel=body['channel_id'],
+                                    user=body['user_id'],
+                                    blocks=blocks,
+                                    text="Name options for tardy selection.")
 
 
 # Start your app
