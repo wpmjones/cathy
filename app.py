@@ -417,6 +417,7 @@ async def tardy(ack, body, client):
             },
             "accessory": {
                 "type": "radio_buttons",
+                "initial_option": "normal",
                 "options": [
                     {
                         "text": {
