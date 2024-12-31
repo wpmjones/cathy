@@ -463,6 +463,7 @@ async def tardy_action_0(ack, body, respond):
     but I don't see a way for a single function to handle multiple action_id's"""
     await ack()
     tardy_type = body['state']['values']['block_tardy']['tardy_type']['selected_option']['value']
+    logger.info(tardy_type)
     await respond({"delete_original": True})
     tardy_tm = body['actions'][0]['value']
     await process_tardy(tardy_tm, tardy_type, body['user']['id'], body['user']['name'])
