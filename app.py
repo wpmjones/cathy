@@ -563,6 +563,7 @@ async def process_tardy(tardy_name, tardy_type, user_id, user_name):
             ]
         }
     ]
+    logger.info([blocks[0], blocks[2]])
     await client.chat_postMessage(channel=creds.test_channel,
                                   blocks=[blocks[0], blocks[2]],
                                   text=f"{tardy_name} was tardy on {now}.")
