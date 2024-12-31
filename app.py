@@ -453,6 +453,12 @@ async def tardy(ack, body, client):
                                     text="Name options for tardy selection.")
 
 
+@app.block_action("tardy_type")
+async def update_tardy_modal(ack):
+    # We're not doing anything here. We just need to handle changes to the radio buttons
+    await ack()
+
+
 @app.action("tardy_id_0")
 async def tardy_action_0(ack, body, respond, view):
     """Respond to buttons in the /tardy comment. I don't want to repeat this function 5 times,
