@@ -519,7 +519,6 @@ async def process_tardy(tardy_name, tardy_type, user_id, user_name):
         now = date.strftime(date.today(), "%m/%d/%Y")
         to_post = [tardy_name, now]
         # sheet.append_row(to_post, value_input_option='USER_ENTERED')
-        logger.info(type(tardy_type))
     except gspread.exceptions.GSpreadException as e:
         await client.chat_postMessage(channel=user_id, text=e)
     except Exception as e:
@@ -545,6 +544,7 @@ async def process_tardy(tardy_name, tardy_type, user_id, user_name):
             ]
         }
     ]
+    logger.info(tardy_name)
     await client.chat_postMessage(channel=creds.test_channel,
                                   blocks=blocks,
                                   text=f"{tardy_name} was tardy on {now}.")
