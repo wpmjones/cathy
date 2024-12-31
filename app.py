@@ -412,6 +412,10 @@ async def tardy(ack, body, client):
         {
             "type": "section",
             "block_id": "block_tardy",
+            "text": {
+                "type": "mrkdwn",
+                "text": "How late was this person?"
+            },
             "accessory": {
                 "type": "radio_buttons",
                 "options": [
