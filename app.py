@@ -533,12 +533,24 @@ async def process_tardy(tardy_name, tardy_type, user_id, user_name):
                                       text=f"There was an error while storing the message to the Google Sheet.\n{e}")
         await client.chat_postMessage(channel=creds.pj_user_id,
                                       text=f"There was an error while storing the message to the Google Sheet.\n{e}")
+    tardy_text = f"This tardy was "
+    if tardy_type == "normal":
+        tardy_text += "a normal tardy. I recommend 1 point."
+    else:
+        tardy_text += "an excessive tardy.  Might I suggest 2 points?"
     blocks = [
         {
             "type": "section",
             "text": {
                 "type": "mrkdwn",
                 "text": f"Tardy record added for {tardy_name}. No meal credit today ({now})."
+            }
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": tardy_text
             }
         },
         {
@@ -552,17 +564,9 @@ async def process_tardy(tardy_name, tardy_type, user_id, user_name):
         }
     ]
     await client.chat_postMessage(channel=creds.test_channel,
-                                  blocks=blocks,
+                                  blocks=[blocks[0], blocks[2]],
                                   text=f"{tardy_name} was tardy on {now}.")
-    tardy_text = f"This tardy was "
-    if tardy_type == "normal":
-        tardy_text += "a normal tardy. I recommend 1 point."
-    else:
-        tardy_text += "an excessive tardy.  Might I suggest 2 points?"
-    logger.info(tardy_text)
-    blocks.insert(1, {"type": "section", "text": {"type": "mrkdwn", "text": tardy_text}})
-    logger.info(blocks)
-    await client.chat_postMessage(channel=creds.test_channel,
+    await client.chat_postMessage(channel=creds.pj_user_id,
                                   blocks=blocks,
                                   text=f"{tardy_name} was tardy on {now}.")
 
