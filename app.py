@@ -463,7 +463,6 @@ async def tardy_action_0(ack, body, respond):
     but I don't see a way for a single function to handle multiple action_id's"""
     await ack()
     tardy_type = body['state']['values']['block_tardy']['tardy_type']['selected_option']['value']
-    logger.info(tardy_type)
     await respond({"delete_original": True})
     tardy_tm = body['actions'][0]['value']
     await process_tardy(tardy_tm, tardy_type, body['user']['id'], body['user']['name'])
@@ -520,6 +519,7 @@ async def process_tardy(tardy_name, tardy_type, user_id, user_name):
         now = date.strftime(date.today(), "%m/%d/%Y")
         to_post = [tardy_name, now]
         # sheet.append_row(to_post, value_input_option='USER_ENTERED')
+        logger.info(type(tardy_type))
     except gspread.exceptions.GSpreadException as e:
         await client.chat_postMessage(channel=user_id, text=e)
     except Exception as e:
