@@ -411,6 +411,30 @@ async def tardy(ack, body, client):
     blocks = [
         {
             "type": "section",
+            "accessory": {
+                "type": "radio_buttons",
+                "block_id": "block_tardy",
+                "options": [
+                    {
+                        "text": {
+                            "type": "plain_text",
+                            "text": "Less than 30"
+                        },
+                        "value": "normal"
+                    },
+                    {
+                        "text": {
+                            "type": "plain_text",
+                            "text": "More than 30"
+                        },
+                        "value": "excessive"
+                    }
+                ],
+                "action_id": "tardy_type"
+            }
+        },
+        {
+            "type": "section",
             "text": {"type": "mrkdwn", "text": "For this tardy record, did you mean?"}
         },
         {
@@ -426,62 +450,67 @@ async def tardy(ack, body, client):
 
 
 @app.action("tardy_id_0")
-async def tardy_action_0(ack, body, respond):
+async def tardy_action_0(ack, body, respond, view):
     """Respond to buttons in the /tardy comment. I don't want to repeat this function 5 times,
     but I don't see a way for a single function to handle multiple action_id's"""
     await ack()
+    tardy_type = view['state']['values']['block_tardy']['tardy_type']['selected_option']['value']
     await respond({"delete_original": True})
     tardy_tm = body['actions'][0]['value']
-    await process_tardy(tardy_tm, body['user']['id'], body['user']['name'])
+    await process_tardy(tardy_tm, tardy_type, body['user']['id'], body['user']['name'])
 
 
 @app.action("tardy_id_1")
-async def tardy_action_1(ack, body, respond):
+async def tardy_action_1(ack, body, respond, view):
     """Respond to buttons in the /tardy comment. I don't want to repeat this function 5 times,
     but I don't see a way for a single function to handle multiple action_id's"""
     await ack()
+    tardy_type = view['state']['values']['block_tardy']['tardy_type']['selected_option']['value']
     await respond({"delete_original": True})
     tardy_tm = body['actions'][0]['value']
-    await process_tardy(tardy_tm, body['user']['id'], body['user']['name'])
+    await process_tardy(tardy_tm, tardy_type, body['user']['id'], body['user']['name'])
 
 
 @app.action("tardy_id_2")
-async def tardy_action_2(ack, body, respond):
+async def tardy_action_2(ack, body, respond, view):
     """Respond to buttons in the /tardy comment. I don't want to repeat this function 5 times,
     but I don't see a way for a single function to handle multiple action_id's"""
     await ack()
+    tardy_type = view['state']['values']['block_tardy']['tardy_type']['selected_option']['value']
     await respond({"delete_original": True})
     tardy_tm = body['actions'][0]['value']
-    await process_tardy(tardy_tm, body['user']['id'], body['user']['name'])
+    await process_tardy(tardy_tm, tardy_type, body['user']['id'], body['user']['name'])
 
 
 @app.action("tardy_id_3")
-async def tardy_action_3(ack, body, respond):
+async def tardy_action_3(ack, body, respond, view):
     """Respond to buttons in the /tardy comment. I don't want to repeat this function 5 times,
     but I don't see a way for a single function to handle multiple action_id's"""
     await ack()
+    tardy_type = view['state']['values']['block_tardy']['tardy_type']['selected_option']['value']
     await respond({"delete_original": True})
     tardy_tm = body['actions'][0]['value']
-    await process_tardy(tardy_tm, body['user']['id'], body['user']['name'])
+    await process_tardy(tardy_tm, tardy_type, body['user']['id'], body['user']['name'])
 
 
 @app.action("tardy_id_4")
-async def tardy_action_4(ack, body, respond):
+async def tardy_action_4(ack, body, respond, view):
     """Respond to buttons in the /tardy comment. I don't want to repeat this function 5 times,
     but I don't see a way for a single function to handle multiple action_id's"""
     await ack()
+    tardy_type = view['state']['values']['block_tardy']['tardy_type']['selected_option']['value']
     await respond({"delete_original": True})
     tardy_tm = body['actions'][0]['value']
-    await process_tardy(tardy_tm, body['user']['id'], body['user']['name'])
+    await process_tardy(tardy_tm, tardy_type, body['user']['id'], body['user']['name'])
 
 
-async def process_tardy(tardy_name, user_id, user_name):
+async def process_tardy(tardy_name, tardy_type, user_id, user_name):
     try:
         sh = gc.open_by_key(creds.pay_scale_id)
         sheet = sh.worksheet("Tardy")
         now = date.strftime(date.today(), "%m/%d/%Y")
         to_post = [tardy_name, now]
-        sheet.append_row(to_post, value_input_option='USER_ENTERED')
+        # sheet.append_row(to_post, value_input_option='USER_ENTERED')
     except gspread.exceptions.GSpreadException as e:
         await client.chat_postMessage(channel=user_id, text=e)
     except Exception as e:
@@ -507,9 +536,17 @@ async def process_tardy(tardy_name, user_id, user_name):
             ]
         }
     ]
-    await client.chat_postMessage(channel=creds.sick_channel,
+    await client.chat_postMessage(channel=creds.test_channel,
                                   blocks=blocks,
                                   text=f"{tardy_name} was tardy on {now}.")
+    tardy_text = f"This tardy was "
+    if tardy_type == "normal":
+        tardy_text += "a normal tardy. I recommend 1 point."
+    else:
+        tardy_text += "an excessive tardy.  Might I suggest 2 points?"
+    blocks.insert(1, {"type": "section", "text": {"type": "mrkdwn", "text": tardy_text}})
+    await client.chat_postMessage(channel=creds.pj_user_id,
+                                  text=tardy_text)
 
 
 @app.command("/injury")
