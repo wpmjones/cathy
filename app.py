@@ -417,7 +417,13 @@ async def tardy(ack, body, client):
             },
             "accessory": {
                 "type": "radio_buttons",
-                "initial_option": "normal",
+                "initial_option": {
+                        "text": {
+                            "type": "plain_text",
+                            "text": "Less than 30"
+                        },
+                        "value": "normal"
+                    },
                 "options": [
                     {
                         "text": {
