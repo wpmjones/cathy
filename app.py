@@ -551,7 +551,6 @@ async def process_tardy(tardy_name, tardy_type, user_id, user_name):
             ]
         }
     ]
-    logger.info(tardy_name)
     await client.chat_postMessage(channel=creds.test_channel,
                                   blocks=blocks,
                                   text=f"{tardy_name} was tardy on {now}.")
@@ -560,9 +559,10 @@ async def process_tardy(tardy_name, tardy_type, user_id, user_name):
         tardy_text += "a normal tardy. I recommend 1 point."
     else:
         tardy_text += "an excessive tardy.  Might I suggest 2 points?"
+    logger.info(tardy_text)
     blocks.insert(1, {"type": "section", "text": {"type": "mrkdwn", "text": tardy_text}})
     logger.info(blocks)
-    await client.chat_postMessage(channel=creds.pj_user_id,
+    await client.chat_postMessage(channel=creds.test_channel,
                                   blocks=blocks,
                                   text=f"{tardy_name} was tardy on {now}.")
 
