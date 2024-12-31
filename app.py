@@ -465,51 +465,51 @@ async def tardy_action_0(ack, body, respond):
     but I don't see a way for a single function to handle multiple action_id's"""
     await ack()
     logger.info(body)
-    tardy_type = "normal"  # view['state']['values']['block_tardy']['tardy_type']['selected_option']['value']
+    tardy_type = body['state']['values']['block_tardy']['tardy_type']['selected_option']['value']
     await respond({"delete_original": True})
     tardy_tm = body['actions'][0]['value']
     await process_tardy(tardy_tm, tardy_type, body['user']['id'], body['user']['name'])
 
 
 @app.action("tardy_id_1")
-async def tardy_action_1(ack, body, respond, view):
+async def tardy_action_1(ack, body, respond):
     """Respond to buttons in the /tardy comment. I don't want to repeat this function 5 times,
     but I don't see a way for a single function to handle multiple action_id's"""
     await ack()
-    tardy_type = view['state']['values']['block_tardy']['tardy_type']['selected_option']['value']
+    tardy_type = body['state']['values']['block_tardy']['tardy_type']['selected_option']['value']
     await respond({"delete_original": True})
     tardy_tm = body['actions'][0]['value']
     await process_tardy(tardy_tm, tardy_type, body['user']['id'], body['user']['name'])
 
 
 @app.action("tardy_id_2")
-async def tardy_action_2(ack, body, respond, view):
+async def tardy_action_2(ack, body, respond):
     """Respond to buttons in the /tardy comment. I don't want to repeat this function 5 times,
     but I don't see a way for a single function to handle multiple action_id's"""
     await ack()
-    tardy_type = view['state']['values']['block_tardy']['tardy_type']['selected_option']['value']
+    tardy_type = body['state']['values']['block_tardy']['tardy_type']['selected_option']['value']
     await respond({"delete_original": True})
     tardy_tm = body['actions'][0]['value']
     await process_tardy(tardy_tm, tardy_type, body['user']['id'], body['user']['name'])
 
 
 @app.action("tardy_id_3")
-async def tardy_action_3(ack, body, respond, view):
+async def tardy_action_3(ack, body, respond):
     """Respond to buttons in the /tardy comment. I don't want to repeat this function 5 times,
     but I don't see a way for a single function to handle multiple action_id's"""
     await ack()
-    tardy_type = view['state']['values']['block_tardy']['tardy_type']['selected_option']['value']
+    tardy_type = body['state']['values']['block_tardy']['tardy_type']['selected_option']['value']
     await respond({"delete_original": True})
     tardy_tm = body['actions'][0]['value']
     await process_tardy(tardy_tm, tardy_type, body['user']['id'], body['user']['name'])
 
 
 @app.action("tardy_id_4")
-async def tardy_action_4(ack, body, respond, view):
+async def tardy_action_4(ack, body, respond):
     """Respond to buttons in the /tardy comment. I don't want to repeat this function 5 times,
     but I don't see a way for a single function to handle multiple action_id's"""
     await ack()
-    tardy_type = view['state']['values']['block_tardy']['tardy_type']['selected_option']['value']
+    tardy_type = body['state']['values']['block_tardy']['tardy_type']['selected_option']['value']
     await respond({"delete_original": True})
     tardy_tm = body['actions'][0]['value']
     await process_tardy(tardy_tm, tardy_type, body['user']['id'], body['user']['name'])
