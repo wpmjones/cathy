@@ -553,6 +553,7 @@ async def process_tardy(tardy_name, tardy_type, user_id, user_name):
     else:
         tardy_text += "an excessive tardy.  Might I suggest 2 points?"
     blocks.insert(1, {"type": "section", "text": {"type": "mrkdwn", "text": tardy_text}})
+    logger.info(blocks)
     await client.chat_postMessage(channel=creds.pj_user_id,
                                   blocks=blocks,
                                   text=f"{tardy_name} was tardy on {now}.")
