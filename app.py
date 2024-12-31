@@ -392,7 +392,6 @@ async def tardy(ack, body, client):
     sheet = sh.worksheet("Staff")
     data = sheet.col_values(1)
     name_options = process.extractBests(tm_name, data, limit=5)
-    logger.info(name_options)
     if not name_options or name_options[0][1] < fuzzy_num:
         return await client.chat_postEphemeral(channel=body['channel_id'],
                                                user=body['user_id'],
@@ -446,7 +445,6 @@ async def tardy(ack, body, client):
             "elements": elements
         }
     ]
-    logger.info(blocks)
     await client.chat_postEphemeral(channel=body['channel_id'],
                                     user=body['user_id'],
                                     blocks=blocks,
@@ -464,7 +462,6 @@ async def tardy_action_0(ack, body, respond):
     """Respond to buttons in the /tardy comment. I don't want to repeat this function 5 times,
     but I don't see a way for a single function to handle multiple action_id's"""
     await ack()
-    logger.info(body)
     tardy_type = body['state']['values']['block_tardy']['tardy_type']['selected_option']['value']
     await respond({"delete_original": True})
     tardy_tm = body['actions'][0]['value']
@@ -557,7 +554,8 @@ async def process_tardy(tardy_name, tardy_type, user_id, user_name):
         tardy_text += "an excessive tardy.  Might I suggest 2 points?"
     blocks.insert(1, {"type": "section", "text": {"type": "mrkdwn", "text": tardy_text}})
     await client.chat_postMessage(channel=creds.pj_user_id,
-                                  text=tardy_text)
+                                  blocks=blocks,
+                                  text=f"{tardy_name} was tardy on {now}.")
 
 
 @app.command("/injury")
