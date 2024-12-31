@@ -460,12 +460,12 @@ async def update_tardy_modal(ack):
 
 
 @app.action("tardy_id_0")
-async def tardy_action_0(ack, body, respond, view):
+async def tardy_action_0(ack, body, respond):
     """Respond to buttons in the /tardy comment. I don't want to repeat this function 5 times,
     but I don't see a way for a single function to handle multiple action_id's"""
     await ack()
-    logger.info(view['state'])
-    tardy_type = view['state']['values']['block_tardy']['tardy_type']['selected_option']['value']
+    logger.info(body)
+    tardy_type = "normal"  # view['state']['values']['block_tardy']['tardy_type']['selected_option']['value']
     await respond({"delete_original": True})
     tardy_tm = body['actions'][0]['value']
     await process_tardy(tardy_tm, tardy_type, body['user']['id'], body['user']['name'])
