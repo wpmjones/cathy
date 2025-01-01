@@ -535,9 +535,9 @@ async def process_tardy(tardy_name, tardy_type, user_id, user_name):
                                       text=f"There was an error while storing the message to the Google Sheet.\n{e}")
     tardy_text = f"This tardy was "
     if tardy_type == "normal":
-        tardy_text += "a normal tardy. I recommend 1 point."
+        tardy_text = ":large_yellow_circle: " + tardy_text + "less than 30 minutes."
     else:
-        tardy_text += "an excessive tardy.  Might I suggest 2 points?"
+        tardy_text = ":red_circle: " + tardy_text + "an excessive tardy."
     blocks = [
         {
             "type": "section",
@@ -565,16 +565,13 @@ async def process_tardy(tardy_name, tardy_type, user_id, user_name):
     ]
     logger.info([blocks[0], blocks[2]])
     await client.chat_postMessage(channel=creds.sick_channel,
-                                  blocks=[blocks[0], blocks[2]],
+                                  blocks=blocks,
                                   text=f"{tardy_name} was tardy on {now}.")
-    # await client.chat_postMessage(channel=creds.pj_user_id,
-    #                               blocks=blocks,
-    #                               text=f"{tardy_name} was tardy on {now}.")
 
 
 @app.command("/injury")
 async def add_injury(ack, body, client):
-    """This ommand adds a report to the Sedgwick channel"""
+    """This command adds a report to the Sedgwick channel"""
     await ack()
     await client.views_open(
         trigger_id=body['trigger_id'],
