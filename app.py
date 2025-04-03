@@ -1074,10 +1074,9 @@ async def cater_add(ack, body, client, view):
             }
         ]
     new_row = sheet.append_row(to_post, value_input_option="USER_ENTERED")
-    # This is a hack because gspread doesn't tell respond with the new row number as an int
+    # This is a hack because gspread doesn't respond with the new row number as an int
     last_row = int(new_row['updates']['updatedRange'][-3:])
-    # Copy formulas for columns G & H - then sort
-    sheet.copy_range(f"G{last_row - 1}:H{last_row - 1}", f"G{last_row}:H{last_row}", paste_type="PASTE_FORMULA")
+    # Sort sheet
     sheet.sort((1, "asc"), (2, "asc"))
     # Notify user of completion
     await client.chat_postMessage(channel=creds.cater_channel,
