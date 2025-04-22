@@ -2556,7 +2556,7 @@ async def waste_view(ack, body, client):
     # if len(errors) > 0:
     #     return await ack(response_action="errors", errors=errors)
     await ack()
-    # logger.info("Temp info approved. Start waste view process...")
+    logger.info("Start waste view process...")
     # message_ts = view['blocks'][-1]['elements'][0]['text']
     # Retrieve leaders from Staff Google Sheet
     sheet = staff_spreadsheet.worksheet("Leaders")
