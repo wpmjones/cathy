@@ -399,6 +399,7 @@ async def tardy(ack, body, client):
     elements = []
     for count, option in enumerate(name_options):
         if option[1] > fuzzy_num:
+            logger.info(f"Option: {option[0]} tardy_id_{count}")
             elements.append(
                 {
                     "type": "button",
@@ -469,6 +470,7 @@ async def tardy_action_0(ack, body, respond):
     """Respond to buttons in the /tardy comment. I don't want to repeat this function 5 times,
     but I don't see a way for a single function to handle multiple action_id's"""
     await ack()
+    logger.info("tardy process ack")
     tardy_type = body['state']['values']['block_tardy']['tardy_type']['selected_option']['value']
     await respond({"delete_original": True})
     tardy_tm = body['actions'][0]['value']
