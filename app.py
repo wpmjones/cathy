@@ -228,6 +228,16 @@ async def pull_notes(user_loc):
     return temp_blocks
 
 
+@app.event()
+async def verify(event):
+    """Used only to verify new IP address at
+    https://api.slack.com/apps/A01NUGS5YNB/event-subscriptions?"""
+    if "challenge" in event:
+        logger.info("New IP address for event subscription.")
+        return event['challenge']
+
+
+
 @app.event(event={"type": "message", "subtype": "message_deleted"})
 async def log_message_delete(event):
     logger.info(event)
