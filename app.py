@@ -228,7 +228,7 @@ async def pull_notes(user_loc):
     return temp_blocks
 
 
-@app.event()
+@app.event("url_verification")
 async def verify(event):
     """Used only to verify new IP address at
     https://api.slack.com/apps/A01NUGS5YNB/event-subscriptions?"""
