@@ -170,7 +170,7 @@ def check_cem():
             "channel_id": creds.test_channel,
             "initial_comment": content
         }
-        reqeusts.post(close_url, headers=headers, json=close_data)
+        requests.post(close_url, headers=headers, json=close_data)
     # r = requests.post(creds.webhook_test, json={"text": content})
     # if r.status_code != 200:
     #     raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
