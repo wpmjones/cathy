@@ -153,27 +153,45 @@ def check_cem():
             buffer = 1
         content += f"{key}{' ' * (25 - len(key))}{' ' * buffer}{value}%\n"
     content += "```"
-    r = requests.post(creds.webhook_test, json={"text": content})
-    if r.status_code != 200:
-        raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
-                         f"The response is: {r.text}")
+    file_size = os.path.getsize("plot.png")
+    get_url = "https://slack.com/api/files.getUploadURLExternal"
+    close_url = "https://slack.com/api/files.completeUploadExternal"
+    headers = {"Authorization": f"Bearer {creds.bot_token}"}
+    data = {"filename": "plot.png", "length": file_size}
+    r = requests.post(get_url, headers=headers, data=data)
+    r_data = r.json()
+    upload_url = r_data.get('upload_url')
+    file_id = r_data.get('file_id')
+    with open("plot.png", "rb") as image_file:
+        files = {"file": (os.path.basename("plot.png"), image_file, "image/png")}
+        r = requests.post(upload_url, files=files, json={"filename": "plot.png"})
+        close_data = {
+            "files": [{"id": file_id, "title": "plot.png"}]
+            "channel_id": creds.test_channel,
+            "initial_comment": content
+        }
+        reqeusts.post(close_url, headers=headers, json=close_data)
+    # r = requests.post(creds.webhook_test, json={"text": content})
+    # if r.status_code != 200:
+    #     raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
+    #                      f"The response is: {r.text}")
     # Post image chart to Slack
-    try:
-        with open("plot.png", "rb") as image_file:
-            files = {"file": (os.path.basename("plot.png"), image_file, "image/png")}
-            data = {
-                "token": creds.bot_token,
-                "channels": creds.test_channel,
-                "initial_comment": "CEM Chart"
-            }
-            r = requests.post("https://slack.com/api/files.upload", files=files, data=data)
-            logger.info(r)
-    except FileNotFoundError:
-        logger.error(f"Error: Image file not found at '{image_path}'.")
-    except requests.exceptions.RequestException as e:
-        logger.error(f"An error occurred during the HTTP request: {e}")
-    except Exception as e:
-        logger.error(f"An unexpected error occurred: {e}")
+    # try:
+    #     with open("plot.png", "rb") as image_file:
+            
+    #         data = {
+    #             "token": creds.bot_token,
+    #             "channels": creds.test_channel,
+    #             "initial_comment": "CEM Chart"
+    #         }
+    #         r = requests.post("https://slack.com/api/files.upload", files=files, data=data)
+    #         logger.info(r)
+    # except FileNotFoundError:
+    #     logger.error(f"Error: Image file not found at '{image_path}'.")
+    # except requests.exceptions.RequestException as e:
+    #     logger.error(f"An error occurred during the HTTP request: {e}")
+    # except Exception as e:
+    #     logger.error(f"An unexpected error occurred: {e}")
 
 
 def check_allocation():
