@@ -166,7 +166,7 @@ def check_cem():
         files = {"file": (os.path.basename("plot.png"), image_file, "image/png")}
         r = requests.post(upload_url, files=files, json={"filename": "plot.png"})
         close_data = {
-            "files": [{"id": file_id, "title": "plot.png"}]
+            "files": [{"id": file_id, "title": "plot.png"}],
             "channel_id": creds.test_channel,
             "initial_comment": content
         }
