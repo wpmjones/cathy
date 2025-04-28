@@ -145,7 +145,7 @@ def check_cem():
     # OLD - ftp = ftplib.FTP(creds.ftp_host, creds.ftp_user, creds.ftp_password)
     # OLD _ ftp.encoding = "utf-8"
     # Upload file to CFAVegas Google Drive
-    new_image = upload_png_to_drive("plot.png", creds.cem_images_id, creds.gspread)
+    new_image = upload_png_to_drive("plot.png")
     # post content to Slack
     content = f"*CEM Scores*\n```"
     cur_scores = cem_data[-1]
