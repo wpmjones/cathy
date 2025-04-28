@@ -142,21 +142,6 @@ def check_cem():
     data.plot(x="Date", y=categories, title="CEM Scores (Last 30 days)", xlabel="Date")
     plt.legend(categories, loc="upper left")
     plt.savefig(fname="plot")
-    try:
-        with open("plot.png", "rb") as image_file:
-            files = {"file": (os.path.basename("plot.png"), image_file, "image/png")}
-            data = {
-                "token": creds.bot_token,
-                "channels": creds.test_channel,
-            }
-            r = requests.post("https://slack.com/api/files.upload", files=files, data=data)
-            logger.info(r)
-    except FileNotFoundError:
-        logger.error(f"Error: Image file not found at '{image_path}'.")
-    except requests.exceptions.RequestException as e:
-        logger.error(f"An error occurred during the HTTP request: {e}")
-    except Exception as e:
-        logger.error(f"An unexpected error occurred: {e}")
     # post content to Slack
     content = f"*CEM Scores*\n```"
     cur_scores = cem_data[-1]
@@ -172,6 +157,23 @@ def check_cem():
     if r.status_code != 200:
         raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
                          f"The response is: {r.text}")
+    # Post image chart to Slack
+    try:
+        with open("plot.png", "rb") as image_file:
+            files = {"file": (os.path.basename("plot.png"), image_file, "image/png")}
+            data = {
+                "token": creds.bot_token,
+                "channels": creds.test_channel,
+                "initial_comment": "CEM Chart"
+            }
+            r = requests.post("https://slack.com/api/files.upload", files=files, data=data)
+            logger.info(r)
+    except FileNotFoundError:
+        logger.error(f"Error: Image file not found at '{image_path}'.")
+    except requests.exceptions.RequestException as e:
+        logger.error(f"An error occurred during the HTTP request: {e}")
+    except Exception as e:
+        logger.error(f"An unexpected error occurred: {e}")
 
 
 def check_allocation():
