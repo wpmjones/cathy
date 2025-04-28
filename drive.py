@@ -5,6 +5,7 @@ import creds
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload
+from loguru import logger
 
 def upload_png_to_drive(
     image_path: str,
@@ -80,9 +81,9 @@ def upload_png_to_drive(
         if files:
             for file in files:
                 service.files().delete(fileId=file["id"]).execute()
-                print(f"File with name '{file_name}' already exists. Deleted existing file (ID: {file['id']}).")
+                logger.info(f"File with name '{file_name}' already exists. Deleted existing file (ID: {file['id']}).")
     except Exception as e:
-         print(f"Error checking and/or deleting existing file: {e}")
+         logger.error(f"Error checking and/or deleting existing file: {e}")
 
     # Upload the file
     try:
@@ -91,12 +92,12 @@ def upload_png_to_drive(
             .create(body=file_metadata, media_body=media, fields="id,webViewLink")
             .execute()
         )
-        print(f"File uploaded successfully. File ID: {file.get('id')}")
+        logger.info(f"File uploaded successfully. File ID: {file.get('id')}\nLink: {file.get('webViewLink')}")
         # Set permission to allow anyone with the link to view the image
         permission = {"role": "reader", "type": "anyone"}
         service.permission().create(fileId=file_id, body=permission).execute()
         return file.get("webViewLink")
     except Exception as e:
-        print(f"Error uploading file: {e}")
+        logger.error(f"Error uploading file: {e}")
         return None
 
