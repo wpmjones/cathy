@@ -64,6 +64,7 @@ def upload_png_to_drive(
             media = MediaIoBaseUpload(
                 image_file, mimetype=mime_type, resumable=True
             )
+            logger.info(type(media))
     except Exception as e:
         raise Exception(f"Error creating media upload object: {e}")
 
