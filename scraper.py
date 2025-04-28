@@ -142,8 +142,6 @@ def check_cem():
     data.plot(x="Date", y=categories, title="CEM Scores (Last 30 days)", xlabel="Date")
     plt.legend(categories, loc="upper left")
     plt.savefig(fname="plot")
-    with open("plot.png", "rb") as image_file:
-        files = {"file": (os.path.basename(image_file), "image/png")}  
     # post content to Slack
     content = f"*CEM Scores*\n```"
     cur_scores = cem_data[-1]
@@ -157,7 +155,9 @@ def check_cem():
     content += "```"
     r = requests.post(creds.webhook_announce, json={"text": content})
     if r.status_code == 200:
-        requests.post(creds.webhook_announce, files=files, data={})
+        with open("plot.png", "rb") as image_file:
+            files = {"file": (os.path.basename(image_file), "image/png")}  
+            requests.post(creds.webhook_announce, files=files, data={})
     else:
         raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
                          f"The response is: {r.text}")
