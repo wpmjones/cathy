@@ -167,7 +167,7 @@ def check_cem():
         r = requests.post(upload_url, files=files, json={"filename": "plot.png"})
         close_data = {
             "files": [{"id": file_id, "title": "CEM Update Chart"}],
-            "channel_id": creds.test_channel,
+            "channel_id": creds.announce_channel,
             "initial_comment": content
         }
         requests.post(close_url, headers=headers, json=close_data)
