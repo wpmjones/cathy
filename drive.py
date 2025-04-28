@@ -9,7 +9,7 @@ from googleapiclient.http import MediaIoBaseUpload
 def upload_png_to_drive(
     image_path: str,
     drive_folder_id: str = None,
-    service_account_path: str) -> str:
+    service_account_path: str = creds.gspread) -> str:
     """
     Uploads a PNG image to Google Drive using a service account.
 
