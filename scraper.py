@@ -4,6 +4,7 @@ import email
 import ftplib
 import gspread
 import matplotlib.pyplot as plt
+import os
 import pandas as pd
 import quopri
 import re
