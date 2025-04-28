@@ -156,7 +156,7 @@ def check_cem():
     r = requests.post(creds.webhook_announce, json={"text": content})
     if r.status_code == 200:
         with open("plot.png", "rb") as image_file:
-            files = {"file": (os.path.basename(image_file), "image/png")}  
+            files = {"file": (os.path.basename("plot.png"), image_file, "image/png")}  
             requests.post(creds.webhook_announce, files=files, data={})
     else:
         raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
