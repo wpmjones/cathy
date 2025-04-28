@@ -142,6 +142,21 @@ def check_cem():
     data.plot(x="Date", y=categories, title="CEM Scores (Last 30 days)", xlabel="Date")
     plt.legend(categories, loc="upper left")
     plt.savefig(fname="plot")
+    try:
+        with open("plot.png", "rb") as image_file:
+            files = {"file": (os.path.basename("plot.png"), image_file, "image/png")}
+            data = {
+                "token": creds.bot_token,
+                "channels": creds.test_channel,
+            }
+        r = resquests.post("https://slack.com/api/files.upload", files=files, data=data)
+        logger.info(r)
+    except FileNotFoundError:
+        logger.error(f"Error: Image file not found at '{image_path}'.")
+    except requests.exceptions.RequestException as e:
+        logger.error(f"An error occurred during the HTTP request: {e}")
+    except Exception as e:
+        logger.error(f"An unexpected error occurred: {e}")
     # post content to Slack
     content = f"*CEM Scores*\n```"
     cur_scores = cem_data[-1]
@@ -153,12 +168,8 @@ def check_cem():
             buffer = 1
         content += f"{key}{' ' * (25 - len(key))}{' ' * buffer}{value}%\n"
     content += "```"
-    r = requests.post(creds.webhook_announce, json={"text": content})
-    if r.status_code == 200:
-        with open("plot.png", "rb") as image_file:
-            files = {"file": (os.path.basename("plot.png"), image_file, "image/png")}  
-            requests.post(creds.webhook_announce, files=files, data={})
-    else:
+    r = requests.post(creds.webhook_test, json={"text": content})
+    if r.status_code != 200:
         raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
                          f"The response is: {r.text}")
 
