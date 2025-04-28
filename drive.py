@@ -64,41 +64,41 @@ def upload_png_to_drive(
             media = MediaIoBaseUpload(
                 image_file, mimetype=mime_type, resumable=True
             )
-            logger.info(type(media))
+
+            # Check if a file with the same name exists and delete it
+            try:
+                query = f"name='{file_name}'"
+                if drive_folder_id:
+                    query += f" and '{drive_folder_id}' in parents"
+                results = (
+                    service.files()
+                    .list(q=query, fields="files(id)")
+                    .execute()
+                )
+                files = results.get("files", [])
+                if files:
+                    for file in files:
+                        service.files().delete(fileId=file["id"]).execute()
+                        logger.info(f"File with name '{file_name}' already exists. Deleted existing file (ID: {file['id']}).")
+            except Exception as e:
+                logger.error(f"Error checking and/or deleting existing file: {e}")
+
+            # Upload the file
+            try:
+                file = (
+                    service.files()
+                    .create(body=file_metadata, media_body=media, fields="id,webViewLink")
+                    .execute()
+                )
+                logger.info(f"File uploaded successfully. File ID: {file.get('id')}\nLink: {file.get('webViewLink')}")
+                # Set permission to allow anyone with the link to view the image
+                permission = {"role": "reader", "type": "anyone"}
+                service.permission().create(fileId=file_id, body=permission).execute()
+                return file.get("webViewLink")
+            except Exception as e:
+                logger.error(f"Error uploading file: {e}")
+                return None
+
     except Exception as e:
         raise Exception(f"Error creating media upload object: {e}")
-
-    # Check if a file with the same name exists and delete it
-    try:
-        query = f"name='{file_name}'"
-        if drive_folder_id:
-            query += f" and '{drive_folder_id}' in parents"
-        results = (
-            service.files()
-            .list(q=query, fields="files(id)")
-            .execute()
-        )
-        files = results.get("files", [])
-        if files:
-            for file in files:
-                service.files().delete(fileId=file["id"]).execute()
-                logger.info(f"File with name '{file_name}' already exists. Deleted existing file (ID: {file['id']}).")
-    except Exception as e:
-         logger.error(f"Error checking and/or deleting existing file: {e}")
-
-    # Upload the file
-    try:
-        file = (
-            service.files()
-            .create(body=file_metadata, media_body=media, fields="id,webViewLink")
-            .execute()
-        )
-        logger.info(f"File uploaded successfully. File ID: {file.get('id')}\nLink: {file.get('webViewLink')}")
-        # Set permission to allow anyone with the link to view the image
-        permission = {"role": "reader", "type": "anyone"}
-        service.permission().create(fileId=file_id, body=permission).execute()
-        return file.get("webViewLink")
-    except Exception as e:
-        logger.error(f"Error uploading file: {e}")
-        return None
 
