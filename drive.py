@@ -90,10 +90,10 @@ def upload_png_to_drive(
                     .create(body=file_metadata, media_body=media, fields="id,webViewLink")
                     .execute()
                 )
-                logger.info(f"File uploaded successfully. File ID: {file.get('id')}\nLink: {file.get('webViewLink')}")
+                logger.info(f"File uploaded successfully.\nFile ID: {file.get('id')}\nLink: {file.get('webViewLink')}")
                 # Set permission to allow anyone with the link to view the image
                 permission = {"role": "reader", "type": "anyone"}
-                service.permission().create(fileId=file_id, body=permission).execute()
+                service.permission().create(fileId=file.get('id'), body=permission).execute()
                 return file.get("webViewLink")
             except Exception as e:
                 logger.error(f"Error uploading file: {e}")
