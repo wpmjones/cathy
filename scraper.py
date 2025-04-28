@@ -9,6 +9,7 @@ import quopri
 import re
 import requests
 
+from drive import upload_png_to_drive
 from loguru import logger
 
 logger.add("scraper.log", rotation="1 week")
@@ -131,8 +132,6 @@ def check_cater():
 
 def check_cem():
     """Look at gmail to find CEM email and report findings"""
-    current_month = datetime.datetime.now().month
-    current_date = datetime.datetime.now().day
     # Google Sheet work
     sh = gc.open_by_key(creds.cem_id)
     daily = sh.worksheet("Daily")
@@ -143,11 +142,10 @@ def check_cem():
     data.plot(x="Date", y=categories, title="CEM Scores (Last 30 days)", xlabel="Date")
     plt.legend(categories, loc="upper left")
     plt.savefig(fname="plot")
-    ftp = ftplib.FTP(creds.ftp_host, creds.ftp_user, creds.ftp_password)
-    ftp.encoding = "utf-8"
-    filename = f"images/plot_{current_month}_{current_date}.png"
-    with open("plot.png", "rb") as file:
-        ftp.storbinary(f"STOR {filename}", file)
+    # OLD - ftp = ftplib.FTP(creds.ftp_host, creds.ftp_user, creds.ftp_password)
+    # OLD _ ftp.encoding = "utf-8"
+    # Upload file to CFAVegas Google Drive
+    new_image = upload_png_to_drive("plot.png", creds.cem_images_id, creds.gspread)
     # post content to Slack
     content = f"*CEM Scores*\n```"
     cur_scores = cem_data[-1]
@@ -168,7 +166,7 @@ def check_cem():
             {
                 "type": "image",
                 "title": {"type": "plain_text", "text": "CEM Update Chart"},
-                "image_url": f"http://www.mayodev.com/images/plot_{current_month}_{current_date}.png",
+                "image_url": new_image,
                 "alt_text": "CEM Update Chart"
             }
         ]
