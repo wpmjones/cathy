@@ -9,7 +9,6 @@ import quopri
 import re
 import requests
 
-from drive import upload_png_to_drive
 from loguru import logger
 
 logger.add("scraper.log", rotation="1 week")
@@ -142,10 +141,8 @@ def check_cem():
     data.plot(x="Date", y=categories, title="CEM Scores (Last 30 days)", xlabel="Date")
     plt.legend(categories, loc="upper left")
     plt.savefig(fname="plot")
-    # OLD - ftp = ftplib.FTP(creds.ftp_host, creds.ftp_user, creds.ftp_password)
-    # OLD _ ftp.encoding = "utf-8"
-    # Upload file to CFAVegas Google Drive
-    new_image = upload_png_to_drive("plot.png")
+    with open("plot.png", "rb") as image_file:
+        files = {"file": (os.path.basename(image_file), "image/png")}  
     # post content to Slack
     content = f"*CEM Scores*\n```"
     cur_scores = cem_data[-1]
@@ -157,23 +154,10 @@ def check_cem():
             buffer = 1
         content += f"{key}{' ' * (25 - len(key))}{' ' * buffer}{value}%\n"
     content += "```"
-    payload = {
-        "blocks": [
-            {
-                "type": "section",
-                "text": {"type": "mrkdwn", "text": content}
-            },
-            {
-                "type": "image",
-                "title": {"type": "plain_text", "text": "CEM Update Chart"},
-                "image_url": "http://www.mayodev.com/images/plot_4_28.png", # new_image,
-                "alt_text": "CEM Update Chart"
-            }
-        ]
-    }
-    logger.info(payload)
-    r = requests.post(creds.webhook_announce, json=payload)
-    if r.status_code != 200:
+    r = requests.post(creds.webhook_announce, json={"text": content})
+    if r.status_code == 200:
+        requests.post(creds.webhook_announce, files=files, data={})
+    else:
         raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
                          f"The response is: {r.text}")
 
