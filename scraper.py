@@ -146,7 +146,6 @@ def check_cem():
     # OLD _ ftp.encoding = "utf-8"
     # Upload file to CFAVegas Google Drive
     new_image = upload_png_to_drive("plot.png")
-    logger.info(type(new_image))
     # post content to Slack
     content = f"*CEM Scores*\n```"
     cur_scores = cem_data[-1]
@@ -167,7 +166,7 @@ def check_cem():
             {
                 "type": "image",
                 "title": {"type": "plain_text", "text": "CEM Update Chart"},
-                "image_url": new_image,
+                "image_url": "http://www.mayodev.com/images/plot_4_28.png", # new_image,
                 "alt_text": "CEM Update Chart"
             }
         ]
