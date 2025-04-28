@@ -172,6 +172,7 @@ def check_cem():
             }
         ]
     }
+    logger.info(payload)
     r = requests.post(creds.webhook_announce, json=payload)
     if r.status_code != 200:
         raise ValueError(f"Request to Slack returned an error {r.status_code}\n"
