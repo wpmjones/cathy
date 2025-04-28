@@ -149,7 +149,7 @@ def check_cem():
                 "token": creds.bot_token,
                 "channels": creds.test_channel,
             }
-        r = resquests.post("https://slack.com/api/files.upload", files=files, data=data)
+        r = requests.post("https://slack.com/api/files.upload", files=files, data=data)
         logger.info(r)
     except FileNotFoundError:
         logger.error(f"Error: Image file not found at '{image_path}'.")
