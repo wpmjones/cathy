@@ -107,17 +107,16 @@ async def order_view(ack, body, client):
 		}
     ]
     logger.info("Blocks ready. Open view.")
-    try:
-        await client.views_open(
-            trigger_id=body['trigger_id'],
-            view={
-                "type": "modal",
-                "callback_id": "order_view",
-                "title": {"type": "plain_text", "text": "Order Form"},
-                "submit": {"type": "plain_text", "text": "Order"},
-                "blocks": blocks
-            }
-        )
+    await client.views_open(
+        trigger_id=body['trigger_id'],
+        view={
+            "type": "modal",
+            "callback_id": "order_view",
+            "title": {"type": "plain_text", "text": "Order Form"},
+            "submit": {"type": "plain_text", "text": "Order"},
+            "blocks": blocks
+        }
+    )
 
 
 @app.command("/loomis")
