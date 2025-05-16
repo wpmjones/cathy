@@ -42,6 +42,9 @@ CHANNEL_TESTING = "G01QADSDVDW"
 CHANNEL_BORROW = "C01BUADKHLK"
 CHANNEL_SEDGWICK = "C059TU4SYR2"
 
+# Global variables
+order_message = ""
+
 
 # look for whitespace in string
 # I'm not currently using this function. I honestly can't remember what I was using for, but if I
@@ -78,11 +81,11 @@ async def cathy_help(ack, say):
 
 
 @app.block_action("order_form")
-async def order_view(ack, body, client):
+async def order_view(ack, body, client, event):
     """Open the order form for data entry"""
     await ack()
     logger.info("Start order form view process...")
-    logger.info(body)
+    logger.info(event)
     blocks = [
         {
             "type": "input",
@@ -117,6 +120,15 @@ async def order_view(ack, body, client):
             "blocks": blocks
         }
     )
+
+
+@app.view("order_view")
+async def handle_order_view(ack, body, client, view):
+    """Process input from order form and update original message. This is 
+    a view handler forthe previous function. It takes the information you 
+    provide in the form and processes it."""
+    logger.info("Processing order input...")
+
 
 
 @app.command("/loomis")

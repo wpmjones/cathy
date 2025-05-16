@@ -15,8 +15,7 @@ def main():
 
     icon = f":{random.choice(ICONS)}:"
     order_text = (
-                    f"{icon} It's Tactical Tummy Time.  Click *Order* to let " 
-                    f"us know what you'd like."
+                    f"{icon} It's Tactical Tummy Time."
                 )
 
     blocks = [
