@@ -14,6 +14,10 @@ def main():
     webhook_url = creds.webhook_test
 
     icon = f":{random.choice(ICONS)}:"
+    order_text = (
+                    f"{icon} It's Tactical Tummy Time.  Click *Order* to let " 
+                    f"us know what you'd like."
+                )
 
     blocks = [
         {
@@ -21,15 +25,12 @@ def main():
             "block_id": "section_header",
             "text": {
                 "type": "mrkdwn",
-                "text": (
-                    f"{icon} It's Tactical Tummy Time.  Click *Order* to let " 
-                    f"us know what you'd like."
-                )
+                "text": order_text
             }
         },
         {
             "type": "actions",
-            "blcok_id": "action_block",
+            "block_id": "action_block",
             "elements": [
                 {
                     "type": "button",
@@ -43,6 +44,8 @@ def main():
             ]
         }
     ]
+
+    logger.info(blocks)
 
     payload = {
         "text": "Time to order food!",
