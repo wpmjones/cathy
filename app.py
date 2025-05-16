@@ -83,6 +83,7 @@ async def cathy_help(ack, say):
 @app.block_action("order_form")
 async def order_view(ack, body, client, event):
     """Open the order form for data entry"""
+    global order_info
     await ack()
     logger.info("Start order form view process...")
     order_info = body['container']
@@ -128,13 +129,56 @@ async def handle_order_view(ack, body, client, view):
     """Process input from order form and update original message. This is 
     a view handler forthe previous function. It takes the information you 
     provide in the form and processes it."""
+    global order_info
     logger.info("Processing order input...")
-    logger.info(f"in handler{order_info}")
-    logger.info(view)
     user = await client.users_info(user=body['user']['id'])
     user_name = user['user']['real_name'].split(" ", 1)[0].title()
     food_item = view['state']['values']['input_food_item']['food_item']['value']
     await ack()
+    blocks = [
+        {
+            "type": "section",
+            "block_id": "section_header",
+            "text": {
+                "type": "mrkdwn",
+                "text": ":poultry_leg: It's Tactical Tummy Time."
+            }
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": f"*{food_item}*"
+            },
+            "accessory": {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "emoji": true,
+                    "text": "Cancel"
+                },
+                "value": f"cancel_{body['body']['id']}"
+            }
+        },
+        {
+            "type": "actions",
+            "block_id": "action_block",
+            "elements": [
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Order"
+                    },
+                    "value": "button_order",
+                    "action_id": "order_form"
+                }
+            ]
+        }
+    ]
+    await client.chat_update(channel=order_info['channel_id'],
+                             ts=order_info['message_ts'],
+                             blocks=blocks)
 
 
 @app.command("/loomis")
