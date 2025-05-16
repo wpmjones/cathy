@@ -154,7 +154,6 @@ async def handle_order_view(ack, body, client, view):
                 "type": "button",
                 "text": {
                     "type": "plain_text",
-                    "emoji": true,
                     "text": "Cancel"
                 },
                 "value": f"cancel_{body['body']['id']}"
