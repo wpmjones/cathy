@@ -49,7 +49,7 @@ def main():
         "blocks": blocks
     }
 
-    r = requests.psot(webhook_url, json=payload)
+    r = requests.post(webhook_url, json=payload)
     if r.status_code != 200:
         raise ValueError(f"Request to Slack returned an error {r.status_code}"
                          f"\nThe response is: {r.text}")
