@@ -43,7 +43,7 @@ CHANNEL_BORROW = "C01BUADKHLK"
 CHANNEL_SEDGWICK = "C059TU4SYR2"
 
 # Global variables
-order_message = ""
+order_info = {}
 
 
 # look for whitespace in string
@@ -85,7 +85,8 @@ async def order_view(ack, body, client, event):
     """Open the order form for data entry"""
     await ack()
     logger.info("Start order form view process...")
-    logger.info(event)
+    order_info = body['container']
+    logger.info(order_info)
     blocks = [
         {
             "type": "input",
@@ -128,7 +129,12 @@ async def handle_order_view(ack, body, client, view):
     a view handler forthe previous function. It takes the information you 
     provide in the form and processes it."""
     logger.info("Processing order input...")
-
+    logger.info(f"in handler{order_info}")
+    logger.info(view)
+    user = await client.users_info(user=body['user']['id'])
+    user_name = user['user']['real_name'].split(" ", 1)[0].title()
+    food_item = view['state']['values']['input_food_item']['food_item']['value']
+    await ack()
 
 
 @app.command("/loomis")
