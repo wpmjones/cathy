@@ -77,6 +77,49 @@ async def cathy_help(ack, say):
               "`/help` List these commands")
 
 
+@app.block_action("order_form")
+async def order_view(ack, body, client):
+    """Open the order form for data entry"""
+    await ack()
+    logger.info("Start order form view process...")
+    logger.info(body)
+    blocks = [
+        {
+            "type": "input",
+            "block_id": "input_food_item",
+            "label": {"type": "plain_text", "text": "What would you like?"},
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "food_item",
+                "placeholder": {
+                    "type": "plain_text",
+                    "text": "Example: Egg White Grill + Hashbrowns"
+                }
+            }
+        },
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": ("If you want multiple items, put them on the same 
+                        "line.\nFor example *Spicy Biscuit + Fruit Cup*.")
+			}
+		}
+    ]
+    logger.info("Blocks ready. Open view.")
+    try:
+        await client.views_open(
+            trigger_id=body['trigger_id'],
+            view={
+                "type": "modal",
+                "callback_id": "order_view",
+                "title": {"type": "plain_text", "text": "Order Form"},
+                "submit": {"type": "plain_text", "text": "Order"},
+                "blocks": blocks
+            }
+        )
+
+
 @app.command("/loomis")
 async def loomis(ack, body, say):
     """Notifies the team that a manual deposit is prepared for Loomis."""
