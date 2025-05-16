@@ -174,10 +174,12 @@ async def handle_order_view(ack, body, client, view):
                 }
             ]
         }
-    ]
-    await client.chat_update(channel=order_info['channel_id'],
-                             ts=order_info['message_ts'],
-                             blocks=blocks)
+    try:
+        await client.chat_update(channel=order_info['channel_id'],
+                                 ts=order_info['message_ts'],
+                                 blocks=blocks)
+    except SlackApiError as e:
+        logger.exception(f"Message update failed: {e}")
 
 
 @app.command("/loomis")
