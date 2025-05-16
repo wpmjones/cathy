@@ -156,7 +156,7 @@ async def handle_order_view(ack, body, client, view):
                     "type": "plain_text",
                     "text": "Cancel"
                 },
-                "value": f"cancel_{body['body']['id']}"
+                "value": f"cancel_{body['user']['id']}"
             }
         },
         {
