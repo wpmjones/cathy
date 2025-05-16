@@ -4,9 +4,9 @@ import requests
 
 from loguru import logger
 
-ICONS = [bread, bagel, pancakes, pizza, waffle, hamburger, fries, cooking,
-         green_salad, burrito, poultry_leg, popcorn, fried_shrimp, lobster, 
-        ramen, doughnut, cookie, sushi]
+ICONS = ["bread", "bagel", "pancakes", "pizza", "waffle", "hamburger", "fries",
+         "cooking", "green_salad", "burrito", "poultry_leg", "popcorn", 
+        "fried_shrimp", "lobster", "ramen", "doughnut", "cookie", "sushi"]
 
 
 def main():
